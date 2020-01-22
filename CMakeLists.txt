@@ -156,6 +156,8 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+add_subdirectory(external)
+
 set(LINK_THREADS Threads::Threads)
 if(STATIC_LINK_VW)
   if(APPLE)
@@ -171,8 +173,8 @@ if(STATIC_LINK_VW)
 endif()
 
 # Align and foreach are also required, for some reason they can't be specified as components though.
-find_package(Boost REQUIRED COMPONENTS program_options system thread unit_test_framework)
-find_package(ZLIB REQUIRED)
+# find_package(Boost REQUIRED COMPONENTS program_options system thread unit_test_framework)
+# find_package(ZLIB REQUIRED)
 
 # This provides the variables such as CMAKE_INSTALL_LIBDIR for installation paths.
 include(GNUInstallDirs)
