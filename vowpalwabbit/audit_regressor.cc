@@ -57,7 +57,7 @@ inline void audit_regressor_feature(audit_regressor_data& dat, const float, cons
   std::string ns_pre1;
   if(!ns_pre1.empty())
   {
-    throw 1;`
+    throw 1;
   }
 
   std::string ns_pre;
