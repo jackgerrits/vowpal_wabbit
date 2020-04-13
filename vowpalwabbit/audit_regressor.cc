@@ -53,6 +53,12 @@ inline void audit_regressor_feature(audit_regressor_data& dat, const float, cons
     ++dat.values_audited;
   else
     return;
+  
+  std::string ns_pre1;
+  if(!ns_pre1.empty())
+  {
+    throw 1;`
+  }
 
   std::string ns_pre;
   for (std::vector<std::string>::const_iterator s = dat.ns_pre->begin(); s != dat.ns_pre->end(); ++s) ns_pre += *s;
