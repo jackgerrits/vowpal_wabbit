@@ -138,34 +138,6 @@ BOOST_AUTO_TEST_CASE(slates_cache_shared_label)
   p.parse_name.delete_v();
 }
 
-BOOST_AUTO_TEST_CASE(slates_cache_action_label)
-{
-  io_buf io;
-
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-  p.words = v_init<VW::string_view>();
-  p.parse_name = v_init<VW::string_view>();
-
-  auto lp = slates::slates_label_parser;
-  auto label = scoped_calloc_or_throw<slates::label>();
-  parse_label(lp, &p, "slates action 5", *label.get());
-  lp.cache_label(label.get(), io);
-  io.space.end() = io.head;
-  io.head = io.space.begin();
-
-  auto uncached_label = scoped_calloc_or_throw<slates::label>();
-  lp.default_label(uncached_label.get());
-  lp.read_cached_label(nullptr, uncached_label.get(), io);
-
-  BOOST_CHECK_EQUAL(uncached_label->type, slates::example_type::action);
-  BOOST_CHECK_EQUAL(uncached_label->labeled, false);
-  BOOST_CHECK_EQUAL(uncached_label->slot_id, 5);
-  lp.delete_label(label.get());
-  lp.delete_label(uncached_label.get());
-  p.words.delete_v();
-  p.parse_name.delete_v();
-}
-
 
 BOOST_AUTO_TEST_CASE(slates_cache_slot_label)
 {
