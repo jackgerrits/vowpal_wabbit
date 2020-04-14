@@ -16,8 +16,7 @@ void print_action_score(int f, v_array<action_score>& a_s, v_array<char>& tag)
   {
     std::stringstream ss;
 
-    for (size_t i = 0; i < a_s.size(); i++)
-    {
+    for (size_t i = 0; i < a_s.size(); i++) {
       if (i > 0)
         ss << ',';
       ss << a_s[i].action << ':' << a_s[i].score;
