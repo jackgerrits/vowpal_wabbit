@@ -14,7 +14,7 @@ void print_action_score(int f, v_array<action_score>& a_s, v_array<char>& tag)
 {
   if (f >= 0)
   {
-    std::stringstream ss;;;
+    std::stringstream ss;;;;
 
     for (size_t i = 0; i < a_s.size(); i++) {
       if (i > 0)
