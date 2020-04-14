@@ -1,0 +1,26 @@
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check_format:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      - name: Run clang-format check
+        run: git clang-format --commit ${{ github.base_ref }} --diff diff_file.txt
+      - name: Check if there are unformatted changes
+        shell: bash
+        run: |
+          num_of_lines=$(wc -l "diff_file.txt")
+          if (( num_of_lines > 2 )); then
+            echo "There are unformatted changes in the file."
+            echo "Run 'git clang-format --commit ${{ github.base_ref }}' to fix"
+            cat diff_file.txt
+            exit(1)
+          else
+            exit(0)
+          fi
