@@ -18,6 +18,7 @@ else()
 endif()
 
 add_library(vw_io STATIC io/io_adapter.h io/io_adapter.cc)
+add_library(VowpalWabbit::io ALIAS vw_io)
 target_link_libraries(vw_io PRIVATE ZLIB::ZLIB)
 
 set(vw_all_headers

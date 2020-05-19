@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#include "vw/example.h"
+#include "vw/experimental/example.h"
+#include "vw/experimental/io.h"
 
 int main()
 {
@@ -13,7 +14,7 @@ int main()
   feature_space_get_features(fs, &indices, &vals, &len);
   for (int i = 0; i < len; i++)
   {
-    printf("%d %f\n", indices[i], vals[i]);
+    printf("%ld %f\n", indices[i], vals[i]);
   }
   deallocate_feature_space(fs);
   return 0;
