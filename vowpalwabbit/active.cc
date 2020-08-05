@@ -5,7 +5,7 @@
 #include <cerrno>
 #include <cfloat>
 
-#include "reductions.h"
+ #include "reductions.h"
 #include "rand48.h"
 #include "vw.h"
 #include "active.h"
