@@ -12,15 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Check code formatting
+      - name: Install clang-format
         shell: bash
         run: sudo apt install clang-format
-      - name: Check code formatting
+      - name: Check code formatting for diff
         shell: bash
-        run: clang-format-diff --help
-      - name: Check code formatting
-        shell: bash
-        run: ./utl/clang-format check
-        env:
-          GH_WORKFLOW_LOGGING: true
-          WARNING_AS_ERROR: true
+        run: |
+          git diff origin/master HEAD -U0 --no-color | clang-format-diff -r '^.*\.(cc|h)$' -p1 > clang_format_diff.txt
+          if [ -s clang_format_diff.txt ]; then
+            cat clang_format_diff.txt
+            echo "::error:: Formatting issues found"
+          fi
