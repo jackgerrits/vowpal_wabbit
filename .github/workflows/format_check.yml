@@ -10,16 +10,25 @@ on:
 jobs:
   check_code_formatting:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v1
       - name: Install clang-format
         shell: bash
         run: sudo apt install clang-format
       - name: Check code formatting for diff
+        # Only run the diff check for pull requests
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
           git diff origin/master HEAD -U0 --no-color | clang-format-diff -r '^.*\.(cc|h)$' -p1 > clang_format_diff.txt
           if [ -s clang_format_diff.txt ]; then
             cat clang_format_diff.txt
             echo "::error:: Formatting issues found"
+            exit 1
           fi
+      - name: Check code formatting for codebase
+        shell: bash
+        run: ./utl/clang-format check
+        env:
+          GH_WORKFLOW_LOGGING: true
