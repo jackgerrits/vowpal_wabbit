@@ -8,10 +8,16 @@ on:
       - master
 
 jobs:
-  check_coverage:
+  check_code_formatting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Check code formatting
+        shell: bash
+        run: sudo apt install clang-format
+      - name: Check code formatting
+        shell: bash
+        run: clang-format-diff --help
       - name: Check code formatting
         shell: bash
         run: ./utl/clang-format check
