@@ -35,13 +35,13 @@ float query_decision(active& a, float ec_revert_weight, float k)
     bias = 1.;
   else
   {
-    weighted_queries = (float)a.all->sd->weighted_labeled_examples;
+  weighted_queries = (float)a.all->sd->weighted_labeled_examples;
     avg_loss = (float)(a.all->sd->sum_loss / k + std::sqrt((1. + 0.5 * log(k)) / (weighted_queries + 0.0001)));
-    bias = get_active_coin_bias(k, avg_loss, ec_revert_weight / k, a.active_c0);
+ bias = get_active_coin_bias(k, avg_loss, ec_revert_weight / k, a.active_c0);
   }
   if (a._random_state->get_and_update_random() < bias)
-    return 1.f / bias;
-  else
+ return 1.f / bias;
+else
     return -1.;
 }
 
