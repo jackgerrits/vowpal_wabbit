@@ -17,3 +17,4 @@ jobs:
         run: ./utl/clang-format check
         env:
           GH_WORKFLOW_LOGGING: true
+          WARNING_AS_ERROR: true

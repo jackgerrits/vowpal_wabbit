@@ -14,7 +14,7 @@ for VW_FILE in $(find vowpalwabbit -type f -name '*.cc' -o -name '*.h'); do
         if [ $? -ne 0 ]; then
             ISSUE_FOUND="true"
             if [[ -v GH_WORKFLOW_LOGGING ]]; then
-                echo "::warning file=$VW_FILE::Formatting issues found in $VW_FILE"
+                echo "::warning file=$VW_FILE:: Formatting issues found in $VW_FILE"
             fi
         fi
     fi
