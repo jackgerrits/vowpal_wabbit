@@ -10,3 +10,4 @@ Version: @PACKAGE_VERSION@
 Requires: zlib
 Libs: -L${libdir} -lvw -lallreduce @CMAKE_THREAD_LIBS_INIT@ @BOOST_LINK_LIBRARIES@
 Cflags: -I${includedir}
+
