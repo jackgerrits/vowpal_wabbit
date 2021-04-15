@@ -1,0 +1,42 @@
+name: Linux / CPP
+
+on:
+  push:
+    branches:
+      - master
+      - 'releases/**'
+      - overhaul
+  pull_request:
+    branches:
+      - master
+      - overhaul
+
+jobs:
+  build:
+    container:
+      image: vowpalwabbit/ubuntu1604-build:latest
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        BUILD_CONFIGURATION: ['Debug', 'Release']
+    steps:
+      # v1 must be used because newer versions require a node.js version that will not run on this old image.
+      - uses: actions/checkout@v1
+      - name: Build C++
+        shell: bash
+        run: ./.scripts/linux/build.sh ${{ matrix.config.BUILD_CONFIGURATION }}
+      - name: Test C++
+        shell: bash
+        run: ./.scripts/linux/test.sh
+      - name: RunTest flatbuffers C++
+        shell: bash
+        run: ./.scripts/linux/test-flatbuffers.sh
+      - name: Build + test Java
+        shell: bash
+        run: ./.scripts/linux/java.sh
+      - name: Build + test Python 2.7
+        shell: bash
+        run: ./.scripts/linux/python27.sh
+      - name: Build + test Python 3.6
+        shell: bash
+        run: ./.scripts/linux/python36.sh
