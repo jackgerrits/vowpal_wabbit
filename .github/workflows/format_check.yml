@@ -4,9 +4,11 @@ on:
     branches:
       - master
       - 'releases/**'
+      - overhaul
   pull_request:
     branches:
       - master
+      - overhaul
 
 jobs:
   check_code_formatting:
