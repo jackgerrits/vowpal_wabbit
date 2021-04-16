@@ -1,4 +1,4 @@
-name: VW Slim
+name: Linux / C++ - VW Slim
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
       - overhaul
 
 jobs:
-  linux:
+  check:
     container:
       image: vowpalwabbit/ubuntu1604-build:latest
     runs-on: ubuntu-latest
