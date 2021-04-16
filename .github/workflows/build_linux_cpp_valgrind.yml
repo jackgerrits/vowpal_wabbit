@@ -1,4 +1,4 @@
-name: Linux / CPP-Valgrind
+name: Linux / C++ - Valgrind
 
 on:
   push:
