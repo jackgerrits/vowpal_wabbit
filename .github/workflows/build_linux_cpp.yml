@@ -22,9 +22,6 @@ jobs:
     steps:
       # v1 must be used because newer versions require a node.js version that will not run on this old image.
       - uses: actions/checkout@v1
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
       - name: Build C++
         shell: bash
         run: ./.scripts/linux/build.sh ${{ matrix.config.BUILD_CONFIGURATION }}
@@ -34,12 +31,3 @@ jobs:
       - name: RunTest flatbuffers C++
         shell: bash
         run: ./.scripts/linux/test-flatbuffers.sh
-      - name: Build + test Java
-        shell: bash
-        run: ./.scripts/linux/java.sh
-      - name: Build + test Python 2.7
-        shell: bash
-        run: ./.scripts/linux/python27.sh
-      - name: Build + test Python 3.6
-        shell: bash
-        run: ./.scripts/linux/python36.sh
