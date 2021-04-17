@@ -1,12 +1,13 @@
+
+This branch is a place for me to experiment with VW's codebase. This does not reflect the direction of the upstream repo.
+
+I will make a best attempt at documenting the changes between this branch and upstream in [changes_from_upstream.md](./changes_from_upstream.md).
+
+---
+
+# Original README
+
 <img src="/logo_assets/vowpal-wabbits-github-logo@3x.png" height="auto" width="100%" alt="Vowpal Wabbit">
-
-[![Linux build status](https://img.shields.io/azure-devops/build/vowpalwabbit/3934113c-9e2b-4dbc-8972-72ab9b9b4342/23?label=Linux%20build&logo=Azure%20Devops)](https://dev.azure.com/vowpalwabbit/Vowpal%20Wabbit/_build/latest?definitionId=23&branchName=master)
-[![Windows build status](https://img.shields.io/azure-devops/build/vowpalwabbit/3934113c-9e2b-4dbc-8972-72ab9b9b4342/14?label=Windows%20build&logo=Azure%20Devops)](https://dev.azure.com/vowpalwabbit/Vowpal%20Wabbit/_build/latest?definitionId=14&branchName=master)
-[![MacOS build status](https://img.shields.io/azure-devops/build/vowpalwabbit/3934113c-9e2b-4dbc-8972-72ab9b9b4342/22?label=MacOS%20build&logo=Azure%20Devops)](https://dev.azure.com/vowpalwabbit/Vowpal%20Wabbit/_build/latest?definitionId=22&branchName=master)
-
-[![codecov](https://codecov.io/gh/VowpalWabbit/vowpal_wabbit/branch/master/graph/badge.svg)](https://codecov.io/gh/VowpalWabbit/vowpal_wabbit)
-[![Total Alerts](https://img.shields.io/lgtm/alerts/g/JohnLangford/vowpal_wabbit.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/JohnLangford/vowpal_wabbit/alerts/)
-[![Gitter chat](https://badges.gitter.im/VowpalWabbit.svg)](https://gitter.im/VowpalWabbit)
 
 This is the *Vowpal Wabbit* fast online learning code.
 
