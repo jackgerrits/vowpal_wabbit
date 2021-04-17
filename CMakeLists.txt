@@ -87,7 +87,6 @@ option(VW_INSTALL "Add install targets." ON)
 option(BUILD_TESTS "Build and enable tests." ON)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_ONLY_STANDALONE_BENCHMARKS "Build only the benchmarks that can run standalone (and do not use vw internals)" OFF)
-option(BUILD_JAVA "Add Java targets." Off)
 option(BUILD_PYTHON "Add Python targets." Off)
 option(BUILD_DOCS "Add documentation targets." Off)
 option(BUILD_EXPERIMENTAL_BINDING "Add targets for experimental bindings" OFF)
@@ -111,7 +110,7 @@ if(FORCE_COLORED_OUTPUT)
   endif()
 endif()
 
-if(WIN32 AND (PROFILE OR VALGRIND_PROFILE OR GCOV OR STATIC_LINK_VW OR BUILD_JAVA OR LTO))
+if(WIN32 AND (PROFILE OR VALGRIND_PROFILE OR GCOV OR STATIC_LINK_VW OR LTO))
   message(FATAL_ERROR "Unsupported option enabled on Windows build")
 endif()
 
@@ -247,10 +246,6 @@ endif()
 
 if(BUILD_DOCS)
   add_subdirectory(doc)
-endif()
-
-if(BUILD_JAVA)
-  add_subdirectory(java)
 endif()
 
 if(BUILD_PYTHON)
