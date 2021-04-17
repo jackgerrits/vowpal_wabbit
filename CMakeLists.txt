@@ -170,6 +170,18 @@ else()
   set(STATIC_LIB_SUFFIXES ".a")
 endif()
 
+if(STATIC_LINK_VW)
+  set(Boost_USE_STATIC_LIBS ON)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ${STATIC_LIB_SUFFIXES})
+  SET(BUILD_SHARED_LIBS OFF)
+else()
+  set(Boost_USE_STATIC_LIBS OFF)
+  if(WIN32)
+    # Windows links everything dynamically
+    add_definitions( -DBOOST_ALL_DYN_LINK )
+  endif()
+endif()
+
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
