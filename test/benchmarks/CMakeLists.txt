@@ -2,6 +2,7 @@ set(all_sources
   benchmark_main.cc
   standalone/benchmark_text_input.cc
   standalone/rcv1_benchmarks.cc
+  standalone/benchmarks_common.cc
 )
 
 if (NOT BUILD_ONLY_STANDALONE_BENCHMARKS)
