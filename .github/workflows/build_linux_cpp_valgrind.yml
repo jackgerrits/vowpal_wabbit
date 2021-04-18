@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     container:
-      image: vowpalwabbit/ubuntu1604-build:latest
+      image: jackgerrits/vowpalwabbit-ubuntu-2004
     runs-on: ubuntu-latest
     steps:
       # v1 must be used because newer versions require a node.js version that will not run on this old image.
