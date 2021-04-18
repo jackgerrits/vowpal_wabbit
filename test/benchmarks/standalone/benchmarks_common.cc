@@ -3,21 +3,24 @@
 #include <sstream>
 #include <string>
 
-std::string get_x_numerical_fts(int feature_size) {
+std::string get_x_numerical_fts(int feature_size)
+{
   std::stringstream ss;
   ss << "1:1:0.5 |";
   for (size_t i = 0; i < feature_size; i++) { ss << " " << std::to_string(i) + ":4.36352"; }
   return ss.str();
 };
 
-std::string get_x_string_fts(int feature_size) {
+std::string get_x_string_fts(int feature_size)
+{
   std::stringstream ss;
   ss << "1:1:0.5 | ";
   for (size_t i = 0; i < feature_size; i++) { ss << "bigfeaturename" + std::to_string(i) + ":10 "; }
   return ss.str();
 };
 
-std::string get_x_string_fts_no_label(int feature_size, size_t action_index) {
+std::string get_x_string_fts_no_label(int feature_size, size_t action_index)
+{
   std::stringstream ss;
   ss << " | ";
   for (size_t j = 0; j < feature_size; j++) { ss << std::to_string(action_index) + "_" + std::to_string(j) << +" "; }
@@ -26,7 +29,8 @@ std::string get_x_string_fts_no_label(int feature_size, size_t action_index) {
   return ss.str();
 };
 
-std::string get_x_string_fts_multi_ex(int feature_size, size_t actions, bool shared, bool label, size_t start_index) {
+std::string get_x_string_fts_multi_ex(int feature_size, size_t actions, bool shared, bool label, size_t start_index)
+{
   size_t action_start = 0;
   std::stringstream ss;
   if (shared) { ss << "shared | s_1 s_2 s_3 s_4" << std::endl; }
