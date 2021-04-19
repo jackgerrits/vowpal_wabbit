@@ -1,4 +1,4 @@
-#include "../benchmarks_common.h"
+#include "benchmarks_common.h"
 
 #include <sstream>
 #include <string>
