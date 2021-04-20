@@ -21,8 +21,8 @@ example_predict::iterator& example_predict::iterator::operator++()
 
 namespace_index example_predict::iterator::index() { return *_index; }
 
-bool example_predict::iterator::operator==(const iterator& rhs) { return _index == rhs._index; }
-bool example_predict::iterator::operator!=(const iterator& rhs) { return _index != rhs._index; }
+bool example_predict::iterator::operator==(const iterator& rhs) const { return _index == rhs._index; }
+bool example_predict::iterator::operator!=(const iterator& rhs) const { return _index != rhs._index; }
 
 example_predict::iterator example_predict::begin() { return {feature_space.data(), indices.begin()}; }
 example_predict::iterator example_predict::end() { return {feature_space.data(), indices.end()}; }

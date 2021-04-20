@@ -54,6 +54,16 @@ public:
   features_value_iterator(features_value_iterator&&) = default;
   features_value_iterator& operator=(features_value_iterator&&) = default;
 
+  inline bool operator==(const features_value_iterator& other) const
+  {
+    return _begin == other._begin;
+  }
+
+  inline bool operator!=(const features_value_iterator& other) const
+  {
+    return !operator==(other);
+  }
+
   inline features_value_iterator& operator++()
   {
     _begin++;
@@ -102,6 +112,16 @@ public:
   features_value_index_iterator& operator=(const features_value_index_iterator&) = default;
   features_value_index_iterator(features_value_index_iterator&&) = default;
   features_value_index_iterator& operator=(features_value_index_iterator&&) = default;
+
+  inline bool operator==(const features_value_index_iterator& other) const
+  {
+    return features_value_iterator::operator==(other) && _begin_index == other._begin_index;
+  }
+
+  inline bool operator!=(const features_value_index_iterator& other) const
+  {
+    return !operator==(other);
+  }
 
   inline features_value_index_iterator& operator++()
   {
@@ -163,6 +183,16 @@ public:
     features_value_index_iterator::operator++();
     if (_begin_audit != nullptr) { _begin_audit++; }
     return *this;
+  }
+
+  inline bool operator==(const features_value_index_audit_iterator& other) const
+  {
+    return features_value_index_iterator::operator==(other) && _begin_audit == other._begin_audit;
+  }
+
+  inline bool operator!=(const features_value_index_audit_iterator& other) const
+  {
+    return !operator==(other);
   }
 
   inline audit_strings_ptr* audit() { return _begin_audit; }
