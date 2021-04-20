@@ -7,7 +7,7 @@ add_library(vw_io STATIC io/io_adapter.h io/io_adapter.cc io/logger.h io/logger.
 target_include_directories(vw_io PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(vw_io PUBLIC ${spdlog_target} fmt::fmt PRIVATE ZLIB::ZLIB)
+target_link_libraries(vw_io PUBLIC ${spdlog_target} fmt::fmt PRIVATE vw_common_flags ZLIB::ZLIB)
 
 if(SPDLOG_SYS_DEP)
   # this doesn't get defined when using a system-installed spdlog
@@ -23,7 +23,7 @@ target_include_directories(allreduce PUBLIC
 
 add_library(VowpalWabbit::allreduce ALIAS allreduce)
 
-target_link_libraries(allreduce PRIVATE vw_io)
+target_link_libraries(allreduce PRIVATE vw_common_flags vw_io)
 
 # Winsock32 should be available on Windows
 if(WIN32)
@@ -364,7 +364,7 @@ target_link_libraries(vw
   PUBLIC
     VowpalWabbit::explore VowpalWabbit::allreduce Boost::boost ${spdlog_target} fmt::fmt
   PRIVATE
-    Boost::program_options ${CMAKE_DL_LIBS} ${LINK_THREADS} vw_io
+    vw_common_flags Boost::program_options ${CMAKE_DL_LIBS} ${LINK_THREADS} vw_io
     # Workaround an issue where RapidJSON needed to be exported tom install the target. This is
     # actually a private dependency and so do not "link" when processing targets for installation.
     # https://gitlab.kitware.com/cmake/cmake/issues/15415
@@ -383,79 +383,19 @@ if(BUILD_FLATBUFFERS)
   target_compile_definitions(vw PUBLIC BUILD_FLATBUFFERS)
 endif()
 
-
 add_library(VowpalWabbit::vw ALIAS vw)
-
-if(GCOV)
-  target_link_libraries(vw PUBLIC gcov --coverage)
-endif()
 
 target_include_directories(vw PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-target_compile_definitions(vw PUBLIC _FILE_OFFSET_BITS=64 $<$<CONFIG:RELEASE>:NDEBUG>)
-# Only define if Clang is not used
-if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  target_compile_definitions(vw PUBLIC __extern_always_inline=inline)
-endif()
-
 # Add natvis file if the Generator is Visual Studio
 if (MSVC_IDE)
   target_sources(vw PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/vw_types.natvis> )
 endif()
 
-# Clang-cl on Windows has issues with our usage of SIMD types. Turn it off explicitly for Windows + clang-cl to mitigate.
-# See issue #
-if(WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  target_compile_definitions(vw PUBLIC VW_NO_INLINE_SIMD)
-endif()
-
-# TODO code analysis
-if(WIN32)
-  target_compile_definitions(vw PUBLIC __SSE2__)
-  target_compile_options(vw PUBLIC /MP /Zc:__cplusplus)
-else()
-  target_compile_options(vw PUBLIC ${linux_flags})
-endif()
-
-# Turn on warnings
-if(WARNINGS)
-  if(MSVC)
-    target_compile_options(vw PRIVATE /W4)
-  else(MSVC)
-    target_compile_options(vw PRIVATE -Wall -Wextra -Wpedantic)
-  endif(MSVC)
-endif(WARNINGS)
-
-# Turn on warnings as errors
-if(WARNING_AS_ERROR)
-  if(MSVC)
-    target_compile_options(vw PRIVATE /WX)
-  else(MSVC)
-    target_compile_options(vw PRIVATE -Wall -Wextra -Wpedantic -Werror)
-  endif(MSVC)
-endif(WARNING_AS_ERROR)
-
 if(NOT WIN32)
-  add_executable(active_interactor active_interactor.cc)
-
-  if(GCOV)
-    target_link_libraries(active_interactor PUBLIC gcov --coverage)
-  endif()
-
-  if(VW_INSTALL)
-    install(
-      TARGETS active_interactor
-      EXPORT VowpalWabbitConfig
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endif()
-
-  target_compile_definitions(active_interactor PUBLIC _FILE_OFFSET_BITS=64)
-  target_compile_definitions(active_interactor PUBLIC $<$<CONFIG:RELEASE>:NDEBUG>)
-  target_compile_options(active_interactor PUBLIC ${linux_flags})
-
   find_file(HELP2MAN_EXECUTABLE help2man HINTS /bin /usr/bin /usr/local/bin)
   if (HELP2MAN_EXECUTABLE)
     add_custom_target(manpage ALL
@@ -482,26 +422,19 @@ if(STATIC_LINK_VW)
   target_link_libraries(vw-bin PRIVATE ${unix_static_flag})
 endif()
 
-# This is used by Travis to not build vw_c_wrapper, this required <codecvt> which became available in GCC 5.1
-if(NOT DEFINED DO_NOT_BUILD_VW_C_WRAPPER)
-  if(STATIC_LINK_VW)
-    add_library(vw_c_wrapper vwdll.cpp)
-  else()
-    add_library(vw_c_wrapper SHARED vwdll.cpp)
-  endif()
 
-  add_library(VowpalWabbit::vw_c_wrapper ALIAS vw_c_wrapper)
+add_library(vw_c_wrapper SHARED vwdll.cpp)
+add_library(VowpalWabbit::vw_c_wrapper ALIAS vw_c_wrapper)
 
-  target_compile_definitions(vw_c_wrapper PUBLIC VWDLL_EXPORTS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE ZLIB_WINAPI)
-  target_link_libraries(vw_c_wrapper PUBLIC VowpalWabbit::vw)
-  if(VW_INSTALL)
-    install(
-      TARGETS vw_c_wrapper
-      EXPORT VowpalWabbitConfig
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endif()
+target_compile_definitions(vw_c_wrapper PUBLIC VWDLL_EXPORTS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE ZLIB_WINAPI)
+target_link_libraries(vw_c_wrapper PUBLIC VowpalWabbit::vw)
+if(VW_INSTALL)
+  install(
+    TARGETS vw_c_wrapper
+    EXPORT VowpalWabbitConfig
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 if(VW_INSTALL)

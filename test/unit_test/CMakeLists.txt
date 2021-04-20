@@ -43,6 +43,7 @@ add_executable(vw-unit-test.out
   tokenize_tests.cc
   v_array_test.cc
   vw_versions_test.cc
+  vwdll_test.cc
   weights_test.cc
 )
 
@@ -52,18 +53,12 @@ endif()
 
 # Add the include directories from vw target for testing
 target_include_directories(vw-unit-test.out PRIVATE $<TARGET_PROPERTY:vw,INCLUDE_DIRECTORIES>)
-target_link_libraries(vw-unit-test.out PRIVATE vw allreduce Boost::unit_test_framework)
-
-if(NOT DEFINED DO_NOT_BUILD_VW_C_WRAPPER)
-  target_sources(vw-unit-test.out PUBLIC vwdll_test.cc)
-  target_link_libraries(vw-unit-test.out PRIVATE vw_c_wrapper)
-
-  add_custom_command(TARGET vw-unit-test.out POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      $<TARGET_FILE:vw_c_wrapper>
-      $<TARGET_FILE_DIR:vw-unit-test.out>
-  )
-endif()
+target_link_libraries(vw-unit-test.out PRIVATE vw vw_c_wrapper allreduce Boost::unit_test_framework)
+add_custom_command(TARGET vw-unit-test.out POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:vw_c_wrapper>
+    $<TARGET_FILE_DIR:vw-unit-test.out>
+)
 
 # Communicate that Boost Unit Test is being statically linked
 if(STATIC_LINK_VW)
