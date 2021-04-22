@@ -479,12 +479,6 @@ Logarithmic Time Multiclass Tree:
   --log_multi arg              Use online tree for multiclass
   --no_progress                disable progressive validation
   --swap_resistance arg (=4, ) higher = more resistance to swap, default=4
-Low Rank Quadratics:
-  --lrq arg             use low rank quadratic features
-  --lrqdropout          use dropout training for low rank quadratic features
-Low Rank Quadratics FA:
-  --lrqfa arg           use low rank quadratic features with field aware 
-                        weights
 Marginal options:
   --marginal arg                   substitute marginal label estimates for ids
   --initial_denominator arg (=1, ) initial denominator
