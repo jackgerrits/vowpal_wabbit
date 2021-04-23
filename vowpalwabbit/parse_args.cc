@@ -58,8 +58,6 @@
 #include "svrg.h"
 #include "rand48.h"
 #include "binary.h"
-#include "lrq.h"
-#include "lrqfa.h"
 #include "autolink.h"
 #include "log_multi.h"
 #include "recall_tree.h"
@@ -1321,8 +1319,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(mf_setup);
   reductions.push_back(marginal_setup);
   reductions.push_back(autolink_setup);
-  reductions.push_back(lrq_setup);
-  reductions.push_back(lrqfa_setup);
   reductions.push_back(stagewise_poly_setup);
   reductions.push_back(scorer_setup);
   reductions.push_back(VW::cbzo::setup);

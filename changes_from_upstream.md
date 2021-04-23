@@ -4,5 +4,7 @@
 - Remove Java bindings
 - Remove visual studio build files since CMake can be used for this
 - Remove VW Slim
-- Remove big_tests
+- Remove Python binding
+- Remove lrq and lrqfa
+- Removed big_tests, demo, library, papers, most of utl
 - C++20 required

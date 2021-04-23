@@ -85,7 +85,6 @@ option(VW_INSTALL "Add install targets." ON)
 option(BUILD_TESTS "Build and enable tests." ON)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_ONLY_STANDALONE_BENCHMARKS "Build only the benchmarks that can run standalone (and do not use vw internals)" OFF)
-option(BUILD_PYTHON "Add Python targets." Off)
 option(BUILD_DOCS "Add documentation targets." Off)
 option(BUILD_EXPERIMENTAL_BINDING "Add targets for experimental bindings" OFF)
 option(LTO "Enable Link Time optimization (Requires Release build, only works with clang and linux/mac for now)." Off)
@@ -247,7 +246,6 @@ endif()
 
 add_subdirectory(explore)
 add_subdirectory(cluster)
-add_subdirectory(library)
 include(ext_libs/ext_libs.cmake)
 add_subdirectory(vowpalwabbit)
 
@@ -257,10 +255,6 @@ endif()
 
 if(BUILD_DOCS)
   add_subdirectory(doc)
-endif()
-
-if(BUILD_PYTHON)
-  add_subdirectory(python)
 endif()
 
 if(BUILD_BENCHMARKS)

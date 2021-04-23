@@ -132,8 +132,6 @@ set(vw_all_headers
   learner.h
   log_multi.h
   loss_functions.h
-  lrq.h
-  lrqfa.h
   marginal.h
   memory_tree.h
   memory.h
@@ -289,8 +287,6 @@ set(vw_all_sources
   learner.cc
   log_multi.cc
   loss_functions.cc
-  lrq.cc
-  lrqfa.cc
   marginal.cc
   memory_tree.cc
   mf.cc
