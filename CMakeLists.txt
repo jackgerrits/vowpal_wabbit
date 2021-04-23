@@ -234,7 +234,6 @@ endif()
 
 add_subdirectory(explore)
 add_subdirectory(cluster)
-add_subdirectory(library)
 include(ext_libs/ext_libs.cmake)
 add_subdirectory(vowpalwabbit)
 
@@ -267,15 +266,6 @@ if(BUILD_TESTS)
     COMMAND ${CMAKE_CTEST_COMMAND} --verbose
     DEPENDS spanning_tree vw-unit-test.out vw-bin ${vw_c_api_unit_test_target}
   )
-
-  # Don't offer these make dependent targets on Windows
-  if(NOT WIN32)
-    # make bigtests BIG_TEST_ARGS="<args here>"
-    add_custom_target(bigtests
-      DEPENDS vw
-      COMMAND make \${BIG_TEST_ARGS}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/big_tests)
-  endif()
 endif()
 
 # Must be done after the test block so that enable_testing() has been called

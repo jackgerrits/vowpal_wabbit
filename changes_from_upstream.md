@@ -6,3 +6,4 @@
 - Remove VW Slim
 - Remove Python binding
 - Remove lrq and lrqfa
+- Removed big_tests, demo, library, papers, most of utl
