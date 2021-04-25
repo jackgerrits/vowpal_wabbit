@@ -63,9 +63,6 @@ extern "C"
   VW_DLL_PUBLIC VWStatus vw_workspace_end_pass(
       VWWorkspace* workspace_handle, VWErrorInfo* err_info_container) VW_API_NOEXCEPT;
 
-  VW_DLL_PUBLIC VWStatus vw_workspace_get_search(
-      const VWWorkspace* workspace_handle, VWSearch** search_handle, VWErrorInfo* err_info_container) VW_API_NOEXCEPT;
-
 #ifdef __cplusplus
 }
 #endif

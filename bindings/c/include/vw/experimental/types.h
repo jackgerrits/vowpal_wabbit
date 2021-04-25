@@ -67,9 +67,6 @@ extern "C"
   typedef VWStatus(VWWriteFunc)(void*, const char*, size_t, size_t*);
   typedef VWStatus(VWTraceMessageFunc)(void*, int trace_level, const char*, size_t);
 
-  struct VWSearch_tag;
-  typedef struct VWSearch_tag VWSearch;
-
   struct VWOptions_tag;
   typedef struct VWOptions_tag VWOptions;
 

@@ -204,7 +204,6 @@ public:
 
   std::unique_ptr<VW::config::options_i, options_deleter_type> options;
 
-  void* /*Search::search*/ searchstr;
 
   uint32_t wpp;
 

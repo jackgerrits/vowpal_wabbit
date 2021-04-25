@@ -46,7 +46,6 @@
 #include "confidence.h"
 #include "scorer.h"
 #include "expreplay.h"
-#include "search.h"
 #include "bfgs.h"
 #include "lda_core.h"
 #include "noop.h"
@@ -1375,7 +1374,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(cbifyldf_setup);
   reductions.push_back(VW::offset_tree::setup);
   reductions.push_back(ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>);
-  reductions.push_back(Search::setup);
   reductions.push_back(audit_regressor_setup);
 
   register_reductions(all, reductions);
@@ -1809,7 +1807,7 @@ vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf*
 
     if (!all.options->get_typed_option<bool>("dry_run").value())
     {
-      if (!all.logger.quiet && !all.bfgs && !all.searchstr && !all.options->was_supplied("audit_regressor"))
+      if (!all.logger.quiet && !all.bfgs && !all.options->was_supplied("audit_regressor"))
       { all.sd->print_update_header(*all.trace_message); }
       all.l->init_driver();
     }
