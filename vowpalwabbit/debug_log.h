@@ -31,9 +31,9 @@ struct vw_dbg
   static constexpr bool cb_sample =           false;
   // clang-format on
 
-  static constexpr bool track_stack = default_log | learner | gd | gd_predict | binary | cb_adf | csoaa |
-      cs_active | cats_tree | cats_pdf | cats | cb_explore_pdf | cb_explore | cbify | get_pmf | sample_pdf |
-      cb_explore_get_pmf | cb_sample_pdf | ccb | scorer | cb_sample;
+  static constexpr bool track_stack = default_log | learner | gd | gd_predict | binary | cb_adf | csoaa | cs_active |
+      cats_tree | cats_pdf | cats | cb_explore_pdf | cb_explore | cbify | get_pmf | sample_pdf | cb_explore_get_pmf |
+      cb_sample_pdf | ccb | scorer | cb_sample;
 };
 
 #define VW_DEBUG_LOG vw_dbg::default_log
