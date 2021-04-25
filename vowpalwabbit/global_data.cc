@@ -310,8 +310,6 @@ vw::vw() : options(nullptr, nullptr)
 
   stdout_adapter = VW::io::open_stdout();
 
-  searchstr = nullptr;
-
   nonormalize = false;
   l1_lambda = 0.0;
   l2_lambda = 0.0;

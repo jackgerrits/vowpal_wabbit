@@ -176,14 +176,6 @@ set(vw_all_headers
   sample_pdf.h
   scope_exit.h
   scorer.h
-  search_dep_parser.h
-  search_entityrelationtask.h
-  search_graph.h
-  search_hooktask.h
-  search_meta.h
-  search_multiclasstask.h
-  search_sequencetask.h
-  search.h
   sender.h
   shared_data.h
   shared_feature_merger.h
@@ -318,14 +310,6 @@ set(vw_all_sources
   recall_tree.cc
   sample_pdf.cc
   scorer.cc
-  search_dep_parser.cc
-  search_entityrelationtask.cc
-  search_graph.cc
-  search_hooktask.cc
-  search_meta.cc
-  search_multiclasstask.cc
-  search_sequencetask.cc
-  search.cc
   sender.cc
   shared_data.cc
   shared_feature_merger.cc
