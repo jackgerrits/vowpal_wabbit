@@ -212,7 +212,7 @@ void to_flat::create_mc_label(VW::named_labels* ldict, example* v, ExampleBuilde
       ex_builder.label = VW::parsers::flatbuffer::CreateMultiClass(_builder, 0, 0U, v->l.multi.weight).Union();
     else
     {
-      VW::string_view named_label = ldict->get(v->l.multi.label);
+      std::string_view named_label = ldict->get(v->l.multi.label);
       ex_builder.label = VW::parsers::flatbuffer::CreateMultiClass(
           _builder, _builder.CreateString(std::string(named_label.begin(), named_label.end())), 0U, v->l.multi.weight)
                              .Union();

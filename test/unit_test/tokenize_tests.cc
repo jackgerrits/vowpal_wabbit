@@ -13,7 +13,7 @@
 #include <cstring>
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string) {
-  std::vector<VW::string_view> container;
+  std::vector<std::string_view> container;
   std::string str = "this is   a string  ";
   tokenize(' ', str, container);
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string) {
 }
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty) {
-  std::vector<VW::string_view> container;
+  std::vector<std::string_view> container;
   std::string str = "this is   a string  ";
   tokenize(' ', str, container, true);
 
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty) {
 }
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty_no_end_space) {
-  std::vector<VW::string_view> container;
+  std::vector<std::string_view> container;
   std::string str = "this is   a string";
   tokenize(' ', str, container, true);
 

@@ -11,7 +11,7 @@
 #include "hash.h"
 #include "vw_exception.h"
 
-std::vector<std::string> escaped_tokenize(char delim, VW::string_view s, bool allow_empty)
+std::vector<std::string> escaped_tokenize(char delim, std::string_view s, bool allow_empty)
 {
   std::vector<std::string> tokens;
   std::string current;
@@ -19,7 +19,7 @@ std::vector<std::string> escaped_tokenize(char delim, VW::string_view s, bool al
   const char delims[3] = {'\\', delim, '\0'};
   bool last_space = false;
 
-  while (!s.empty() && ((end_pos = s.find_first_of(delims)) != VW::string_view::npos))
+  while (!s.empty() && ((end_pos = s.find_first_of(delims)) != std::string_view::npos))
   {
     if (s[end_pos] == '\\')
     {

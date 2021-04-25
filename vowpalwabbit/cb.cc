@@ -11,7 +11,7 @@
 #include "vw_exception.h"
 #include "example.h"
 #include "cb_label_parser.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "shared_data.h"
 
 #include "io/logger.h"
@@ -32,7 +32,7 @@ std::pair<bool, cb_class> get_observed_cost_cb(const label& ld)
   return std::make_pair(false, CB::cb_class{});
 }
 
-void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<VW::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -89,7 +89,7 @@ label_parser cb_label = {
   // default_label
   [](polylabel* v) { CB::default_label(v->cb); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
     CB::parse_label(p, sd, v->cb, words, red_features);
   },
   // cache_label
@@ -182,7 +182,7 @@ void default_label(CB_EVAL::label& ld)
 bool test_label(CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
 
 
-void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<VW::string_view>& words,
+void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<std::string_view>& words,
     reduction_features& red_features)
 {
   if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
@@ -201,7 +201,7 @@ label_parser cb_eval = {
   // default_label
   [](polylabel* v) { CB_EVAL::default_label(v->cb_eval); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
     CB_EVAL::parse_label(p, sd, v->cb_eval, words, red_features);
   },
   // cache_label

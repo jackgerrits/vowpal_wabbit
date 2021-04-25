@@ -7,7 +7,7 @@
 #include "gd.h"
 #include "vw.h"
 #include "vw_exception.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "example.h"
 #include "parse_primitives.h"
 #include "shared_data.h"
@@ -18,7 +18,7 @@ namespace logger = VW::io::logger;
 
 namespace COST_SENSITIVE
 {
-void name_value(VW::string_view& s, std::vector<VW::string_view>& name, float& v)
+void name_value(std::string_view& s, std::vector<std::string_view>& name, float& v)
 {
   tokenize(':', s, name);
 
@@ -100,7 +100,7 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(parser* p, shared_data* sd, label& ld, std::vector<VW::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data* sd, label& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -169,7 +169,7 @@ label_parser cs_label = {
   // default_label
   [](polylabel* v) { default_label(v->cs); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->cs, words, red_features);
   },
   // cache_label
@@ -259,8 +259,8 @@ void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label,
     if (!all.sd->ldict) { all.print_by_ref(sink.get(), (float)multiclass_prediction, 0, ec.tag); }
     else
     {
-      VW::string_view sv_pred = all.sd->ldict->get(multiclass_prediction);
-      all.print_text_by_ref(sink.get(), sv_pred.to_string(), ec.tag);
+      std::string_view sv_pred = all.sd->ldict->get(multiclass_prediction);
+      all.print_text_by_ref(sink.get(), std::string{sv_pred}, ec.tag);
     }
   }
 

@@ -12,7 +12,7 @@
 #include "parser.h"
 #include "parse_primitives.h"
 
-void parse_slates_label(parser* p, VW::string_view label, VW::slates::label& l)
+void parse_slates_label(parser* p, std::string_view label, VW::slates::label& l)
 {
   tokenize(' ', label, p->words);
   VW::slates::default_label(l);

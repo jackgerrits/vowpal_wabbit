@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "vw_string_view.h"
+#include <string_view>
 
 namespace VW
 {
@@ -15,8 +15,8 @@ class named_labels
 private:
   // NOTE: This ordering is critical. m_id2name and m_name2id contain pointers into m_label_list!
   std::string m_label_list;
-  std::vector<string_view> m_id2name;
-  std::unordered_map<string_view, uint32_t> m_name2id;
+  std::vector<std::string_view> m_id2name;
+  std::unordered_map<std::string_view, uint32_t> m_name2id;
   uint32_t m_K;
 
   void initialize_maps_from_input_string();
@@ -33,7 +33,7 @@ public:
   named_labels& operator=(named_labels&& other) noexcept = delete;
 
   uint32_t getK() const;
-  uint32_t get(string_view s) const;
-  string_view get(uint32_t v) const;
+  uint32_t get(std::string_view s) const;
+  std::string_view get(uint32_t v) const;
 };
 }  // namespace VW

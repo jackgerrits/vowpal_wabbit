@@ -12,21 +12,21 @@
 
 #include "v_array.h"
 #include "hashstring.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "fast_pow10.h"
 #include "future_compat.h"
 
 #include "io/logger.h"
 
-// chop up the string into a v_array or any compatible container of VW::string_view.
+// chop up the string into a v_array or any compatible container of std::string_view.
 template <typename ContainerT>
-void tokenize(char delim, VW::string_view s, ContainerT& ret, bool allow_empty = false)
+void tokenize(char delim, std::string_view s, ContainerT& ret, bool allow_empty = false)
 {
   ret.clear();
   size_t end_pos = 0;
   bool last_space = false;
 
-  while (!s.empty() && ((end_pos = s.find(delim)) != VW::string_view::npos))
+  while (!s.empty() && ((end_pos = s.find(delim)) != std::string_view::npos))
   {
     last_space = end_pos == 0;
     if (allow_empty || end_pos > 0) ret.emplace_back(s.substr(0, end_pos));
@@ -36,7 +36,7 @@ void tokenize(char delim, VW::string_view s, ContainerT& ret, bool allow_empty =
 }
 
 // This function returns a vector of strings (not string_views) because we need to remove the escape characters
-std::vector<std::string> escaped_tokenize(char delim, VW::string_view s, bool allow_empty = false);
+std::vector<std::string> escaped_tokenize(char delim, std::string_view s, bool allow_empty = false);
 
 inline const char* safe_index(const char* start, char v, const char* max)
 {
@@ -111,7 +111,7 @@ inline FORCE_INLINE float parseFloat(const char* p, size_t& end_idx, const char*
   }
 }
 
-inline float float_of_string(VW::string_view s)
+inline float float_of_string(std::string_view s)
 {
   size_t end_idx;
   float f = parseFloat(s.begin(), end_idx, s.end());
@@ -123,7 +123,7 @@ inline float float_of_string(VW::string_view s)
   return f;
 }
 
-inline int int_of_string(VW::string_view s, char*& end)
+inline int int_of_string(std::string_view s, char*& end)
 {
   // can't use stol because that throws an exception. Use strtol instead.
   int i = strtol(s.begin(), &end, 10);
@@ -136,7 +136,7 @@ inline int int_of_string(VW::string_view s, char*& end)
   return i;
 }
 
-inline int int_of_string(VW::string_view s)
+inline int int_of_string(std::string_view s)
 {
   char* end = nullptr;
   return int_of_string(s, end);
