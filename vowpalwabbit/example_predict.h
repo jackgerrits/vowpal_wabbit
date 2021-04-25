@@ -52,8 +52,8 @@ struct example_predict
     features& operator*();
     iterator& operator++();
     namespace_index index();
-    bool operator==(const iterator& rhs);
-    bool operator!=(const iterator& rhs);
+    bool operator==(const iterator& rhs) const;
+    bool operator!=(const iterator& rhs) const;
   };
 
   example_predict() = default;

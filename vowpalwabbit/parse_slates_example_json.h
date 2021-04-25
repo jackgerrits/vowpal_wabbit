@@ -62,7 +62,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
     case rapidjson::kObjectType:
     {
       push_ns(current_example, key_namespace, namespaces, all);
-      for (auto& object_value : value.GetObject())
+      for (auto& object_value : value.GetObj())
       { handle_features_value(object_value.name.GetString(), object_value.value, current_example, namespaces, all); }
       pop_ns(current_example, namespaces);
     }
@@ -224,7 +224,7 @@ void parse_slates_example_json(vw& all, v_array<example*>& examples, char* line,
   document.ParseInsitu(line);
 
   // Build shared example
-  const Value& context = document.GetObject();
+  const Value& context = document.GetObj();
   std::vector<example*> slot_examples;
   parse_context<audit>(context, all, examples, example_factory, ex_factory_context, slot_examples, dedup_examples);
 }
@@ -238,7 +238,7 @@ void parse_slates_example_dsjson(vw& all, v_array<example*>& examples, char* lin
   document.ParseInsitu(line);
 
   // Build shared example
-  const Value& context = document["c"].GetObject();
+  const Value& context = document["c"].GetObj();
   std::vector<example*> slot_examples;
   parse_context<audit>(context, all, examples, example_factory, ex_factory_context, slot_examples, dedup_examples);
 

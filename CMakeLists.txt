@@ -49,8 +49,9 @@ project(vowpal_wabbit VERSION ${PACKAGE_VERSION} LANGUAGES C CXX)
 set(VW_PROJECT_DESCRIPTION "Vowpal Wabbit Machine Learning System")
 set(VW_PROJECT_URL "https://vowpalwabbit.org")
 
-option(USE_LATEST_STD "Override using C++11 with the latest standard the compiler offers. Default is C++11. " OFF)
-include(DetectCXXStandard)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Grab git commitish into variable
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.git)
@@ -75,9 +76,6 @@ ProcessorCount(NumProcessors)
 message(STATUS "Number of processors: ${NumProcessors}")
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/nprocs.txt ${NumProcessors})
 
-option(PROFILE "Turn on flags required for profiling" OFF)
-option(VALGRIND_PROFILE "Turn on flags required for profiling with valgrind" OFF)
-option(GCOV "Turn on flags required for gcov" OFF)
 option(WARNINGS "Turn on warning flags. ON by default." ON)
 option(WARNING_AS_ERROR "Turn on warning as error. OFF by default." OFF)
 option(STATIC_LINK_VW "Link VW executable statically. Off by default." OFF)
@@ -97,18 +95,7 @@ option(BUILD_FLATBUFFERS "Build flatbuffers" OFF)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" CONFIG)
 
-# When using Ninja, or CCache GCC and Clang do not output colors as it sees it as a non-terminal output.
-# Use this option to force color output in these modes.
-option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." OFF)
-if(FORCE_COLORED_OUTPUT)
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    add_compile_options(-fdiagnostics-color=always)
-  elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    add_compile_options(-fcolor-diagnostics)
-  endif()
-endif()
-
-if(WIN32 AND (PROFILE OR VALGRIND_PROFILE OR GCOV OR STATIC_LINK_VW OR LTO))
+if(WIN32 AND (STATIC_LINK_VW OR LTO))
   message(FATAL_ERROR "Unsupported option enabled on Windows build")
 endif()
 
@@ -118,44 +105,69 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(linux_x86_64_opt_flags -msse2 -mfpmath=sse)
 endif()
 
-# Add -ffast-math for speed, remove for testability.
-# no-stack-check is added to mitigate stack alignment issue on Catalina where there is a bug with aligning stack-check instructions, and stack-check became default option
-set(linux_release_config -O3 -fno-strict-aliasing ${linux_x86_64_opt_flags} -fno-stack-check)
+set(linux_lto_flag "")
+set(windows_lto_flag "")
+if(LTO)
+  if(WIN32)
+    set(windows_lto_flag "/GL")
+  else()
+    if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+      message(FATAL_ERROR "LTO requires Clang")
+    endif()
+    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "8.0.0")
+      message(FATAL_ERROR "LTO requires Clang 8.0 (llvm 3.9) or later")
+    endif()
+    If("${CONFIG}" STREQUAL "DEBUG")
+      message(FATAL_ERROR "LTO only works with Release builds")
+    endif()
+    set(linux_lto_flag -flto=thin)
+  endif()
+endif()
+
+add_library(vw_common_flags INTERFACE)
+target_compile_options(vw_common_flags INTERFACE )
+set(linux_common_flags -fvisibility=hidden)
+set(linux_release_config -O3 -fno-strict-aliasing ${linux_x86_64_opt_flags} ${linux_lto_flag} -fno-stack-check -fomit-frame-pointer)
 set(linux_debug_config -g -O0 -fno-stack-check)
 
-if((NOT PROFILE) AND (NOT GCOV))
-  set(linux_release_config ${linux_release_config} -fomit-frame-pointer)
-endif()
-
 #Use default visiblity on UNIX otherwise a lot of the C++ symbols end up for exported and interpose'able
-set(linux_flags -fvisibility=hidden $<$<CONFIG:DEBUG>:${linux_debug_config}> $<$<CONFIG:RELEASE>:${linux_release_config}> $<$<CONFIG:RelWithDebInfo>:${linux_release_config}>)
+set(linux_flags ${linux_common_flags} $<$<CONFIG:DEBUG>:${linux_debug_config}> $<$<CONFIG:RELEASE>:${linux_release_config}> $<$<CONFIG:RelWithDebInfo>:${linux_release_config}>)
+set(windows_flags /MP /Zc:__cplusplus $<$<CONFIG:RELEASE>:${windows_lto_flag}> $<$<CONFIG:RelWithDebInfo>:${windows_lto_flag}> )
 
-if(LTO)
-	if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-		message(FATAL_ERROR "LTO requires Clang")
-	endif()
-	if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "8.0.0")
-		message(FATAL_ERROR "LTO requires Clang 8.0 (llvm 3.9) or later")
-	endif()
-	If("${CONFIG}" STREQUAL "DEBUG")
-		message(FATAL_ERROR "LTO only works with Release builds")
-	endif()
-  set(linux_flags ${linux_flags} -flto=thin)
+if(WIN32)
+  target_compile_definitions(vw_common_flags INTERFACE __SSE2__)
+  target_compile_options(vw_common_flags INTERFACE ${windows_flags})
+  if(WARNINGS)
+    target_compile_options(vw_common_flags INTERFACE /W4)
+  endif()
+  if(WARNING_AS_ERROR)
+    target_compile_options(vw_common_flags INTERFACE /WX)
+  endif()
+else()
+  target_compile_options(vw_common_flags INTERFACE ${linux_flags})
+  if(WARNINGS)
+    target_compile_options(vw_common_flags INTERFACE -Wall -Wextra -Wpedantic)
+  endif()
+  if(WARNING_AS_ERROR)
+    target_compile_options(vw_common_flags INTERFACE -Wall -Wextra -Wpedantic -Werror)
+  endif()
 endif()
 
-# for profiling -- note that it needs to be gcc
-if(PROFILE)
-  set(linux_flags ${linux_flags} -fno-strict-aliasing -pg)
+# Clang-cl on Windows has issues with our usage of SIMD types. Turn it off explicitly for Windows + clang-cl to mitigate.
+if(WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_definitions(vw_common_flags INTERFACE VW_NO_INLINE_SIMD)
 endif()
 
-# for valgrind profiling: run 'valgrind --tool=callgrind PROGRAM' then 'callgrind_annotate --tree=both --inclusive=yes'
-if(VALGRIND_PROFILE)
-  set(linux_flags ${linux_flags} -g -fomit-frame-pointer -fno-strict-aliasing)
+target_compile_definitions(vw_common_flags INTERFACE _FILE_OFFSET_BITS=64 $<$<CONFIG:RELEASE>:NDEBUG>)
+# Only define if Clang is not used
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_definitions(vw_common_flags INTERFACE __extern_always_inline=inline)
 endif()
 
-# gcov configuration
-if(GCOV)
-  set(linux_flags ${linux_flags} -g -O0 -fprofile-arcs -ftest-coverage -fno-strict-aliasing -pg)
+if(VW_INSTALL)
+  install(
+    TARGETS vw_common_flags
+    EXPORT VowpalWabbitConfig)
 endif()
 
 # Use folders in VS solution
@@ -181,7 +193,7 @@ else()
     set(Boost_USE_STATIC_LIBS OFF)
     if(WIN32)
       # Windows links everything dynamically
-      add_definitions( -DBOOST_ALL_DYN_LINK )
+      add_definitions(-DBOOST_ALL_DYN_LINK)
     endif()
   endif()
 endif()
@@ -272,9 +284,6 @@ endif()
 if(BUILD_EXPERIMENTAL_BINDING)
   add_subdirectory(bindings)
 endif()
-
-# TODO convert cs directory to cmake
-# TODO convert c_test directory to cmake
 
 # Handle installation of targets, version, config and pkgconfig
 if(VW_INSTALL)

@@ -7,3 +7,4 @@
 - Remove Python binding
 - Remove lrq and lrqfa
 - Removed big_tests, demo, library, papers, most of utl
+- C++20 required
