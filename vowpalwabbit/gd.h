@@ -62,8 +62,8 @@ inline void vec_add_multipredict(multipredict_info<T>& mp, const float fx, uint6
 }
 
 // iterate through one namespace (or its part), callback function T(some_data_R, feature_value_x, feature_weight)
-template <class R, typename T>
-inline void foreach_feature(vw& all, features& fs, R& dat, uint64_t offset = 0, float mult = 1.)
+template <class StateType, typename FuncT>
+inline void foreach_feature(vw& all, features& fs, StateType& dat, uint64_t offset = 0, float mult = 1.)
 {
   if (all.weights.sparse)
     foreach_feature(all.weights.sparse_weights, fs, dat, offset, mult);
@@ -71,28 +71,29 @@ inline void foreach_feature(vw& all, features& fs, R& dat, uint64_t offset = 0, 
     foreach_feature(all.weights.dense_weights, fs, dat, offset, mult);
 }
 
-template <class R, class S, void (*T)(R&, float, S)>
-inline void foreach_feature(vw& all, example& ec, R& dat)
+template <class StateType, class WeightsItemType, void (*FuncT)(StateType&, float, WeightsItemType)>
+inline void foreach_feature(vw& all, example& ec, StateType& dat)
 {
   return all.weights.sparse
-      ? foreach_feature<R, S, T, sparse_parameters>(all.weights.sparse_weights, all.ignore_some_linear,
+      ? foreach_feature<StateType, WeightsItemType, FuncT, sparse_parameters>(all.weights.sparse_weights, all.ignore_some_linear,
             all.ignore_linear, *ec.interactions, all.permutations, ec, dat)
-      : foreach_feature<R, S, T, dense_parameters>(all.weights.dense_weights, all.ignore_some_linear, all.ignore_linear,
+      : foreach_feature<StateType, WeightsItemType, FuncT, dense_parameters>(all.weights.dense_weights, all.ignore_some_linear,
+            all.ignore_linear,
             *ec.interactions, all.permutations, ec, dat);
 }
 
-// iterate through all namespaces and quadratic&cubic features, callback function T(some_data_R, feature_value_x,
+// iterate through all namespaces and quadratic&cubic features, callback function FuncT(some_data_R, feature_value_x,
 // feature_weight)
-template <class R, void (*T)(R&, float, float&)>
-inline void foreach_feature(vw& all, example& ec, R& dat)
+template <class StateType, void (*FuncT)(StateType&, float, float&)>
+inline void foreach_feature(vw& all, example& ec, StateType& dat)
 {
-  foreach_feature<R, float&, T>(all, ec, dat);
+  foreach_feature<StateType, float&, FuncT>(all, ec, dat);
 }
 
-template <class R, void (*T)(R&, float, const float&)>
-inline void foreach_feature(vw& all, example& ec, R& dat)
+template <class StateType, void (*FuncT)(StateType&, float, const float&)>
+inline void foreach_feature(vw& all, example& ec, StateType& dat)
 {
-  foreach_feature<R, const float&, T>(all, ec, dat);
+  foreach_feature<StateType, const float&, FuncT>(all, ec, dat);
 }
 
 inline float inline_predict(vw& all, example& ec)

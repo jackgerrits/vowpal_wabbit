@@ -12,54 +12,54 @@
 
 namespace GD
 {
-// iterate through one namespace (or its part), callback function T(some_data_R, feature_value_x, feature_index)
-template <class R, void (*T)(R&, float, uint64_t), class W>
-void foreach_feature(W& /*weights*/, const features& fs, R& dat, uint64_t offset = 0, float mult = 1.)
+// iterate through one namespace (or its part), callback function FuncT(some_data_R, feature_value_x, feature_index)
+template <class StateType, void (*FuncT)(StateType&, float, uint64_t), class WeightsType>
+void foreach_feature(WeightsType& /*weights*/, const features& fs, StateType& dat, uint64_t offset = 0, float mult = 1.)
 {
-  for (const auto& f : fs) { T(dat, mult * f.value(), f.index() + offset); }
+  for (const auto& f : fs) { FuncT(dat, mult * f.value(), f.index() + offset); }
 }
 
-// iterate through one namespace (or its part), callback function T(some_data_R, feature_value_x, feature_weight)
-template <class R, void (*T)(R&, const float, float&), class W>
-inline void foreach_feature(W& weights, const features& fs, R& dat, uint64_t offset = 0, float mult = 1.)
+// iterate through one namespace (or its part), callback function FuncT(some_data_R, feature_value_x, feature_weight)
+template <class StateType, void (*FuncT)(StateType&, const float, float&), class WeightsType>
+inline void foreach_feature(WeightsType& weights, const features& fs, StateType& dat, uint64_t offset = 0, float mult = 1.)
 {
   for (const auto& f : fs)
   {
     weight& w = weights[(f.index() + offset)];
-    T(dat, mult * f.value(), w);
+    FuncT(dat, mult * f.value(), w);
   }
 }
 
-// iterate through one namespace (or its part), callback function T(some_data_R, feature_value_x, feature_weight)
-template <class R, void (*T)(R&, const float, const float&), class W>
-inline void foreach_feature(const W& weights, const features& fs, R& dat, uint64_t offset = 0, float mult = 1.)
+// iterate through one namespace (or its part), callback function FuncT(some_data_R, feature_value_x, feature_weight)
+template <class StateType, void (*FuncT)(StateType&, const float, const float&), class WeightsType>
+inline void foreach_feature(const WeightsType& weights, const features& fs, StateType& dat, uint64_t offset = 0, float mult = 1.)
 {
   for (const auto& f : fs)
   {
     const weight& w = weights[(f.index() + offset)];
-    T(dat, mult * f.value(), w);
+    FuncT(dat, mult * f.value(), w);
   }
 }
 
-template <class R>
-inline void dummy_func(R&, const audit_strings*)
+template <class StateType>
+inline void dummy_func(StateType&, const audit_strings*)
 {
 }  // should never be called due to call_audit overload
 
-template <class R, class S, void (*T)(R&, float, S), class W>  // nullptr func can't be used as template param in old
+template <class StateType, class WeightsItemType, void (*FuncT)(StateType&, float, WeightsItemType), class WeightsType>  // nullptr func can't be used as template param in old
                                                                // compilers
-inline void generate_interactions(namespace_interactions& interactions, bool permutations, example_predict& ec, R& dat,
-    W& weights)  // default value removed to eliminate
+inline void generate_interactions(namespace_interactions& interactions, bool permutations, example_predict& ec, StateType& dat,
+    WeightsType& weights)  // default value removed to eliminate
                  // ambiguity in old complers
 {
-  INTERACTIONS::generate_interactions<R, S, T, false, dummy_func<R>, W>(interactions, permutations, ec, dat, weights);
+  INTERACTIONS::generate_interactions<StateType, WeightsItemType, FuncT, false, dummy_func<StateType>, WeightsType>(interactions, permutations, ec, dat, weights);
 }
 
-// iterate through all namespaces and quadratic&cubic features, callback function T(some_data_R, feature_value_x, S)
-// where S is EITHER float& feature_weight OR uint64_t feature_index
-template <class R, class S, void (*T)(R&, float, S), class W>
-inline void foreach_feature(W& weights, bool ignore_some_linear, std::array<bool, NUM_NAMESPACES>& ignore_linear,
-    namespace_interactions& interactions, bool permutations, example_predict& ec, R& dat)
+// iterate through all namespaces and quadratic&cubic features, callback function FuncT(some_data_R, feature_value_x, WeightsItemType)
+// where WeightsItemType is EITHER float& feature_weight OR uint64_t feature_index
+template <class StateType, class WeightsItemType, void (*FuncT)(StateType&, float, WeightsItemType), class WeightsType>
+inline void foreach_feature(WeightsType& weights, bool ignore_some_linear, std::array<bool, NUM_NAMESPACES>& ignore_linear,
+    namespace_interactions& interactions, bool permutations, example_predict& ec, StateType& dat)
 {
   uint64_t offset = ec.ft_offset;
   if (ignore_some_linear)
@@ -68,22 +68,22 @@ inline void foreach_feature(W& weights, bool ignore_some_linear, std::array<bool
       if (!ignore_linear[i.index()])
       {
         features& f = *i;
-        foreach_feature<R, T, W>(weights, f, dat, offset);
+        foreach_feature<StateType, FuncT, WeightsType>(weights, f, dat, offset);
       }
     }
   else
-    for (features& f : ec) foreach_feature<R, T, W>(weights, f, dat, offset);
+    for (features& f : ec) foreach_feature<StateType, FuncT, WeightsType>(weights, f, dat, offset);
 
-  generate_interactions<R, S, T, W>(interactions, permutations, ec, dat, weights);
+  generate_interactions<StateType, WeightsItemType, FuncT, WeightsType>(interactions, permutations, ec, dat, weights);
 }
 
 inline void vec_add(float& p, const float fx, const float& fw) { p += fw * fx; }
 
-template <class W>
-inline float inline_predict(W& weights, bool ignore_some_linear, std::array<bool, NUM_NAMESPACES>& ignore_linear,
+template <class WeightsType>
+inline float inline_predict(WeightsType& weights, bool ignore_some_linear, std::array<bool, NUM_NAMESPACES>& ignore_linear,
     namespace_interactions& interactions, bool permutations, example_predict& ec, float initial = 0.f)
 {
-  foreach_feature<float, const float&, vec_add, W>(
+  foreach_feature<float, const float&, vec_add, WeightsType>(
       weights, ignore_some_linear, ignore_linear, interactions, permutations, ec, initial);
   return initial;
 }
