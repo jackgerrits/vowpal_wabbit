@@ -149,7 +149,7 @@ else()
     target_compile_options(vw_common_flags INTERFACE -Wall -Wextra -Wpedantic)
   endif()
   if(WARNING_AS_ERROR)
-    target_compile_options(vw_common_flags INTERFACE -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(vw_common_flags INTERFACE -Werror)
   endif()
 endif()
 
@@ -294,10 +294,6 @@ if(VW_INSTALL)
   ENDFOREACH()
 
   configure_file(libvw.pc.in libvw.pc @ONLY)
-  configure_file(libvw_c_wrapper.pc.in libvw_c_wrapper.pc @ONLY)
-  install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/libvw.pc ${CMAKE_CURRENT_BINARY_DIR}/libvw_c_wrapper.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
   install(EXPORT VowpalWabbitConfig
     FILE
