@@ -114,7 +114,7 @@ inline FORCE_INLINE float parseFloat(const char* p, size_t& end_idx, const char*
 inline float float_of_string(std::string_view s)
 {
   size_t end_idx;
-  float f = parseFloat(s.begin(), end_idx, s.end());
+  float f = parseFloat(s.data(), end_idx, s.data() + s.size());
   if ((end_idx == 0 && s.size() > 0) || std::isnan(f))
   {
     VW::io::logger::log_warn("warning: {} is not a good float, replacing with 0", s);
