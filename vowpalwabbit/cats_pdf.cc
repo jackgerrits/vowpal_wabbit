@@ -10,7 +10,6 @@
 #include "cats_pdf.h"
 #include "parse_args.h"
 #include "err_constants.h"
-#include "api_status.h"
 #include "cb_continuous_label.h"
 #include "debug_log.h"
 #include "shared_data.h"
@@ -47,8 +46,8 @@ struct cats_pdf
 {
   cats_pdf(single_learner* p_base, bool always_predict = false);
 
-  int learn(example& ec, experimental::api_status* status);
-  int predict(example& ec, experimental::api_status* status);
+  void learn(example& ec);
+  void predict(example& ec);
 
 private:
   single_learner* _base = nullptr;
@@ -56,15 +55,14 @@ private:
 };
 
 // Pass through
-int cats_pdf::predict(example& ec, experimental::api_status*)
+void cats_pdf::predict(example& ec)
 {
   VW_DBG(ec) << "cats_pdf::predict(), " << features_to_string(ec) << endl;
   _base->predict(ec);
-  return error_code::success;
 }
 
 // Pass through
-int cats_pdf::learn(example& ec, experimental::api_status*)
+void cats_pdf::learn(example& ec)
 {
   assert(!ec.test_only);
   VW_DBG(ec) << "cats_pdf::learn(), " << to_string(ec.l.cb_cont) << features_to_string(ec) << endl;
@@ -72,7 +70,6 @@ int cats_pdf::learn(example& ec, experimental::api_status*)
   if (_always_predict) { _base->predict(ec); }
 
   _base->learn(ec);
-  return error_code::success;
 }
 
 cats_pdf::cats_pdf(single_learner* p_base, bool always_predict) : _base(p_base), _always_predict(always_predict) {}
@@ -81,13 +78,10 @@ cats_pdf::cats_pdf(single_learner* p_base, bool always_predict) : _base(p_base),
 template <bool is_learn>
 void predict_or_learn(cats_pdf& reduction, single_learner&, example& ec)
 {
-  experimental::api_status status;
   if (is_learn)
-    reduction.learn(ec, &status);
+    reduction.learn(ec);
   else
-    reduction.predict(ec, &status);
-
-  if (status.get_error_code() != error_code::success) { VW_DBG(ec) << status.get_error_msg() << endl; }
+    reduction.predict(ec);
 }
 // END cats_pdf reduction and reduction methods
 ////////////////////////////////////////////////////
