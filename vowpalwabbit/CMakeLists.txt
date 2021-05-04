@@ -81,6 +81,7 @@ set(vw_all_headers
   cb_label_parser.h
   cb.h
   cbify.h
+  cb_to_cb_adf.h
   ccb_label.h
   ccb_reduction_features.h
   continuous_actions_reduction_features.h
@@ -135,6 +136,7 @@ set(vw_all_headers
   marginal.h
   memory_tree.h
   memory.h
+  metrics.h
   mf.h
   multiclass.h
   multilabel_oaa.h
@@ -248,6 +250,7 @@ set(vw_all_sources
   cb_sample.cc
   cb.cc
   cbify.cc
+  cb_to_cb_adf.cc
   ccb_label.cc
   classweight.cc
   conditional_contextual_bandit.cc
@@ -281,6 +284,7 @@ set(vw_all_sources
   loss_functions.cc
   marginal.cc
   memory_tree.cc
+  metrics.cc
   mf.cc
   multiclass.cc
   multilabel_oaa.cc
