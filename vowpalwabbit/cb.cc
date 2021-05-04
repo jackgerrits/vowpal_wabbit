@@ -48,7 +48,7 @@ void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string
     if (p->parse_name.empty() || p->parse_name.size() > 3) { THROW("malformed cost specification: " << word); }
 
     f.partial_prediction = 0.;
-    f.action = (uint32_t)hashstring(p->parse_name[0].begin(), p->parse_name[0].length(), 0);
+    f.action = (uint32_t)hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0);
     f.cost = FLT_MAX;
 
     if (p->parse_name.size() > 1) f.cost = float_of_string(p->parse_name[1]);
@@ -196,7 +196,7 @@ void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<std
 {
   if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
 
-  ld.action = (uint32_t)hashstring(words[0].begin(), words[0].length(), 0);
+  ld.action = (uint32_t)hashstring(words[0].data(), words[0].length(), 0);
 
   // Removing the first element of a vector is not efficient at all, every element must be copied/moved.
   const auto stashed_first_token = std::move(words[0]);

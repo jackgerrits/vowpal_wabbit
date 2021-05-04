@@ -153,7 +153,7 @@ void parse_label(parser* p, shared_data* sd, label& ld, std::vector<std::string_
     if (p->parse_name.size() == 1 || p->parse_name.size() == 2 || p->parse_name.size() == 3)
     {
       f.class_index = sd->ldict ? (uint32_t)sd->ldict->get(p->parse_name[0])
-                                : (uint32_t)hashstring(p->parse_name[0].begin(), p->parse_name[0].length(), 0);
+                                : (uint32_t)hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0);
       if (p->parse_name.size() == 1 && f.x >= 0)  // test examples are specified just by un-valued class #s
         f.x = FLT_MAX;
     }
