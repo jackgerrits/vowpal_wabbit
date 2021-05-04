@@ -126,7 +126,7 @@ inline float float_of_string(std::string_view s)
 inline int int_of_string(std::string_view s, char*& end)
 {
   // can't use stol because that throws an exception. Use strtol instead.
-  int i = strtol(s.begin(), &end, 10);
+  int i = strtol(s.data(), &end, 10);
   if (end <= s.begin() && s.size() > 0)
   {
     VW::io::logger::log_warn("warning: {} is not a good int, replacing with 0", s);
