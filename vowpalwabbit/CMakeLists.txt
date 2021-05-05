@@ -199,7 +199,6 @@ set(vw_all_headers
   vw_validate.h
   vw_versions.h
   vw.h
-  vwdll.h
   vwvis.h
   warm_cb.h
 )
@@ -401,21 +400,6 @@ set_target_properties(vw-bin PROPERTIES OUTPUT_NAME vw)
 
 if(STATIC_LINK_VW)
   target_link_libraries(vw-bin PRIVATE ${unix_static_flag})
-endif()
-
-
-add_library(vw_c_wrapper SHARED vwdll.cpp)
-add_library(VowpalWabbit::vw_c_wrapper ALIAS vw_c_wrapper)
-
-target_compile_definitions(vw_c_wrapper PUBLIC VWDLL_EXPORTS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE ZLIB_WINAPI)
-target_link_libraries(vw_c_wrapper PUBLIC VowpalWabbit::vw)
-if(VW_INSTALL)
-  install(
-    TARGETS vw_c_wrapper
-    EXPORT VowpalWabbitConfig
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 if(VW_INSTALL)
