@@ -40,10 +40,7 @@ private:
   single_learner* _base = nullptr;
 };
 
-void cb_explore_pdf::learn(example& ec)
-{
-  _base->learn(ec);
-}
+void cb_explore_pdf::learn(example& ec) { _base->learn(ec); }
 
 void cb_explore_pdf::predict(example& ec)
 {

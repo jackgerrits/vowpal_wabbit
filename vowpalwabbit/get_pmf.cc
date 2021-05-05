@@ -39,10 +39,7 @@ private:
   float _epsilon;
 };
 
-void get_pmf::learn(example& ec)
-{
-  _base->learn(ec);
-}
+void get_pmf::learn(example& ec) { _base->learn(ec); }
 
 void get_pmf::predict(example& ec)
 {

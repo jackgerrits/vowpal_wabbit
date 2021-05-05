@@ -82,7 +82,7 @@ void predict_or_learn(sample_pdf& reduction, single_learner&, example& ec)
     reduction.learn(ec);
   else
   {
-   reduction.predict(ec);
+    reduction.predict(ec);
   }
 }
 
