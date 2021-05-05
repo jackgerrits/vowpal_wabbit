@@ -3,7 +3,6 @@
 // license as described in the file LICENSE.
 
 #include "cb_explore_pdf.h"
-#include "err_constants.h"
 #include "debug_log.h"
 #include "parse_args.h"
 

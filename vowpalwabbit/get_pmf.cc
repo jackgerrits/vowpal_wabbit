@@ -3,7 +3,6 @@
 // license as described in the file LICENSE.
 
 #include "get_pmf.h"
-#include "err_constants.h"
 #include "debug_log.h"
 #include "parse_args.h"
 #include "guard.h"
