@@ -6,7 +6,7 @@
 
 #include "cache.h"
 #include "parser.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "constant.h"
 #include "vw_math.h"
 #include "parse_primitives.h"
@@ -86,7 +86,7 @@ bool test_label(slates::label& ld) { return ld.labeled == false; }
 // For a more complete description of the grammar, including examples see:
 // https://github.com/VowpalWabbit/vowpal_wabbit/wiki/Slates
 void parse_label(
-    parser* p, shared_data* /*sd*/, slates::label& ld, std::vector<VW::string_view>& words, reduction_features&)
+    parser* p, shared_data* /*sd*/, slates::label& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   ld.weight = 1;
 
@@ -128,7 +128,7 @@ void parse_label(
       ld.labeled = true;
       tokenize(',', words[2], p->parse_name);
 
-      std::vector<VW::string_view> split_colons;
+      std::vector<std::string_view> split_colons;
       for (auto& token : p->parse_name)
       {
         tokenize(':', token, split_colons);
@@ -173,7 +173,7 @@ label_parser slates_label_parser = {
   // default_label
   [](polylabel* v) { default_label(v->slates); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->slates, words, red_features);
   },
   // cache_label

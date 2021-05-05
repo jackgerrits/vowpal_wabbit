@@ -22,7 +22,7 @@
 
 #include <atomic>
 #include <memory>
-#include "vw_string_view.h"
+#include <string_view>
 #include "queue.h"
 #include "object_pool.h"
 #include "hashstring.h"
@@ -51,7 +51,7 @@ struct parser
   parser& operator=(const parser&) = delete;
 
   // helper(s) for text parsing
-  std::vector<VW::string_view> words;
+  std::vector<std::string_view> words;
 
   VW::object_pool<example> example_pool;
   VW::ptr_queue<example> ready_parsed_examples;
@@ -92,7 +92,7 @@ struct parser
   size_t finished_count;   // the number of finished examples;
   int bound_sock = 0;
 
-  std::vector<VW::string_view> parse_name;
+  std::vector<std::string_view> parse_name;
 
   label_parser lbl_parser;  // moved from vw
 

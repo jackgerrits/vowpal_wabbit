@@ -142,7 +142,7 @@ int main(int argc, char** argv)
         }
 
         auto* ae = &VW::get_unused_example(vw);
-        VW::string_view example(line.c_str(), line.size());
+        std::string_view example(line.c_str(), line.size());
         substring_to_example(vw, ae, example);
         exs.push_back(ae);
       }
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
       for (const auto& line : lines)
       {
         example& ae = VW::get_unused_example(vw);
-        VW::string_view example(line.c_str(), line.size());
+        std::string_view example(line.c_str(), line.size());
         substring_to_example(vw, &ae, example);
         VW::finish_example(*vw, ae);
       }

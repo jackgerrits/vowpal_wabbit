@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_CASE(tag_with_seed__seed_extraction)
   auto examples = parse_json(*vw, json);
   auto example = examples[0];
 
-  VW::string_view expected{"test_seed"};
+  std::string_view expected{"test_seed"};
 
-  VW::string_view seed;
+  std::string_view seed;
 
   auto extracted = VW::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(true, extracted);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(tag_without_seed__seed_extraction)
   auto examples = parse_json(*vw, json);
   auto example = examples[0];
 
-  VW::string_view seed;
+  std::string_view seed;
 
   auto extracted = VW::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(false, extracted);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(no_tag__seed_extraction)
   auto examples = parse_json(*vw, json);
   auto example = examples[0];
 
-  VW::string_view seed;
+  std::string_view seed;
 
   auto extracted = VW::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(false, extracted);
