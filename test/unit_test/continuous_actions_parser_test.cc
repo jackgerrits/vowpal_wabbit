@@ -13,7 +13,7 @@
 #include "parse_primitives.h"
 #include <memory>
 
-void parse_label(label_parser& lp, parser* p, VW::string_view label, polylabel& l, reduction_features& red_fts)
+void parse_label(label_parser& lp, parser* p, std::string_view label, polylabel& l, reduction_features& red_fts)
 {
   tokenize(' ', label, p->words);
   lp.default_label(&l);

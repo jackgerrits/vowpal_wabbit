@@ -40,7 +40,7 @@ VW_WARNING_STATE_POP
 #include "best_constant.h"
 #include "json_utils.h"
 #include "parse_slates_example_json.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include <algorithm>
 #include <vector>
 #include <limits>
@@ -1174,10 +1174,7 @@ public:
     return return_state;
   }
 
-  BaseState<audit>* Uint(Context<audit>& ctx, unsigned i) override
-  {
-    return Float(ctx, static_cast<float>(i));
-  }
+  BaseState<audit>* Uint(Context<audit>& ctx, unsigned i) override { return Float(ctx, static_cast<float>(i)); }
 
   BaseState<audit>* Null(Context<audit>& /*ctx*/) override
   {
@@ -1755,7 +1752,7 @@ inline void append_empty_newline_example_for_driver(vw* all, v_array<example*>& 
   {
     example& ae = VW::get_unused_example(all);
     static const char empty[] = "";
-    VW::string_view example(empty);
+    std::string_view example(empty);
     substring_to_example(all, &ae, example);
     ae.is_newline = true;
 

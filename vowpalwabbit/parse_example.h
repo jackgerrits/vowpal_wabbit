@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "example.h"
 #include "vw.h"
-#include "vw_string_view.h"
+#include <string_view>
 
 // example processing
 typedef enum
@@ -14,7 +14,7 @@ typedef enum
   JsonFeatures
 } FeatureInputType;
 
-void substring_to_example(vw* all, example* ae, VW::string_view example);
+void substring_to_example(vw* all, example* ae, std::string_view example);
 
 namespace VW
 {

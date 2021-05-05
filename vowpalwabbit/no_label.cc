@@ -10,9 +10,8 @@
 #include "cache.h"
 #include "accumulate.h"
 #include "best_constant.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "example.h"
-#include "vw_string_view_fmt.h"
 
 #include "io/logger.h"
 // needed for printing ranges of objects (eg: all elements of a vector)
@@ -22,7 +21,7 @@ namespace logger = VW::io::logger;
 
 namespace no_label
 {
-void parse_no_label(const std::vector<VW::string_view>& words)
+void parse_no_label(const std::vector<std::string_view>& words)
 {
   switch (words.size())
   {
@@ -39,7 +38,7 @@ label_parser no_label_parser = {
   // default_label
   [](polylabel*) {},
   // parse_label
-  [](parser*, shared_data*, polylabel*, std::vector<VW::string_view>& words, reduction_features&) {
+  [](parser*, shared_data*, polylabel*, std::vector<std::string_view>& words, reduction_features&) {
     parse_no_label(words);
   },
   // cache_label

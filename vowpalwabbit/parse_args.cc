@@ -181,7 +181,7 @@ void parse_dictionary_argument(vw& all, const std::string& str)
   // in the case of just 'foo.txt' it's applied to the default namespace
 
   char ns = ' ';
-  VW::string_view s(str);
+  std::string_view s(str);
   if ((str.length() > 2) && (str[1] == ':'))
   {
     ns = str[0];
@@ -294,7 +294,7 @@ void parse_dictionary_argument(vw& all, const std::string& str)
                          << (map->size() == 1 ? "" : "s") << endl;
 
   all.namespace_dictionaries[(size_t)ns].push_back(map);
-  dictionary_info info = {s.to_string(), fd_hash, map};
+  dictionary_info info = {std::string{s}, fd_hash, map};
   all.loaded_dictionaries.push_back(info);
 }
 
@@ -1713,8 +1713,8 @@ char** to_argv_escaped(std::string const& s, int& argc)
 
 char** to_argv(std::string const& s, int& argc)
 {
-  VW::string_view strview(s);
-  std::vector<VW::string_view> foo;
+  std::string_view strview(s);
+  std::vector<std::string_view> foo;
   tokenize(' ', strview, foo);
 
   char** argv = calloc_or_throw<char*>(foo.size() + 1);
