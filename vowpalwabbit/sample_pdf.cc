@@ -3,12 +3,6 @@
 // license as described in the file LICENSE.
 
 #include "sample_pdf.h"
-<<<<<<< HEAD
-#include "err_constants.h"
-=======
-#include "error_constants.h"
-#include "api_status.h"
->>>>>>> master
 #include "debug_log.h"
 #include "parse_args.h"
 #include "explore.h"
@@ -55,10 +49,6 @@ void sample_pdf::learn(example& ec)
     auto restore = VW::swap_guard(ec.pred.pdf, _pred_pdf);
     _base->learn(ec);
   }
-<<<<<<< HEAD
-=======
-  return VW::experimental::error_code::success;
->>>>>>> master
 }
 
 void sample_pdf::predict(example& ec)
@@ -73,9 +63,7 @@ void sample_pdf::predict(example& ec)
   const int ret_code = exploration::sample_pdf(_p_random_state, std::begin(_pred_pdf), std::end(_pred_pdf),
       ec.pred.pdf_value.action, ec.pred.pdf_value.pdf_value);
 
-  if (ret_code != S_EXPLORATION_OK) return VW::experimental::error_code::sample_pdf_failed;
-
-  return VW::experimental::error_code::success;
+  if (ret_code != S_EXPLORATION_OK) THROW("VW::experimental::error_code::sample_pdf_failed;");
 }
 
 void sample_pdf::init(single_learner* p_base, uint64_t* p_random_seed)
@@ -93,17 +81,8 @@ void predict_or_learn(sample_pdf& reduction, single_learner&, example& ec)
     reduction.learn(ec);
   else
   {
-<<<<<<< HEAD
     reduction.predict(ec);
   }
-=======
-    if (VW::experimental::error_code::success != reduction.predict(ec, &status))
-      THROW(VW::experimental::error_code::sample_pdf_failed_s);
-  }
-
-  if (status.get_error_code() != VW::experimental::error_code::success)
-  { VW_DBG(ec) << status.get_error_msg() << endl; }
->>>>>>> master
 }
 
 // END sample_pdf reduction and reduction methods
