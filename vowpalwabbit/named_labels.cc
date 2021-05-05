@@ -19,7 +19,7 @@ void VW::named_labels::initialize_maps_from_input_string()
 
   for (uint32_t k = 0; k < m_K; k++)
   {
-    const VW::string_view& l = m_id2name[static_cast<size_t>(k)];
+    const std::string_view& l = m_id2name[static_cast<size_t>(k)];
     auto iter = m_name2id.find(l);
     if (iter != m_name2id.end()) THROW("error: label dictionary initialized with multiple occurances of: " << l);
     m_name2id.emplace(l, k + 1);
@@ -47,7 +47,7 @@ VW::named_labels& VW::named_labels::operator=(const VW::named_labels& other)
   return *this;
 }
 
-uint32_t VW::named_labels::get(VW::string_view s) const
+uint32_t VW::named_labels::get(std::string_view s) const
 {
   auto iter = m_name2id.find(s);
   if (iter == m_name2id.end())
@@ -60,10 +60,10 @@ uint32_t VW::named_labels::get(VW::string_view s) const
 
 uint32_t VW::named_labels::getK() const { return m_K; }
 
-VW::string_view VW::named_labels::get(uint32_t v) const
+std::string_view VW::named_labels::get(uint32_t v) const
 {
   static_assert(sizeof(size_t) >= sizeof(uint32_t), "size_t is smaller than 32-bits. Potential overflow issues.");
-  if ((v == 0) || (v > m_K)) { return VW::string_view(); }
+  if ((v == 0) || (v > m_K)) { return std::string_view(); }
 
   return m_id2name[static_cast<size_t>(v - 1)];
 }

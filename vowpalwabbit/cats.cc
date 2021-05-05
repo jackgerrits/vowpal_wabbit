@@ -38,21 +38,19 @@ namespace cats
 ////////////////////////////////////////////////////
 // BEGIN cats reduction and reduction methods
 // Pass through
-int cats::predict(example& ec, experimental::api_status*)
+void cats::predict(example& ec)
 {
   VW_DBG(ec) << "cats::predict(), " << features_to_string(ec) << endl;
   _base->predict(ec);
-  return error_code::success;
 }
 
 // Pass through
-int cats::learn(example& ec, experimental::api_status* status = nullptr)
+void cats::learn(example& ec)
 {
   assert(!ec.test_only);
-  predict(ec, status);
+  predict(ec);
   VW_DBG(ec) << "cats::learn(), " << to_string(ec.l.cb_cont) << features_to_string(ec) << endl;
   _base->learn(ec);
-  return error_code::success;
 }
 
 float cats::get_loss(const VW::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const
@@ -87,13 +85,10 @@ cats::cats(single_learner* p_base) : _base(p_base) {}
 template <bool is_learn>
 void predict_or_learn(cats& reduction, single_learner&, example& ec)
 {
-  experimental::api_status status;
   if (is_learn)
-    reduction.learn(ec, &status);
+    reduction.learn(ec);
   else
-    reduction.predict(ec, &status);
-
-  if (status.get_error_code() != error_code::success) { VW_DBG(ec) << status.get_error_msg() << endl; }
+    reduction.predict(ec);
 }
 
 // END cats reduction and reduction methods

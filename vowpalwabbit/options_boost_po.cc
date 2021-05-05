@@ -23,10 +23,10 @@ std::ostream& std::operator<<(std::ostream& os, const std::vector<bool>& vec)
   return os;
 }
 
-bool is_number(const VW::string_view& s)
+bool is_number(const std::string_view& s)
 {
   size_t endidx = 0;
-  auto f = parseFloat(s.begin(), endidx, s.end());
+  auto f = parseFloat(s.data(), endidx, s.data() + s.size());
   if ((endidx == 0 && !s.empty()) || std::isnan(f)) { return false; }
 
   return true;

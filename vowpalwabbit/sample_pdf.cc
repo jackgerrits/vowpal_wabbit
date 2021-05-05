@@ -4,7 +4,6 @@
 
 #include "sample_pdf.h"
 #include "err_constants.h"
-#include "api_status.h"
 #include "debug_log.h"
 #include "parse_args.h"
 #include "explore.h"
@@ -31,8 +30,8 @@ namespace continuous_action
 // BEGIN sample_pdf reduction and reduction methods
 struct sample_pdf
 {
-  int learn(example& ec, experimental::api_status* status);
-  int predict(example& ec, experimental::api_status* status);
+  void learn(example& ec);
+  void predict(example& ec);
 
   void init(single_learner* p_base, uint64_t* p_random_seed);
 
@@ -42,7 +41,7 @@ private:
   single_learner* _base = nullptr;
 };
 
-int sample_pdf::learn(example& ec, experimental::api_status*)
+void sample_pdf::learn(example& ec)
 {
   // one of the base reductions will call predict so we need a valid
   // predict buffer
@@ -51,10 +50,9 @@ int sample_pdf::learn(example& ec, experimental::api_status*)
     auto restore = VW::swap_guard(ec.pred.pdf, _pred_pdf);
     _base->learn(ec);
   }
-  return error_code::success;
 }
 
-int sample_pdf::predict(example& ec, experimental::api_status*)
+void sample_pdf::predict(example& ec)
 {
   _pred_pdf.clear();
 
@@ -66,9 +64,7 @@ int sample_pdf::predict(example& ec, experimental::api_status*)
   const int ret_code = exploration::sample_pdf(_p_random_state, std::begin(_pred_pdf), std::end(_pred_pdf),
       ec.pred.pdf_value.action, ec.pred.pdf_value.pdf_value);
 
-  if (ret_code != S_EXPLORATION_OK) return error_code::sample_pdf_failed;
-
-  return error_code::success;
+  if (ret_code != S_EXPLORATION_OK) THROW("error_code::sample_pdf_failed");
 }
 
 void sample_pdf::init(single_learner* p_base, uint64_t* p_random_seed)
@@ -82,15 +78,12 @@ void sample_pdf::init(single_learner* p_base, uint64_t* p_random_seed)
 template <bool is_learn>
 void predict_or_learn(sample_pdf& reduction, single_learner&, example& ec)
 {
-  experimental::api_status status;
   if (is_learn)
-    reduction.learn(ec, &status);
+    reduction.learn(ec);
   else
   {
-    if (error_code::success != reduction.predict(ec, &status)) THROW(error_code::sample_pdf_failed_s);
+    reduction.predict(ec);
   }
-
-  if (status.get_error_code() != error_code::success) { VW_DBG(ec) << status.get_error_msg() << endl; }
 }
 
 // END sample_pdf reduction and reduction methods

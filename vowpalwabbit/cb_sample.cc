@@ -7,7 +7,7 @@
 #include "explore.h"
 
 #include "rand48.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "tag_utils.h"
 
 #undef VW_DEBUG_LOG
@@ -65,9 +65,9 @@ struct cb_sample_data
     {
       uint64_t seed = _random_state->get_current_state();
 
-      VW::string_view tag_seed;
+      std::string_view tag_seed;
       const bool tag_provided_seed = try_extract_random_seed(*examples[0], tag_seed);
-      if (tag_provided_seed) { seed = uniform_hash(tag_seed.begin(), tag_seed.size(), 0); }
+      if (tag_provided_seed) { seed = uniform_hash(tag_seed.data(), tag_seed.size(), 0); }
 
       // Sampling is done after the base learner has generated a pdf.
       auto result = exploration::sample_after_normalizing(

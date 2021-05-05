@@ -46,7 +46,6 @@ set(vw_all_headers
   active_cover.h
   active.h
   allreduce.h
-  api_status.h
   array_parameters_dense.h
   array_parameters.h
   audit_regressor.h
@@ -197,7 +196,6 @@ set(vw_all_headers
   vw_allreduce.h
   vw_exception.h
   vw_math.h
-  vw_string_view.h
   vw_validate.h
   vw_versions.h
   vw.h
@@ -218,7 +216,6 @@ set(vw_all_sources
   action_score.cc
   active_cover.cc
   active.cc
-  api_status.cc
   audit_regressor.cc
   autolink.cc
   baseline.cc

@@ -138,7 +138,7 @@ void parser::parse_example(vw* all, example* ae, const Example* eg)
 
   if (flatbuffers::IsFieldPresent(eg, Example::VT_TAG))
   {
-    VW::string_view tag(eg->tag()->c_str());
+    std::string_view tag(eg->tag()->c_str());
     ae->tag.insert(ae->tag.end(), tag.begin(), tag.end());
   }
 

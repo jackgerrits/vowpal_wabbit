@@ -13,7 +13,7 @@
 #include "parse_primitives.h"
 #include <memory>
 
-void parse_ccb_label(parser* p, VW::string_view label, CCB::label& l)
+void parse_ccb_label(parser* p, std::string_view label, CCB::label& l)
 {
   tokenize(' ', label, p->words);
   CCB::default_label(l);

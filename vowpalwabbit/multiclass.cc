@@ -7,7 +7,7 @@
 #include "global_data.h"
 #include "vw.h"
 #include "vw_exception.h"
-#include "vw_string_view.h"
+#include <string_view>
 #include "example.h"
 #include "parse_primitives.h"
 #include "shared_data.h"
@@ -50,7 +50,7 @@ size_t read_cached_label(shared_data*, label_t& ld, io_buf& cache)
 float weight(label_t& ld) { return (ld.weight > 0) ? ld.weight : 0.f; }
 bool test_label(const label_t& ld) { return ld.label == (uint32_t)-1; }
 
-void parse_label(parser*, shared_data* sd, label_t& ld, std::vector<VW::string_view>& words, reduction_features&)
+void parse_label(parser*, shared_data* sd, label_t& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   switch (words.size())
   {
@@ -91,7 +91,7 @@ label_parser mc_label = {
   // default_label
   [](polylabel* v) { default_label(v->multi); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->multi, words, red_features);
   },
   // cache_label
@@ -108,10 +108,10 @@ label_parser mc_label = {
 
 void print_label_pred(vw& all, example& ec, uint32_t prediction)
 {
-  VW::string_view sv_label = all.sd->ldict->get(ec.l.multi.label);
-  VW::string_view sv_pred = all.sd->ldict->get(prediction);
+  std::string_view sv_label = all.sd->ldict->get(ec.l.multi.label);
+  std::string_view sv_pred = all.sd->ldict->get(prediction);
   all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass,
-      sv_label.empty() ? "unknown" : sv_label.to_string(), sv_pred.empty() ? "unknown" : sv_pred.to_string(),
+      sv_label.empty() ? "unknown" : std::string{sv_label}, sv_pred.empty() ? "unknown" : std::string{sv_pred},
       ec.num_features, all.progress_add, all.progress_arg);
 }
 
@@ -176,8 +176,8 @@ void finish_example(vw& all, example& ec, bool update_loss)
       all.print_by_ref(sink.get(), (float)ec.pred.multiclass, 0, ec.tag);
     else
     {
-      VW::string_view sv_pred = all.sd->ldict->get(ec.pred.multiclass);
-      all.print_text_by_ref(sink.get(), sv_pred.to_string(), ec.tag);
+      std::string_view sv_pred = all.sd->ldict->get(ec.pred.multiclass);
+      all.print_text_by_ref(sink.get(), std::string{sv_pred}, ec.tag);
     }
 
   MULTICLASS::print_update<direct_print_update>(all, ec, ec.pred.multiclass);

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "vw_string_view.h"
+#include <string_view>
 
 struct example;
 
 namespace VW
 {
-bool try_extract_random_seed(const example& ex, VW::string_view& view);
+bool try_extract_random_seed(const example& ex, std::string_view& view);
 }

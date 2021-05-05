@@ -11,7 +11,7 @@
 #include "global_data.h"
 #include "shared_data.h"
 
-void parse_label(label_parser& lp, parser* p, shared_data* sd, VW::string_view label, polylabel& l)
+void parse_label(label_parser& lp, parser* p, shared_data* sd, std::string_view label, polylabel& l)
 {
   tokenize(' ', label, p->words);
   lp.default_label(&l);
