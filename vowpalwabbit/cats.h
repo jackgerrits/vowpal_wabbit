@@ -5,7 +5,6 @@
 #pragma once
 #include "learner.h"
 #include "options.h"
-#include "api_status.h"
 
 namespace VW
 {
@@ -23,8 +22,8 @@ struct cats
 
   cats(LEARNER::single_learner* p_base);
 
-  int learn(example& ec, experimental::api_status* status);
-  int predict(example& ec, experimental::api_status* status);
+  void learn(example& ec);
+  void predict(example& ec);
   float get_loss(const VW::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const;
 
 private:

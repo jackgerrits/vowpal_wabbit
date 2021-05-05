@@ -4,7 +4,6 @@
 
 #include "cb_explore_pdf.h"
 #include "err_constants.h"
-#include "api_status.h"
 #include "debug_log.h"
 #include "parse_args.h"
 
@@ -27,8 +26,8 @@ namespace continuous_action
 // BEGIN sample_pdf reduction and reduction methods
 struct cb_explore_pdf
 {
-  int learn(example& ec, experimental::api_status* status);
-  int predict(example& ec, experimental::api_status* status);
+  void learn(example& ec);
+  void predict(example& ec);
 
   void init(single_learner* p_base);
 
@@ -41,13 +40,9 @@ private:
   single_learner* _base = nullptr;
 };
 
-int cb_explore_pdf::learn(example& ec, experimental::api_status*)
-{
-  _base->learn(ec);
-  return error_code::success;
-}
+void cb_explore_pdf::learn(example& ec) { _base->learn(ec); }
 
-int cb_explore_pdf::predict(example& ec, experimental::api_status*)
+void cb_explore_pdf::predict(example& ec)
 {
   const auto& reduction_features = ec._reduction_features.template get<VW::continuous_actions::reduction_features>();
   if (first_only && !reduction_features.is_pdf_set() && !reduction_features.is_chosen_action_set())
@@ -55,13 +50,13 @@ int cb_explore_pdf::predict(example& ec, experimental::api_status*)
     // uniform random
     ec.pred.pdf.push_back(
         VW::continuous_actions::pdf_segment{min_value, max_value, static_cast<float>(1. / (max_value - min_value))});
-    return error_code::success;
+    return;
   }
   else if (first_only && reduction_features.is_pdf_set())
   {
     // pdf provided
     ec.pred.pdf = reduction_features.pdf;
-    return error_code::success;
+    return;
   }
 
   _base->predict(ec);
@@ -69,7 +64,6 @@ int cb_explore_pdf::predict(example& ec, experimental::api_status*)
   continuous_actions::probability_density_function& _pred_pdf = ec.pred.pdf;
   for (uint32_t i = 0; i < _pred_pdf.size(); i++)
   { _pred_pdf[i].pdf_value = _pred_pdf[i].pdf_value * (1 - epsilon) + epsilon / (max_value - min_value); }
-  return error_code::success;
 }
 
 void cb_explore_pdf::init(single_learner* p_base) { _base = p_base; }
@@ -78,13 +72,10 @@ void cb_explore_pdf::init(single_learner* p_base) { _base = p_base; }
 template <bool is_learn>
 void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
 {
-  experimental::api_status status;
   if (is_learn)
-    reduction.learn(ec, &status);
+    reduction.learn(ec);
   else
-    reduction.predict(ec, &status);
-
-  if (status.get_error_code() != error_code::success) { VW_DBG(ec) << status.get_error_msg() << endl; }
+    reduction.predict(ec);
 }
 
 // END sample_pdf reduction and reduction methods

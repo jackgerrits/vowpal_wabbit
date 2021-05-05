@@ -4,7 +4,6 @@
 
 #include "get_pmf.h"
 #include "err_constants.h"
-#include "api_status.h"
 #include "debug_log.h"
 #include "parse_args.h"
 #include "guard.h"
@@ -30,8 +29,8 @@ namespace continuous_action
 // BEGIN sample_pdf reduction and reduction methods
 struct get_pmf
 {
-  int learn(example& ec, experimental::api_status* status);
-  int predict(example& ec, experimental::api_status* status);
+  void learn(example& ec);
+  void predict(example& ec);
 
   void init(single_learner* p_base, float epsilon);
 
@@ -40,13 +39,9 @@ private:
   float _epsilon;
 };
 
-int get_pmf::learn(example& ec, experimental::api_status*)
-{
-  _base->learn(ec);
-  return error_code::success;
-}
+void get_pmf::learn(example& ec) { _base->learn(ec); }
 
-int get_pmf::predict(example& ec, experimental::api_status*)
+void get_pmf::predict(example& ec)
 {
   uint32_t base_prediction;
 
@@ -59,8 +54,6 @@ int get_pmf::predict(example& ec, experimental::api_status*)
   // Assume ec.pred.a_s allocated by the caller (probably pmf_to_pdf);
   ec.pred.a_s.clear();
   ec.pred.a_s.push_back({base_prediction, 1.0f});
-
-  return error_code::success;
 }
 
 void get_pmf::init(single_learner* p_base, float epsilon)
@@ -73,13 +66,10 @@ void get_pmf::init(single_learner* p_base, float epsilon)
 template <bool is_learn>
 void predict_or_learn(get_pmf& reduction, single_learner&, example& ec)
 {
-  experimental::api_status status;
   if (is_learn)
-    reduction.learn(ec, &status);
+    reduction.learn(ec);
   else
-    reduction.predict(ec, &status);
-
-  if (status.get_error_code() != error_code::success) { VW_DBG(ec) << status.get_error_msg() << endl; }
+    reduction.predict(ec);
 }
 
 // END sample_pdf reduction and reduction methods
