@@ -9,3 +9,4 @@
 - Removed big_tests, demo, library, papers, most of utl
 - C++20 required
 - Remove search
+- Remove sender

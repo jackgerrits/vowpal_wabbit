@@ -176,7 +176,6 @@ set(vw_all_headers
   sample_pdf.h
   scope_exit.h
   scorer.h
-  sender.h
   shared_data.h
   shared_feature_merger.h
   simple_label_parser.h
@@ -309,7 +308,6 @@ set(vw_all_sources
   recall_tree.cc
   sample_pdf.cc
   scorer.cc
-  sender.cc
   shared_data.cc
   shared_feature_merger.cc
   simple_label_parser.cc

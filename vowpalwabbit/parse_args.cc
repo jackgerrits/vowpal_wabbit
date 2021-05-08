@@ -16,7 +16,6 @@
 #include "vw.h"
 #include "interactions.h"
 
-#include "sender.h"
 #include "nn.h"
 #include "gd.h"
 #include "cbify.h"
@@ -1301,7 +1300,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(kernel_svm_setup);
   reductions.push_back(ftrl_setup);
   reductions.push_back(svrg_setup);
-  reductions.push_back(sender_setup);
   reductions.push_back(gd_mf_setup);
   reductions.push_back(print_setup);
   reductions.push_back(noop_setup);

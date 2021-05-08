@@ -601,8 +601,6 @@ Continuous actions - sample pdf:
 scorer options:
   --link arg (=identity, ) Specify the link function: identity, logistic, glf1 
                            or poisson
-Network sending:
-  --sendto arg          send examples to <host>
 Slates:
   --slates              EXPERIMENTAL
 Stagewise polynomial options:
