@@ -42,9 +42,6 @@ endif()
 if(WIN32)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/platforms/win32.cmake)
   message(STATUS "WinSDK Version: ${CMAKE_SYSTEM_VERSION}")
-  if (vw_BUILD_NET_FRAMEWORK)
-    message(STATUS ".NET Framework Version: ${CMAKE_DOTNET_TARGET_FRAMEWORK_VERSION}")
-  endif()
 endif()
 
 project(vowpal_wabbit VERSION ${PACKAGE_VERSION} LANGUAGES C CXX)
@@ -275,13 +272,6 @@ if(BUILD_TESTS)
     set(vw_c_api_unit_test_target "vw_c_api_unit_test")
   endif()
 
-  set(vw_cs_unittest_targets "")
-  if (vw_BUILD_NET_FRAMEWORK)
-    set(vw_cs_unittest_targets
-      cs_unittest
-      cs_unittest_nofriend
-    )
-  endif()
 
   # The Visual Studio expression generator
   set(cmake_test_configuration "")
@@ -303,7 +293,7 @@ if(BUILD_TESTS)
   # This target ensures all dependencies are built and also uses verbose mode allowing the test output to be seen.
   add_custom_target(test_with_output
     COMMAND ${CMAKE_CTEST_COMMAND} ${cmake_test_configuration} ${cmake_test_verbosity}
-    DEPENDS spanning_tree vw-unit-test.out vw-bin ${vw_c_api_unit_test_target} ${vw_cs_unittest_targets}
+    DEPENDS spanning_tree vw-unit-test.out vw-bin ${vw_c_api_unit_test_target}
   )
 endif()
 
