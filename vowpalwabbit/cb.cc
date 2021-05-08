@@ -48,7 +48,7 @@ void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string
     if (p->parse_name.empty() || p->parse_name.size() > 3) { THROW("malformed cost specification: " << word); }
 
     f.partial_prediction = 0.;
-    f.action = (uint32_t)hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0);
+    f.action = static_cast<uint32_t>(hashstring(p->parse_name[0].begin(), p->parse_name[0].length(), 0));
     f.cost = FLT_MAX;
 
     if (p->parse_name.size() > 1) f.cost = float_of_string(p->parse_name[1]);
@@ -154,8 +154,8 @@ void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool act
           num_features, all.progress_add, all.progress_arg);
     }
     else
-      all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_buf, (uint32_t)pred,
-          num_features, all.progress_add, all.progress_arg);
+      all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_buf,
+          static_cast<uint32_t>(pred), num_features, all.progress_add, all.progress_arg);
   }
 }
 }  // namespace CB
@@ -169,7 +169,7 @@ size_t read_cached_label(shared_data* sd, CB_EVAL::label& ld, io_buf& cache)
   char* c;
   size_t total = sizeof(uint32_t);
   if (cache.buf_read(c, total) < total) return 0;
-  ld.action = *(uint32_t*)c;
+  ld.action = *reinterpret_cast<uint32_t*>(c);
 
   return total + CB::read_cached_label(sd, ld.event, cache);
 }
@@ -178,7 +178,7 @@ void cache_label(CB_EVAL::label& ld, io_buf& cache)
 {
   char* c;
   cache.buf_write(c, sizeof(uint32_t));
-  *(uint32_t*)c = ld.action;
+  *reinterpret_cast<uint32_t*>(c) = ld.action;
 
   CB::cache_label(ld.event, cache);
 }

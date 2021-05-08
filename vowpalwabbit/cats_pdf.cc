@@ -9,7 +9,7 @@
 
 #include "cats_pdf.h"
 #include "parse_args.h"
-#include "err_constants.h"
+#include "error_constants.h"
 #include "cb_continuous_label.h"
 #include "debug_log.h"
 #include "shared_data.h"
@@ -163,7 +163,7 @@ LEARNER::base_learner* setup(config::options_i& options, vw& all)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (num_actions <= 0) THROW(error_code::num_actions_gt_zero_s);
+  if (num_actions <= 0) THROW(VW::experimental::error_code::num_actions_gt_zero_s);
 
   // cats stack = [cats_pdf -> cb_explore_pdf -> pmf_to_pdf -> get_pmf -> cats_tree]
   if (!options.was_supplied("cb_explore_pdf")) options.insert("cb_explore_pdf", "");
