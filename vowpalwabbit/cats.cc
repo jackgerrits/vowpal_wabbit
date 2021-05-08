@@ -4,7 +4,7 @@
 
 #include "cats.h"
 #include "parse_args.h"
-#include "err_constants.h"
+#include "error_constants.h"
 #include "debug_log.h"
 #include "shared_data.h"
 
@@ -175,7 +175,7 @@ LEARNER::base_learner* setup(options_i& options, vw& all)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (num_actions <= 0) THROW(error_code::num_actions_gt_zero_s);
+  if (num_actions <= 0) THROW(VW::experimental::error_code::num_actions_gt_zero_s);
 
   // cats stack = [cats -> sample_pdf -> cats_pdf ... rest specified by cats_pdf]
   if (!options.was_supplied("sample_pdf")) options.insert("sample_pdf", "");
