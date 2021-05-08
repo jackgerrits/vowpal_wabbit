@@ -48,7 +48,7 @@ void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string
     if (p->parse_name.empty() || p->parse_name.size() > 3) { THROW("malformed cost specification: " << word); }
 
     f.partial_prediction = 0.;
-    f.action = static_cast<uint32_t>(hashstring(p->parse_name[0].begin(), p->parse_name[0].length(), 0));
+    f.action = static_cast<uint32_t>(hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0));
     f.cost = FLT_MAX;
 
     if (p->parse_name.size() > 1) f.cost = float_of_string(p->parse_name[1]);
