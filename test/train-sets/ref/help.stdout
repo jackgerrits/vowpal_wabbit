@@ -469,16 +469,6 @@ Continuous actions - convert to pmf:
 Interact via elementwise multiplication:
   --interact arg        Put weights on feature products from namespaces <n1> 
                         and <n2>
-Kernel SVM:
-  --ksvm                   kernel svm
-  --reprocess arg (=1, )   number of reprocess steps for LASVM
-  --pool_greedy            use greedy selection on mini pools
-  --para_active            do parallel active learning
-  --pool_size arg (=1, )   size of pools for active learning
-  --subsample arg (=1, )   number of items to subsample from the pool
-  --kernel arg (=linear, ) type of kernel (rbf or linear (default))
-  --bandwidth arg (=1, )   bandwidth of rbf kernel
-  --degree arg (=2, )      degree of poly kernel
 Latent Dirichlet Allocation:
   --lda arg                    Run lda with <int> topics
   --lda_alpha arg (=0.1, )     Prior on sparsity of per-document topic weights
@@ -601,8 +591,6 @@ Continuous actions - sample pdf:
 scorer options:
   --link arg (=identity, ) Specify the link function: identity, logistic, glf1 
                            or poisson
-Network sending:
-  --sendto arg          send examples to <host>
 Slates:
   --slates              EXPERIMENTAL
 Stagewise polynomial options:
