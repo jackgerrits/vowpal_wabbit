@@ -66,7 +66,6 @@
 #include "active.h"
 #include "active_cover.h"
 #include "cs_active.h"
-#include "kernel_svm.h"
 #include "parse_example.h"
 #include "best_constant.h"
 #include "interact.h"
@@ -1297,7 +1296,6 @@ void parse_reductions(options_i& options, vw& all)
 
   // Base algorithms
   reductions.push_back(GD::setup);
-  reductions.push_back(kernel_svm_setup);
   reductions.push_back(ftrl_setup);
   reductions.push_back(svrg_setup);
   reductions.push_back(gd_mf_setup);

@@ -124,7 +124,6 @@ set(vw_all_headers
   interactions.h
   io_buf.h
   json_utils.h
-  kernel_svm.h
   label_dictionary.h
   label_parser.h
   lda_core.h
@@ -270,7 +269,6 @@ set(vw_all_sources
   interact.cc
   interactions.cc
   io_buf.cc
-  kernel_svm.cc
   label_dictionary.cc
   lda_core.cc
   learner.cc
