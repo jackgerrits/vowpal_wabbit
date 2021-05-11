@@ -86,8 +86,7 @@ inline uint32_t weight_gen(std::shared_ptr<rand_state>& state)  // sampling from
   if (temp <= 0.9999999999999999998412) return 19;
   return 20;
 }
-}
-
+}  // namespace BS
 
 uint32_t cb_explore_adf_bag::get_bag_learner_update_count(uint32_t learner_index)
 {

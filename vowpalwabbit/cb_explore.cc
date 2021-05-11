@@ -137,8 +137,7 @@ inline uint32_t weight_gen(std::shared_ptr<rand_state>& state)  // sampling from
   if (temp <= 0.9999999999999999998412) return 19;
   return 20;
 }
-}
-
+}  // namespace BS
 
 template <bool is_learn>
 void predict_or_learn_bag(cb_explore& data, single_learner& base, example& ec)
