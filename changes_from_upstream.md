@@ -11,3 +11,10 @@
 - Remove search
 - Remove sender
 - Remove kernel svm
+- Remove active cover
+- Remove active
+- Remove cs active
+- Remove interact
+- Remove lda core
+- Remove mwt
+- Remove nn
