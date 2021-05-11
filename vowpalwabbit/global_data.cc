@@ -276,7 +276,6 @@ vw::vw() : options(nullptr, nullptr)
   bfgs = false;
   no_bias = false;
   hessian_on = false;
-  active = false;
   num_bits = 18;
   default_bits = true;
   daemon = false;

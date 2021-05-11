@@ -450,7 +450,7 @@ input_options parse_source(vw& all, options_i& options)
                          << endl;
   }
 
-  if (parsed_options.daemon || options.was_supplied("pid_file") || (options.was_supplied("port") && !all.active))
+  if (parsed_options.daemon || options.was_supplied("pid_file") || options.was_supplied("port"))
   {
     all.daemon = true;
     // allow each child to process up to 1e5 connections

@@ -353,7 +353,7 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
   // default text reader
   all.example_parser->text_reader = VW::read_lines;
 
-  if (!all.no_daemon && (all.daemon || all.active))
+  if (!all.no_daemon && all.daemon)
   {
 #ifdef _WIN32
     WSAData wsaData;
@@ -412,7 +412,7 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
     if (!input_options.foreground)
     {
       // FIXME switch to posix_spawn
-      if (!all.active && daemon(1, 1)) THROWERRNO("daemon");
+      if (daemon(1, 1)) THROWERRNO("daemon");
     }
 
     // write pid file
@@ -436,7 +436,7 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
 #endif
     }
 
-    if (all.daemon && !all.active)
+    if (all.daemon)
     {
 #ifdef _WIN32
       THROW("not supported on windows");
@@ -526,13 +526,9 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
     all.example_parser->input->add_file(socket->get_reader());
     if (!all.logger.quiet) *(all.trace_message) << "reading data from port " << port << endl;
 
-    if (all.active) { set_string_reader(all); }
-    else
-    {
-      all.example_parser->sorted_cache = true;
-      set_daemon_reader(all, input_options.json, input_options.dsjson);
-      all.example_parser->sorted_cache = true;
-    }
+    all.example_parser->sorted_cache = true;
+    set_daemon_reader(all, input_options.json, input_options.dsjson);
+    all.example_parser->sorted_cache = true;
     all.example_parser->resettable = all.example_parser->write_cache || all.daemon;
   }
   else

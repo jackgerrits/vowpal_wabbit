@@ -246,7 +246,6 @@ public:
   vw_logger logger;
   bool audit;     // should I print lots of debugging information?
   bool training;  // Should I train if lable data is available?
-  bool active;
   bool invariant_updates;  // Should we use importance aware/safe updates
   uint64_t random_seed;
   bool random_weights;
