@@ -138,7 +138,6 @@ if __name__ == '__main__':
         errors += do_test(filename, '--hash_seed 10')
         errors += do_test(filename, '--loss_function logistic')
         errors += do_test(filename, '--boosting 10')
-        errors += do_test(filename, '--bootstrap 10')
         errors += do_test(filename, '--l1 1e-04')
         errors += do_test(filename, '--l2 1e-04')
         errors += do_test(filename, '--learning_rate 0.1')

@@ -7,7 +7,6 @@
 #include "reductions.h"
 #include "cb_adf.h"
 #include "rand48.h"
-#include "bs.h"
 #include "gen_cs_example.h"
 #include "cb_explore.h"
 #include "explore.h"

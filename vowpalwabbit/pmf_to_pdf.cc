@@ -12,7 +12,7 @@
 #include "cb_label_parser.h"
 #include "shared_data.h"
 
-using namespace LEARNER;
+using namespace VW::LEARNER;
 using namespace VW;
 using namespace VW::config;
 
