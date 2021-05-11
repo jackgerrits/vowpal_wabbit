@@ -43,8 +43,6 @@ endif()
 set(vw_all_headers
   accumulate.h
   action_score.h
-  active_cover.h
-  active.h
   allreduce.h
   array_parameters_dense.h
   array_parameters.h
@@ -94,7 +92,6 @@ set(vw_all_headers
   correctedMath.h
   cost_sensitive.h
   crossplat_compat.h
-  cs_active.h
   csoaa.h
   debug_print.h
   decision_scores.h
@@ -119,14 +116,12 @@ set(vw_all_headers
   global_data.h
   guard.h
   hashstring.h
-  interact.h
   interactions_predict.h
   interactions.h
   io_buf.h
   json_utils.h
   label_dictionary.h
   label_parser.h
-  lda_core.h
   learner.h
   log_multi.h
   loss_functions.h
@@ -138,12 +133,10 @@ set(vw_all_headers
   multiclass.h
   multilabel_oaa.h
   multilabel.h
-  mwt.h
   numeric_casts.h
   named_labels.h
   network.h
   kskip_ngram_transformer.h
-  nn.h
   no_label.h
   noop.h
   oaa.h
@@ -211,8 +204,6 @@ endif()
 set(vw_all_sources
   accumulate.cc
   action_score.cc
-  active_cover.cc
-  active.cc
   audit_regressor.cc
   autolink.cc
   baseline.cc
@@ -250,7 +241,6 @@ set(vw_all_sources
   confidence.cc
   cbzo.cc
   cost_sensitive.cc
-  cs_active.cc
   csoaa.cc
   decision_scores.cc
   distributionally_robust.cc
@@ -266,11 +256,9 @@ set(vw_all_sources
   get_pmf.cc
   global_data.cc
   hashstring.cc
-  interact.cc
   interactions.cc
   io_buf.cc
   label_dictionary.cc
-  lda_core.cc
   learner.cc
   log_multi.cc
   loss_functions.cc
@@ -281,11 +269,9 @@ set(vw_all_sources
   multiclass.cc
   multilabel_oaa.cc
   multilabel.cc
-  mwt.cc
   named_labels.cc
   network.cc
   kskip_ngram_transformer.cc
-  nn.cc
   no_label.cc
   noop.cc
   oaa.cc

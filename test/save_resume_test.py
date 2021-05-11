@@ -151,7 +151,6 @@ if __name__ == '__main__':
         errors += do_test(filename, '--normalized')
         errors += do_test(filename, '--invariant')
         errors += do_test(filename, '--loss_function logistic --link logistic')
-        errors += do_test(filename, '--nn 2')
         errors += do_test(filename, '--binary')
         errors += do_test(filename, '--ftrl')
         errors += do_test(filename, '--pistol')

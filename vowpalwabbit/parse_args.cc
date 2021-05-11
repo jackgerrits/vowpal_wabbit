@@ -16,7 +16,6 @@
 #include "vw.h"
 #include "interactions.h"
 
-#include "nn.h"
 #include "gd.h"
 #include "cbify.h"
 #include "oaa.h"
@@ -42,12 +41,10 @@
 #include "cb_explore_adf_rnd.h"
 #include "cb_explore_adf_softmax.h"
 #include "slates.h"
-#include "mwt.h"
 #include "confidence.h"
 #include "scorer.h"
 #include "expreplay.h"
 #include "bfgs.h"
-#include "lda_core.h"
 #include "noop.h"
 #include "print.h"
 #include "gd_mf.h"
@@ -63,12 +60,8 @@
 #include "memory_tree.h"
 #include "plt.h"
 #include "stagewise_poly.h"
-#include "active.h"
-#include "active_cover.h"
-#include "cs_active.h"
 #include "parse_example.h"
 #include "best_constant.h"
-#include "interact.h"
 #include "vw_exception.h"
 #include "accumulate.h"
 #include "vw_validate.h"
@@ -1301,7 +1294,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(gd_mf_setup);
   reductions.push_back(print_setup);
   reductions.push_back(noop_setup);
-  reductions.push_back(lda_setup);
   reductions.push_back(bfgs_setup);
   reductions.push_back(OjaNewton_setup);
   // reductions.push_back(VW_CNTK::setup);
@@ -1309,10 +1301,7 @@ void parse_reductions(options_i& options, vw& all)
   // Score Users
   reductions.push_back(baseline_setup);
   reductions.push_back(ExpReplay::expreplay_setup<'b', simple_label_parser>);
-  reductions.push_back(active_setup);
-  reductions.push_back(active_cover_setup);
   reductions.push_back(confidence_setup);
-  reductions.push_back(nn_setup);
   reductions.push_back(mf_setup);
   reductions.push_back(marginal_setup);
   reductions.push_back(autolink_setup);
@@ -1336,13 +1325,10 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(multilabel_oaa_setup);
   reductions.push_back(plt_setup);
 
-  reductions.push_back(cs_active_setup);
   reductions.push_back(CSOAA::csoaa_setup);
-  reductions.push_back(interact_setup);
   reductions.push_back(CSOAA::csldf_setup);
   reductions.push_back(cb_algs_setup);
   reductions.push_back(cb_adf_setup);
-  reductions.push_back(mwt_setup);
   reductions.push_back(VW::cats_tree::setup);
   reductions.push_back(cb_explore_setup);
   reductions.push_back(VW::cb_explore_adf::greedy::setup);
