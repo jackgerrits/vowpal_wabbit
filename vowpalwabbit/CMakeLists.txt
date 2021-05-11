@@ -98,8 +98,6 @@ set(vw_all_headers
   example_predict.h
   example.h
   explore_eval.h
-  expreplay.h
-  ezexample.h
   fast_pow10.h
   feature_group.h
   ftrl.h
@@ -117,10 +115,8 @@ set(vw_all_headers
   label_dictionary.h
   label_parser.h
   learner.h
-  log_multi.h
   loss_functions.h
   marginal.h
-  memory_tree.h
   memory.h
   metrics.h
   multiclass.h
@@ -152,7 +148,6 @@ set(vw_all_headers
   prob_dist_cont.h
   queue.h
   rand48.h
-  recall_tree.h
   reductions.h
   reductions_fwd.h
   sample_pdf.h
@@ -244,10 +239,8 @@ set(vw_all_sources
   io_buf.cc
   label_dictionary.cc
   learner.cc
-  log_multi.cc
   loss_functions.cc
   marginal.cc
-  memory_tree.cc
   metrics.cc
   multiclass.cc
   multilabel_oaa.cc
@@ -269,7 +262,6 @@ set(vw_all_sources
   print.cc
   prob_dist_cont.cc
   rand48.cc
-  recall_tree.cc
   sample_pdf.cc
   scorer.cc
   shared_data.cc

@@ -27,3 +27,7 @@
 - Remove ojanewton
 - Remove stagewise poly
 - Remove svrg
+- Remove expreplay
+- Remove log multi
+- Remove memory tree
+- Remove parse args

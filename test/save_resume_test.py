@@ -161,8 +161,6 @@ if __name__ == '__main__':
         errors += do_test('train-sets/multiclass', '--oaa 10')
         errors += do_test('train-sets/multiclass', '--csoaa 10')
         errors += do_test('train-sets/multiclass', '--ect 10')
-        errors += do_test('train-sets/multiclass', '--log_multi 10')
-        errors += do_test('train-sets/multiclass', '--recall_tree 10')
 
     if errors:
         sys.exit('%s failed' % errors)

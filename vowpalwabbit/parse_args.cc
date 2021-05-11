@@ -42,16 +42,12 @@
 #include "slates.h"
 #include "confidence.h"
 #include "scorer.h"
-#include "expreplay.h"
 #include "print.h"
 #include "learner.h"
 #include "ftrl.h"
 #include "rand48.h"
 #include "binary.h"
 #include "autolink.h"
-#include "log_multi.h"
-#include "recall_tree.h"
-#include "memory_tree.h"
 #include "plt.h"
 #include "parse_example.h"
 #include "best_constant.h"
@@ -1286,7 +1282,6 @@ void parse_reductions(options_i& options, vw& all)
 
   // Score Users
   reductions.push_back(baseline_setup);
-  reductions.push_back(ExpReplay::expreplay_setup<'b', simple_label_parser>);
   reductions.push_back(confidence_setup);
   reductions.push_back(marginal_setup);
   reductions.push_back(autolink_setup);
@@ -1296,14 +1291,10 @@ void parse_reductions(options_i& options, vw& all)
   // Reductions
   reductions.push_back(VW::binary::binary_setup);
 
-  reductions.push_back(ExpReplay::expreplay_setup<'m', MULTICLASS::mc_label>);
   reductions.push_back(topk_setup);
   reductions.push_back(oaa_setup);
   reductions.push_back(boosting_setup);
   reductions.push_back(ect_setup);
-  reductions.push_back(log_multi_setup);
-  reductions.push_back(recall_tree_setup);
-  reductions.push_back(memory_tree_setup);
   reductions.push_back(multilabel_oaa_setup);
   reductions.push_back(plt_setup);
 
@@ -1340,7 +1331,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(cbifyldf_setup);
   reductions.push_back(cb_to_cb_adf_setup);
   reductions.push_back(VW::offset_tree::setup);
-  reductions.push_back(ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>);
   reductions.push_back(audit_regressor_setup);
   reductions.push_back(VW::metrics::metrics_setup);
 
