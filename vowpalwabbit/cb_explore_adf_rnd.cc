@@ -3,7 +3,6 @@
 // license as described in the file LICENSE.
 
 #include "cb_explore_adf_rnd.h"
-#include "bs.h"
 #include "cb_adf.h"
 #include "cb_explore.h"
 #include "debug_print.h"

@@ -49,12 +49,9 @@ set(vw_all_headers
   audit_regressor.h
   autolink.h
   baseline.h
-  beam.h
   best_constant.h
-  bfgs.h
   binary.h
   boosting.h
-  bs.h
   cache.h
   cats_pdf.h
   cats_tree.h
@@ -82,8 +79,6 @@ set(vw_all_headers
   ccb_label.h
   ccb_reduction_features.h
   continuous_actions_reduction_features.h
-  classweight.h
-  compat.h
   conditional_contextual_bandit.h
   confidence.h
   config.h.in
@@ -108,7 +103,6 @@ set(vw_all_headers
   fast_pow10.h
   feature_group.h
   ftrl.h
-  gd_mf.h
   gd_predict.h
   gd.h
   gen_cs_example.h
@@ -129,20 +123,16 @@ set(vw_all_headers
   memory_tree.h
   memory.h
   metrics.h
-  mf.h
   multiclass.h
   multilabel_oaa.h
   multilabel.h
   numeric_casts.h
   named_labels.h
-  network.h
   kskip_ngram_transformer.h
   no_label.h
-  noop.h
   oaa.h
   object_pool.h
   offset_tree.h
-  OjaNewton.h
   options_boost_po.h
   options_serializer_boost_po.h
   options_types.h
@@ -176,8 +166,6 @@ set(vw_all_headers
   slates.h
   spanning_tree.h
   stable_unique.h
-  stagewise_poly.h
-  svrg.h
   tag_utils.h
   topk.h
   unique_sort.h
@@ -208,10 +196,8 @@ set(vw_all_sources
   autolink.cc
   baseline.cc
   best_constant.cc
-  bfgs.cc
   binary.cc
   boosting.cc
-  bs.cc
   cache.cc
   cats_pdf.cc
   cats_tree.cc
@@ -236,7 +222,6 @@ set(vw_all_sources
   cbify.cc
   cb_to_cb_adf.cc
   ccb_label.cc
-  classweight.cc
   conditional_contextual_bandit.cc
   confidence.cc
   cbzo.cc
@@ -250,7 +235,6 @@ set(vw_all_sources
   explore_eval.cc
   feature_group.cc
   ftrl.cc
-  gd_mf.cc
   gd.cc
   gen_cs_example.cc
   get_pmf.cc
@@ -265,18 +249,14 @@ set(vw_all_sources
   marginal.cc
   memory_tree.cc
   metrics.cc
-  mf.cc
   multiclass.cc
   multilabel_oaa.cc
   multilabel.cc
   named_labels.cc
-  network.cc
   kskip_ngram_transformer.cc
   no_label.cc
-  noop.cc
   oaa.cc
   offset_tree.cc
-  OjaNewton.cc
   options_boost_po.cc
   options_serializer_boost_po.cc
   parse_args.cc
@@ -298,8 +278,6 @@ set(vw_all_sources
   simple_label.cc
   slates_label.cc
   slates.cc
-  stagewise_poly.cc
-  svrg.cc
   tag_utils.cc
   topk.cc
   unique_sort.cc

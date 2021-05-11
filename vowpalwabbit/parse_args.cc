@@ -22,7 +22,6 @@
 #include "boosting.h"
 #include "multilabel_oaa.h"
 #include "rand48.h"
-#include "bs.h"
 #include "topk.h"
 #include "ect.h"
 #include "csoaa.h"
@@ -44,14 +43,9 @@
 #include "confidence.h"
 #include "scorer.h"
 #include "expreplay.h"
-#include "bfgs.h"
-#include "noop.h"
 #include "print.h"
-#include "gd_mf.h"
 #include "learner.h"
-#include "mf.h"
 #include "ftrl.h"
-#include "svrg.h"
 #include "rand48.h"
 #include "binary.h"
 #include "autolink.h"
@@ -59,20 +53,17 @@
 #include "recall_tree.h"
 #include "memory_tree.h"
 #include "plt.h"
-#include "stagewise_poly.h"
 #include "parse_example.h"
 #include "best_constant.h"
 #include "vw_exception.h"
 #include "accumulate.h"
 #include "vw_validate.h"
 #include "vw_allreduce.h"
-#include "OjaNewton.h"
 #include "audit_regressor.h"
 #include "marginal.h"
 #include "metrics.h"
 #include "explore_eval.h"
 #include "baseline.h"
-#include "classweight.h"
 #include "cb_sample.h"
 #include "warm_cb.h"
 #include "shared_feature_merger.h"
@@ -1290,27 +1281,19 @@ void parse_reductions(options_i& options, vw& all)
   // Base algorithms
   reductions.push_back(GD::setup);
   reductions.push_back(ftrl_setup);
-  reductions.push_back(svrg_setup);
-  reductions.push_back(gd_mf_setup);
   reductions.push_back(print_setup);
-  reductions.push_back(noop_setup);
-  reductions.push_back(bfgs_setup);
-  reductions.push_back(OjaNewton_setup);
   // reductions.push_back(VW_CNTK::setup);
 
   // Score Users
   reductions.push_back(baseline_setup);
   reductions.push_back(ExpReplay::expreplay_setup<'b', simple_label_parser>);
   reductions.push_back(confidence_setup);
-  reductions.push_back(mf_setup);
   reductions.push_back(marginal_setup);
   reductions.push_back(autolink_setup);
-  reductions.push_back(stagewise_poly_setup);
   reductions.push_back(scorer_setup);
   reductions.push_back(VW::cbzo::setup);
 
   // Reductions
-  reductions.push_back(bs_setup);
   reductions.push_back(VW::binary::binary_setup);
 
   reductions.push_back(ExpReplay::expreplay_setup<'m', MULTICLASS::mc_label>);
@@ -1321,7 +1304,6 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(log_multi_setup);
   reductions.push_back(recall_tree_setup);
   reductions.push_back(memory_tree_setup);
-  reductions.push_back(classweight_setup);
   reductions.push_back(multilabel_oaa_setup);
   reductions.push_back(plt_setup);
 

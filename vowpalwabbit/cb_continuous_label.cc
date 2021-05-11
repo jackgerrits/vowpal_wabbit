@@ -13,7 +13,7 @@
 
 #include "io/logger.h"
 
-using namespace LEARNER;
+using namespace VW::LEARNER;
 
 namespace logger = VW::io::logger;
 

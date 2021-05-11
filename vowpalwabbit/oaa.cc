@@ -98,7 +98,7 @@ void learn(oaa& o, VW::LEARNER::single_learner& base, example& ec)
 }
 
 template <bool print_all, bool scores, bool probabilities>
-void predict(oaa& o, LEARNER::single_learner& base, example& ec)
+void predict(oaa& o, VW::LEARNER::single_learner& base, example& ec)
 {
   // The predictions are either an array of scores or a single
   // class id of a multiclass label
@@ -273,7 +273,7 @@ VW::LEARNER::base_learner* oaa_setup(options_i& options, vw& all)
         *(all.trace_message) << "WARNING: --probabilities should be used only with --loss_function=logistic"
                              << std::endl;
       // the three boolean template parameters are: is_learn, print_all and scores
-      l = &LEARNER::init_multiclass_learner(data, base, learn<false, true, true>, predict<false, true, true>,
+      l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, true, true>, predict<false, true, true>,
           all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-prob", prediction_type_t::scalars);
       all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
       all.sd->report_multiclass_log_loss = true;

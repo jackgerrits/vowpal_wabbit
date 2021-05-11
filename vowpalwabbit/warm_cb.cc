@@ -6,7 +6,6 @@
 #include "reductions.h"
 #include "cb_algs.h"
 #include "rand48.h"
-#include "bs.h"
 #include "vw.h"
 #include "hash.h"
 #include "explore.h"

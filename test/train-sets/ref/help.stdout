@@ -168,15 +168,6 @@ Input options:
                         version, so enabling this option will migrate you to 
                         the new behavior and silence the warning.
   --flatbuffer          data file will be interpreted as a flatbuffer file
-OjaNewton options:
-  --OjaNewton                    Online Newton with Oja's Sketch
-  --sketch_size arg (=10, )      size of sketch
-  --epoch_size arg (=1, )        size of epoch
-  --alpha arg (=1, )             mutiplicative constant for indentiy
-  --alpha_inverse arg            one over alpha, similar to learning rate
-  --learning_rate_cnt arg (=2, ) constant for the learning rate 1/t
-  --normalize arg                normalize the features or not
-  --random_init arg              randomize initialization of Oja or not
 Audit Regressor:
   --audit_regressor arg stores feature names and their regressor values. Same 
                         dataset must be used for both regressor training and 
@@ -191,13 +182,6 @@ Baseline options:
                         baseline predictions
   --check_enabled       only use baseline when the example contains enabled 
                         flag
-Conjugate Gradient options:
-  --conjugate_gradient  use conjugate gradient based optimization
-LBFGS and Conjugate Gradient options:
-  --bfgs                       use conjugate gradient based optimization
-  --hessian_on                 use second derivative in line search
-  --mem arg (=15, )            memory in bfgs
-  --termination arg (=0.001, ) Termination threshold
 Binary loss:
   --binary              report loss as binary classification on -1,1
 Boosting:
@@ -205,9 +189,6 @@ Boosting:
   --gamma arg (=0.1, )  weak learner's edge (=0.1), used only by online BBM
   --alg arg (=BBM, )    specify the boosting algorithm: BBM (default), logistic
                         (AdaBoost.OL.W), adaptive (AdaBoost.OL)
-Bootstrap:
-  --bootstrap arg       k-way bootstrap by online importance resampling
-  --bs_type arg         prediction type {mean,vote}
 Continuous actions tree with smoothing:
   --cats arg            number of discrete actions <k> for cats
   --min_value arg       Minimum continuous value
@@ -386,8 +367,6 @@ EXPERIMENTAL: Conditional Contextual Bandit Exploration with ADF:
   --ccb_explore_adf     EXPERIMENTAL: Do Conditional Contextual Bandit learning
                         with multiline action dependent features.
   --all_slots_loss      Report average loss from all slots
-importance weight classes:
-  --classweight arg     importance weight multiplier for class
 Confidence:
   --confidence                 Get confidence for binary predictions
   --confidence_after_training  Confidence after training
@@ -464,10 +443,6 @@ Memory Tree:
                                        update as well
 Multilabel One Against All:
   --multilabel_oaa arg  One-against-all multilabel with <k> labels
-Matrix Factorization Reduction:
-  --new_mf arg          rank for reduction-based matrix factorization
-Noop Learner:
-  --noop                do no learning
 One Against All Options:
   --oaa arg             One-against-all multiclass with <k> labels
   --oaa_subsample arg   subsample this number of negative examples when 
@@ -498,10 +473,6 @@ Convert discrete PMF into continuous PDF:
                           or uniform random
 Print psuedolearner:
   --print               print examples
-Gradient Descent Matrix Factorization:
-  --rank arg            rank for matrix factorization.
-  --bfgs                Option not supported by this reduction
-  --conjugate_gradient  Option not supported by this reduction
 Recall Tree:
   --recall_tree arg       Use online tree for multiclass
   --max_candidates arg    maximum number of labels per leaf in the tree
@@ -534,16 +505,6 @@ scorer options:
                            or poisson
 Slates:
   --slates              EXPERIMENTAL
-Stagewise polynomial options:
-  --stage_poly                use stagewise polynomial feature learning
-  --sched_exponent arg (=1, ) exponent controlling quantity of included 
-                              features
-  --batch_sz arg (=1000, )    multiplier on batch size before including more 
-                              features
-  --batch_sz_no_doubling      batch_sz does not double
-Stochastic Variance Reduced Gradient:
-  --svrg                  Streaming Stochastic Variance Reduced Gradient
-  --stage_size arg (=1, ) Number of passes per SVRG stage
 Top K:
   --top arg             top k recommendation
 Make Multiclass into Warm-starting Contextual Bandit:

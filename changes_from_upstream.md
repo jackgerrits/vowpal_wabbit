@@ -18,3 +18,12 @@
 - Remove lda core
 - Remove mwt
 - Remove nn
+- Remove bfgs
+- Remove bs
+- Remove classweight
+- Remove gd_mf
+- Remove mf
+- Remove noop
+- Remove ojanewton
+- Remove stagewise poly
+- Remove svrg
