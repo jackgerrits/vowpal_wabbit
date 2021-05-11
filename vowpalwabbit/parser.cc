@@ -371,7 +371,6 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
       all.chain_hash_json = input_options.chain_hash_json;
     }
 
-
   if (passes > 1 && !all.example_parser->resettable)
     THROW("need a cache file for multiple passes : try using --cache_file");
 
