@@ -7,4 +7,4 @@ REPO_DIR=$SCRIPT_DIR/../../
 cd $REPO_DIR
 
 cd test
-./RunTests -d -f -E 0.001 -F -V ../build/vowpalwabbit/vw
+python3 run_tests.py -f -E 0.001 --valgrind -j $(nproc)
