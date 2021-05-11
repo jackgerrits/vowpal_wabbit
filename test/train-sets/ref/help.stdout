@@ -411,10 +411,6 @@ Gradient Descent options:
   --l2_state arg (=1, )  use per feature normalized updates
 Continuous actions - convert to pmf:
   --get_pmf             Convert a single multiclass prediction to a pmf
-Logarithmic Time Multiclass Tree:
-  --log_multi arg              Use online tree for multiclass
-  --no_progress                disable progressive validation
-  --swap_resistance arg (=4, ) higher = more resistance to swap, default=4
 Marginal options:
   --marginal arg                   substitute marginal label estimates for ids
   --initial_denominator arg (=1, ) initial denominator
@@ -425,22 +421,6 @@ Marginal options:
                                    marginals
   --decay arg (=0, )               decay multiplier per event (1e-3 for 
                                    example)
-Memory Tree:
-  --memory_tree arg (=0, )             Make a memory tree with at most <n> 
-                                       nodes
-  --max_number_of_labels arg (=10, )   max number of unique label
-  --leaf_example_multiplier arg (=1, ) multiplier on examples per leaf (default
-                                       = log nodes)
-  --alpha arg (=0.1, )                 Alpha
-  --dream_repeats arg (=1, )           number of dream operations per example 
-                                       (default = 1)
-  --top_K arg (=1, )                   top K prediction error (default 1)
-  --learn_at_leaf                      Enable learning at leaf
-  --oas                                use oas at the leaf
-  --dream_at_update arg (=0, )         turn on dream operations at reward based
-                                       update as well
-  --online                             turn on dream operations at reward based
-                                       update as well
 Multilabel One Against All:
   --multilabel_oaa arg  One-against-all multilabel with <k> labels
 One Against All Options:
@@ -473,31 +453,6 @@ Convert discrete PMF into continuous PDF:
                           or uniform random
 Print psuedolearner:
   --print               print examples
-Recall Tree:
-  --recall_tree arg       Use online tree for multiclass
-  --max_candidates arg    maximum number of labels per leaf in the tree
-  --bern_hyper arg (=1, ) recall tree depth penalty
-  --max_depth arg         maximum depth of the tree, default log_2 (#classes)
-  --node_only             only use node features, not full path features
-  --randomized_routing    randomized routing
-Experience Replay / replay_b:
-  --replay_b arg              use experience replay at a specified level 
-                              [b=classification/regression, m=multiclass, 
-                              c=cost sensitive] with specified buffer size
-  --replay_b_count arg (=1, ) how many times (in expectation) should each 
-                              example be played (default: 1 = permuting)
-Experience Replay / replay_c:
-  --replay_c arg              use experience replay at a specified level 
-                              [b=classification/regression, m=multiclass, 
-                              c=cost sensitive] with specified buffer size
-  --replay_c_count arg (=1, ) how many times (in expectation) should each 
-                              example be played (default: 1 = permuting)
-Experience Replay / replay_m:
-  --replay_m arg              use experience replay at a specified level 
-                              [b=classification/regression, m=multiclass, 
-                              c=cost sensitive] with specified buffer size
-  --replay_m_count arg (=1, ) how many times (in expectation) should each 
-                              example be played (default: 1 = permuting)
 Continuous actions - sample pdf:
   --sample_pdf          Sample a pdf and pick a continuous valued action
 scorer options:
