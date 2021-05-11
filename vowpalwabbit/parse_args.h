@@ -8,11 +8,8 @@
 // Used in parse_source
 struct input_options
 {
-  bool daemon;
-  bool foreground;
   size_t port;
   std::string pid_file;
-  std::string port_file;
 
   bool cache;
   std::vector<std::string> cache_files;

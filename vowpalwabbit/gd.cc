@@ -17,7 +17,6 @@
 #  endif
 #endif
 
-#include "accumulate.h"
 #include "debug_log.h"
 #include "gd.h"
 #include "reductions.h"
@@ -164,13 +163,7 @@ void end_pass(gd& g)
   }
   else
     sync_weights(all);
-  if (all.all_reduce != nullptr)
-  {
-    if (all.weights.adaptive)
-      accumulate_weighted_avg(all, all.weights);
-    else
-      accumulate_avg(all, all.weights, 0);
-  }
+
   all.eta *= all.eta_decay_rate;
   if (all.save_per_pass) save_predictor(all, all.final_regressor_name, all.current_pass);
 

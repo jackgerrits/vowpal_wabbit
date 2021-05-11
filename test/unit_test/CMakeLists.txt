@@ -53,7 +53,7 @@ endif()
 
 # Add the include directories from vw target for testing
 target_include_directories(vw-unit-test.out PRIVATE $<TARGET_PROPERTY:vw,INCLUDE_DIRECTORIES>)
-target_link_libraries(vw-unit-test.out PRIVATE vw allreduce Boost::unit_test_framework)
+target_link_libraries(vw-unit-test.out PRIVATE vw Boost::unit_test_framework)
 
 # Communicate that Boost Unit Test is being statically linked
 if(STATIC_LINK_VW)

@@ -21,17 +21,6 @@ namespace VW
 {
 namespace io
 {
-namespace details
-{
-struct socket_closer
-{
-  socket_closer(int fd);
-  ~socket_closer();
-
-private:
-  int _socket_fd;
-};
-}  // namespace details
 
 struct reader
 {
@@ -81,18 +70,6 @@ struct writer
   writer& operator=(writer&& other) = delete;
 };
 
-struct socket
-{
-  socket(int fd) : _socket_fd(fd) { _closer = std::make_shared<details::socket_closer>(fd); }
-  ~socket() = default;
-  std::unique_ptr<reader> get_reader();
-  std::unique_ptr<writer> get_writer();
-
-private:
-  int _socket_fd;
-  std::shared_ptr<details::socket_closer> _closer;
-};
-
 std::unique_ptr<writer> open_file_writer(const std::string& file_path);
 std::unique_ptr<reader> open_file_reader(const std::string& file_path);
 std::unique_ptr<writer> open_compressed_file_writer(const std::string& file_path);
@@ -104,10 +81,6 @@ std::unique_ptr<writer> open_stdout();
 
 typedef ssize_t (*write_func_t)(void* context, const char* buffer, size_t num_bytes);
 std::unique_ptr<writer> create_custom_writer(void* context, write_func_t write_func);
-
-/// \param fd the file descriptor of the socket. Will take ownership of the resource.
-/// \returns socket object which allows creation of readers or writers from this socket
-std::unique_ptr<socket> wrap_socket_descriptor(int fd);
 
 /// \param buffer a shared pointer is required to ensure the buffer remains
 /// alive while in use. Passing this in allows callers to retrieve the results

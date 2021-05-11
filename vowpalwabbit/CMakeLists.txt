@@ -16,23 +16,6 @@ endif()
 
 add_library(VowpalWabbit::io ALIAS vw_io)
 
-add_library(allreduce STATIC allreduce_sockets.cc allreduce_threads.cc vw_exception.cc)
-target_include_directories(allreduce PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-
-add_library(VowpalWabbit::allreduce ALIAS allreduce)
-
-target_link_libraries(allreduce PRIVATE vw_common_flags vw_io)
-
-# Winsock32 should be available on Windows
-if(WIN32)
-  target_link_libraries(allreduce PUBLIC wsock32 ws2_32)
-else()
-  target_compile_options(allreduce PUBLIC ${linux_flags})
-endif()
-
-
 if(BUILD_FLATBUFFERS)
   add_subdirectory(parser/flatbuffer)
   add_library(FlatbuffersTarget INTERFACE)
@@ -41,9 +24,7 @@ if(BUILD_FLATBUFFERS)
 endif()
 
 set(vw_all_headers
-  accumulate.h
   action_score.h
-  allreduce.h
   array_parameters_dense.h
   array_parameters.h
   audit_regressor.h
@@ -159,14 +140,12 @@ set(vw_all_headers
   simple_label.h
   slates_label.h
   slates.h
-  spanning_tree.h
   stable_unique.h
   tag_utils.h
   topk.h
   unique_sort.h
   v_array.h
   version.h
-  vw_allreduce.h
   vw_exception.h
   vw_math.h
   vw_validate.h
@@ -185,7 +164,6 @@ if(BUILD_EXTERNAL_PARSER)
 endif()
 
 set(vw_all_sources
-  accumulate.cc
   action_score.cc
   audit_regressor.cc
   autolink.cc
@@ -289,15 +267,11 @@ if(BUILD_EXTERNAL_PARSER)
   set(vw_all_sources ${vw_all_sources} ${external_parser_sources})
 endif()
 
-if (vw_BUILD_NET_FRAMEWORK)
-set(vw_all_sources ${vw_all_sources} spanning_tree.cc)
-endif()
-
 add_library(vw STATIC ${vw_all_sources} ${vw_all_headers})
 
 target_link_libraries(vw
   PUBLIC
-    VowpalWabbit::explore VowpalWabbit::allreduce Boost::boost ${spdlog_target} fmt::fmt
+    VowpalWabbit::explore Boost::boost ${spdlog_target} fmt::fmt
   PRIVATE
     vw_common_flags Boost::program_options ${CMAKE_DL_LIBS} ${LINK_THREADS} vw_io
     # Workaround an issue where RapidJSON needed to be exported tom install the target. This is
@@ -359,7 +333,7 @@ endif()
 
 if(VW_INSTALL)
   install(
-    TARGETS vw vw-bin allreduce vw_io
+    TARGETS vw vw-bin vw_io
     EXPORT VowpalWabbitConfig
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

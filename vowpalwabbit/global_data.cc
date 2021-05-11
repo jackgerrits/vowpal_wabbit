@@ -14,7 +14,6 @@
 #include "gd.h"
 #include "vw_exception.h"
 #include "future_compat.h"
-#include "vw_allreduce.h"
 #include "named_labels.h"
 #include "shared_data.h"
 #ifdef BUILD_FLATBUFFERS
@@ -61,26 +60,6 @@ void get_prediction(VW::io::reader* f, float& res, float& weight)
   really_read(f, &p, sizeof(p));
   res = p.p;
   weight = p.weight;
-}
-
-void send_prediction(VW::io::writer* f, global_prediction p)
-{
-  if (f->write(reinterpret_cast<const char*>(&p), sizeof(p)) < static_cast<int>(sizeof(p)))
-    THROWERRNO("send_prediction write(unknown socket fd)");
-}
-
-void binary_print_result(VW::io::writer* f, float res, float weight, v_array<char> array)
-{
-  binary_print_result_by_ref(f, res, weight, array);
-}
-
-void binary_print_result_by_ref(VW::io::writer* f, float res, float weight, const v_array<char>&)
-{
-  if (f != nullptr)
-  {
-    global_prediction ps = {res, weight};
-    send_prediction(f, ps);
-  }
 }
 
 int print_tag_by_ref(std::stringstream& ss, const v_array<char>& tag)
@@ -278,8 +257,6 @@ vw::vw() : options(nullptr, nullptr)
   hessian_on = false;
   num_bits = 18;
   default_bits = true;
-  daemon = false;
-  num_children = 10;
   save_resume = false;
   preserve_performance_counters = false;
 
@@ -317,7 +294,6 @@ vw::vw() : options(nullptr, nullptr)
   initial_weight = 0.0;
   initial_constant = 0.0;
 
-  all_reduce = nullptr;
 
   for (size_t i = 0; i < NUM_NAMESPACES; i++)
   {
@@ -372,6 +348,4 @@ vw::~vw()
 
   const bool seeded = weights.seeded() > 0;
   if (!seeded) { delete sd; }
-
-  delete all_reduce;
 }
