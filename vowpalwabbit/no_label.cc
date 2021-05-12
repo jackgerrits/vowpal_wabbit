@@ -8,7 +8,6 @@
 #include <cstdio>
 
 #include "cache.h"
-#include "accumulate.h"
 #include "best_constant.h"
 #include <string_view>
 #include "example.h"
