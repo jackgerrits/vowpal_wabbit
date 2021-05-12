@@ -267,11 +267,13 @@ std::string prob_dist_pred_to_string(const example& ec)
 
 namespace VW
 {
-
-example* alloc_examples(size_t count) { example* ec = calloc_or_throw<example>(count);
+example* alloc_examples(size_t count)
+{
+  example* ec = calloc_or_throw<example>(count);
   if (ec == nullptr) return nullptr;
   for (size_t i = 0; i < count; i++) { new (ec + i) example; }
-  return ec; }
+  return ec;
+}
 
 void dealloc_examples(example* example_ptr, size_t count)
 {
