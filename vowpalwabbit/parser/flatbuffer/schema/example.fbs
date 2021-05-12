@@ -1,4 +1,4 @@
-namespace VW.parsers.flatbuffer;
+namespace vw.parsers.flatbuffer;
 
 table Feature {
   name:string;
