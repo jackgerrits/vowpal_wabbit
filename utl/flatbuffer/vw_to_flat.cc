@@ -290,7 +290,7 @@ void to_flat::create_no_label(example* v, ExampleBuilder& ex_builder)
   ex_builder.label = vw::parsers::flatbuffer::Createno_label(_builder, (uint8_t)'\000').Union();
 }
 
-void to_flat::convert_txt_to_flat(vw& all)
+void to_flat::convert_txt_to_flat(workspace& all)
 {
   std::ofstream outfile;
   if (output_flatbuffer_name.empty()) { output_flatbuffer_name = all.data_filename + ".fb"; }
