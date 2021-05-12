@@ -100,7 +100,7 @@ void learn_or_predict(cb_dro_data &data, multi_learner &base, multi_ex &examples
   data.learn_or_predict<is_learn, is_explore>(base, examples);
 }
 
-base_learner *cb_dro_setup(options_i &options, workspace &all)
+base_learner* cb_dro_setup(options_i& options, workspace& all)
 {
   double alpha;
   double tau;

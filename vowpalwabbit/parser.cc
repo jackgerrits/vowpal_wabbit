@@ -101,10 +101,7 @@ uint32_t cache_numbits(io_buf* buf, vw::io::reader* filepointer)
   std::vector<char> t(v_length);
   buf->read_file(filepointer, t.data(), v_length);
   vw::version_struct v_tmp(t.data());
-  if (v_tmp != vw::version)
-  {
-    return 0;
-  }
+  if (v_tmp != vw::version) { return 0; }
 
   char temp;
   if (buf->read_file(filepointer, &temp, 1) < 1) THROW("failed to read");
@@ -295,10 +292,9 @@ void enable_sources(workspace& all, bool quiet, size_t passes, input_options& in
   // default text reader
   all.example_parser->text_reader = vw::read_lines;
 
-
-    if (all.example_parser->input->num_files() != 0)
-    {
-      if (!quiet) *(all.trace_message) << "ignoring text input in favor of cache input" << endl;
+  if (all.example_parser->input->num_files() != 0)
+  {
+    if (!quiet) *(all.trace_message) << "ignoring text input in favor of cache input" << endl;
     }
     else
     {

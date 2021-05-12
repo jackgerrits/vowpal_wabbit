@@ -176,7 +176,6 @@ public:
 
   std::unique_ptr<vw::config::options_i, options_deleter_type> options;
 
-
   uint32_t wpp;
 
   std::unique_ptr<vw::io::writer> stdout_adapter;

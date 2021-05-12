@@ -1670,8 +1670,8 @@ inline void apply_pdrop(workspace& all, float pdrop, v_array<example*>& examples
 }
 
 template <bool audit>
-void read_line_decision_service_json(workspace& all, v_array<example*>& examples, char* line, size_t length, bool copy_line,
-    example_factory_t example_factory, void* ex_factory_context, DecisionServiceInteraction* data)
+void read_line_decision_service_json(workspace& all, v_array<example*>& examples, char* line, size_t length,
+    bool copy_line, example_factory_t example_factory, void* ex_factory_context, DecisionServiceInteraction* data)
 {
   if (all.example_parser->lbl_parser.label_type == label_type_t::slates)
   {

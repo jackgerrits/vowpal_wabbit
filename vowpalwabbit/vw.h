@@ -49,8 +49,8 @@ workspace* initialize(std::string s, io_buf* model = nullptr, bool skipModelLoad
     trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
 workspace* initialize(int argc, char* argv[], io_buf* model = nullptr, bool skipModelLoad = false,
     trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
-workspace* seed_vw_model(
-    workspace* vw_model, std::string extra_args, trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
+workspace* seed_vw_model(workspace* vw_model, std::string extra_args, trace_message_t trace_listener = nullptr,
+    void* trace_context = nullptr);
 // Allows the input command line string to have spaces escaped by '\'
 workspace* initialize_escaped(std::string const& s, io_buf* model = nullptr, bool skipModelLoad = false,
     trace_message_t trace_listener = nullptr, void* trace_context = nullptr);

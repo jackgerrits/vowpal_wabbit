@@ -780,8 +780,8 @@ void save_load_regressor(workspace& all, io_buf& model_file, bool read, bool tex
 }
 
 template <class T>
-void save_load_online_state(
-    workspace& all, io_buf& model_file, bool read, bool text, gd* g, std::stringstream& msg, uint32_t ftrl_size, T& weights)
+void save_load_online_state(workspace& all, io_buf& model_file, bool read, bool text, gd* g, std::stringstream& msg,
+    uint32_t ftrl_size, T& weights)
 {
   uint64_t length = static_cast<uint64_t>(1) << all.num_bits;
 
