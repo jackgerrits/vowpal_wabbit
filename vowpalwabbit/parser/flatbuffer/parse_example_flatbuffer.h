@@ -37,7 +37,7 @@ private:
   uint32_t _labeled_action = 0;
   uint64_t _c_hash = 0;
 
-  bool parse(vw* all, uint8_t* buffer_pointer = nullptr);
+  bool parse(workspace* all, uint8_t* buffer_pointer = nullptr);
   void process_collection_item(workspace* all, v_array<example*>& examples);
   void parse_example(workspace* all, example* ae, const Example* eg);
   void parse_multi_example(workspace* all, example* ae, const MultiExample* eg);
