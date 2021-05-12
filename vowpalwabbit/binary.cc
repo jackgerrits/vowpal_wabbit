@@ -12,7 +12,6 @@
 
 #include "io/logger.h"
 
-
 using namespace vw::config;
 using std::endl;
 

@@ -26,7 +26,6 @@
 #include "io/logger.h"
 namespace logger = vw::io::logger;
 
-
 struct global_prediction
 {
   float p;

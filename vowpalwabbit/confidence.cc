@@ -61,10 +61,7 @@ void confidence_print_result(vw::io::writer* f, float res, float confidence, v_a
     auto ss_string(ss.str());
     ssize_t len = ss_string.size();
     ssize_t t = f->write(ss_string.c_str(), static_cast<unsigned int>(len));
-    if (t != len)
-    {
-      logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
-    }
+    if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
   }
 }
 

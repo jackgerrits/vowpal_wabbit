@@ -107,7 +107,7 @@ void learn_or_predict(cb_sample_data &data, multi_learner &base, multi_ex &examp
   data.learn_or_predict<is_learn>(base, examples);
 }
 
-base_learner *cb_sample_setup(options_i &options, workspace &all)
+base_learner* cb_sample_setup(options_i& options, workspace& all)
 {
   bool cb_sample_option = false;
 

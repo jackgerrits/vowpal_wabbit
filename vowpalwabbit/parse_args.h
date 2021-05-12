@@ -26,7 +26,8 @@ struct input_options
 };
 
 // trace listener + context need to be passed at initialization to capture all messages.
-workspace& parse_args(vw::config::options_i& options, trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
+workspace& parse_args(
+    vw::config::options_i& options, trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
 void parse_modules(vw::config::options_i& options, workspace& all);
 void parse_sources(vw::config::options_i& options, workspace& all, io_buf& model, bool skipModelLoad = false);
 

@@ -565,8 +565,8 @@ std::string spoof_hex_encoded_namespaces(const std::string& arg)
   return res;
 }
 
-void parse_feature_tweaks(
-    options_i& options, workspace& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
+void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_settings_duplicated,
+    std::vector<std::string>& dictionary_nses)
 {
   std::string hash_function("strings");
   uint32_t new_bits;
@@ -1497,7 +1497,8 @@ void merge_options_from_header_strings(const std::vector<std::string>& strings, 
   if (count == 0 && saved_key != "") { options.insert(saved_key, ""); }
 }
 
-options_i& load_header_merge_options(options_i& options, workspace& all, io_buf& model, bool& interactions_settings_duplicated)
+options_i& load_header_merge_options(
+    options_i& options, workspace& all, io_buf& model, bool& interactions_settings_duplicated)
 {
   std::string file_options;
   save_load_header(all, model, true, false, file_options, options);
@@ -1513,8 +1514,8 @@ options_i& load_header_merge_options(options_i& options, workspace& all, io_buf&
   return options;
 }
 
-void parse_modules(
-    options_i& options, workspace& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
+void parse_modules(options_i& options, workspace& all, bool interactions_settings_duplicated,
+    std::vector<std::string>& dictionary_nses)
 {
   option_group_definition rand_options("Randomization options");
   rand_options.add(make_option("random_seed", all.random_seed).help("seed random number generator"));
@@ -1730,7 +1731,8 @@ workspace* initialize(std::unique_ptr<options_i, options_deleter_type> options, 
   }
 }
 
-workspace* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
+workspace* initialize(
+    std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
 {
   int argc = 0;
   char** argv = to_argv(s, argc);
@@ -1781,7 +1783,8 @@ workspace* initialize(
 
 // Create a new vw instance while sharing the model with another instance
 // The extra arguments will be appended to those of the other vw instance
-workspace* seed_vw_model(workspace* vw_model, const std::string extra_args, trace_message_t trace_listener, void* trace_context)
+workspace* seed_vw_model(
+    workspace* vw_model, const std::string extra_args, trace_message_t trace_listener, void* trace_context)
 {
   options_serializer_boost_po serializer;
   for (auto const& option : vw_model->options->get_all_options())

@@ -19,7 +19,7 @@ namespace logger = vw::io::logger;
 struct oaa
 {
   uint64_t k;
-  workspace* all;                    // for raw
+  workspace* all;             // for raw
   polyprediction* pred;       // for multipredict
   uint64_t num_subsample;     // for randomized subsampling, how many negatives to draw?
   uint32_t* subsample_order;  // for randomized subsampling, in what order should we touch classes

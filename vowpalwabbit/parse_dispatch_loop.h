@@ -56,7 +56,8 @@ inline void parse_dispatch(workspace& all, dispatch_fptr dispatch)
   }
   catch (vw::vw_exception& e)
   {
-    vw::io::logger::errlog_error("vw example #{0}({1}:{2}): {3}", example_number, e.Filename(), e.LineNumber(), e.what());
+    vw::io::logger::errlog_error(
+        "vw example #{0}({1}:{2}): {3}", example_number, e.Filename(), e.LineNumber(), e.what());
 
     // Stash the exception so it can be thrown on the main thread.
     all.example_parser->exc_ptr = std::current_exception();
