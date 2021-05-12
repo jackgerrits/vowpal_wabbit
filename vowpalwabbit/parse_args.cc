@@ -1343,11 +1343,9 @@ workspace& parse_args(
 
   try
   {
-    time(&all.init_time);
-
     bool strict_parse = false;
     int ring_size_tmp;
-    option_group_definition vw_args("vw options");
+    option_group_definition vw_args("VW options");
     vw_args.add(make_option("ring_size", ring_size_tmp).default_value(256).help("size of example ring"))
         .add(make_option("strict_parse", strict_parse).help("throw on malformed examples"));
     all.options->add_and_parse(vw_args);
