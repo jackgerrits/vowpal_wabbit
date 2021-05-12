@@ -8,13 +8,13 @@
 
 #include <vector>
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
 namespace greedy
 {
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 }  // namespace greedy
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

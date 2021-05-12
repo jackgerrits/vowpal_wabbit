@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-namespace VW
+namespace vw
 {
 version_struct::version_struct(int maj, int min, int rv)
 {
@@ -110,4 +110,4 @@ void version_struct::from_string(const char* str)
 
 const version_struct version(PACKAGE_VERSION);
 const std::string git_commit(COMMIT_VERSION);
-}  // namespace VW
+}  // namespace vw

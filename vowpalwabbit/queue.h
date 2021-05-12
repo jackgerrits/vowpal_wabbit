@@ -20,7 +20,7 @@
 #  include <condition_variable>
 #endif
 
-namespace VW
+namespace vw
 {
 template <typename T>
 class ptr_queue
@@ -77,4 +77,4 @@ private:
   std::condition_variable is_not_full;
   std::condition_variable is_not_empty;
 };
-}  // namespace VW
+}  // namespace vw

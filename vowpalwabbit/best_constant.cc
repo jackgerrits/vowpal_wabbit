@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-bool get_best_constant(vw& all, float& best_constant, float& best_constant_loss)
+bool get_best_constant(workspace& all, float& best_constant, float& best_constant_loss)
 {
   if (all.sd->first_observed_label == FLT_MAX ||  // no non-test labels observed or function was never called
       (all.loss == nullptr) || (all.sd == nullptr))

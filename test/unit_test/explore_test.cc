@@ -12,7 +12,7 @@
 
 #include "cb_explore_pdf.h"
 
-using namespace VW::continuous_actions;
+using namespace vw::continuous_actions;
 using std::vector;
 
 struct pdf_seg

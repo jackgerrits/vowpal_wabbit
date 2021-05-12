@@ -7,13 +7,13 @@
 #include "cb_explore_adf_common.h"
 #include "reductions_fwd.h"
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
 namespace rnd
 {
-LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 }  // namespace rnd
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

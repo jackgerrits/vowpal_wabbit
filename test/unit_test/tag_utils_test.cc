@@ -15,7 +15,7 @@
 
 BOOST_AUTO_TEST_CASE(tag_with_seed__seed_extraction)
 {
-  auto vw = VW::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   std::string json = R"(
   {
     "_label": 1,
@@ -32,17 +32,17 @@ BOOST_AUTO_TEST_CASE(tag_with_seed__seed_extraction)
 
   std::string_view seed;
 
-  auto extracted = VW::try_extract_random_seed(*example, seed);
+  auto extracted = vw::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(true, extracted);
   BOOST_CHECK_EQUAL(expected, seed);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(tag_without_seed__seed_extraction)
 {
-  auto vw = VW::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   std::string json = R"(
   {
     "_label": 1,
@@ -57,16 +57,16 @@ BOOST_AUTO_TEST_CASE(tag_without_seed__seed_extraction)
 
   std::string_view seed;
 
-  auto extracted = VW::try_extract_random_seed(*example, seed);
+  auto extracted = vw::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(false, extracted);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(no_tag__seed_extraction)
 {
-  auto vw = VW::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--json --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   std::string json = R"(
   {
     "_label": 1,
@@ -80,11 +80,11 @@ BOOST_AUTO_TEST_CASE(no_tag__seed_extraction)
 
   std::string_view seed;
 
-  auto extracted = VW::try_extract_random_seed(*example, seed);
+  auto extracted = vw::try_extract_random_seed(*example, seed);
   BOOST_CHECK_EQUAL(false, extracted);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 

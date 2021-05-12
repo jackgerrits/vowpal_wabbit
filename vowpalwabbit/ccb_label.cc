@@ -26,11 +26,11 @@
 #include <unordered_set>
 #include <cmath>
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CCB
 {
@@ -280,7 +280,7 @@ void parse_label(parser* p, shared_data*, label& ld, std::vector<std::string_vie
           });
 
       // TODO do a proper comparison here.
-      if (!VW::math::are_same(total_pred, 1.f))
+      if (!vw::math::are_same(total_pred, 1.f))
       {
         THROW("When providing all prediction probabilities they must add up to 1.f, instead summed to " << total_pred);
       }

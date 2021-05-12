@@ -27,10 +27,10 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 using std::endl;
 
@@ -39,7 +39,7 @@ struct boosting
   int N;
   float gamma;
   std::string alg;
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
   std::vector<std::vector<int64_t> > C;
   std::vector<float> alpha;
@@ -51,7 +51,7 @@ struct boosting
 // Online Boost-by-Majority (BBM)
 // --------------------------------------------------
 template <bool is_learn>
-void predict_or_learn(boosting& o, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn(boosting& o, vw::LEARNER::single_learner& base, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -78,7 +78,7 @@ void predict_or_learn(boosting& o, VW::LEARNER::single_learner& base, example& e
         c = o.C[o.N - (i + 1)][static_cast<int64_t>(k)];
       else
       {
-        c = VW::math::choose(o.N - (i + 1), static_cast<int64_t>(k));
+        c = vw::math::choose(o.N - (i + 1), static_cast<int64_t>(k));
         o.C[o.N - (i + 1)][static_cast<int64_t>(k)] = c;
       }
 
@@ -106,7 +106,7 @@ void predict_or_learn(boosting& o, VW::LEARNER::single_learner& base, example& e
 
   ec.weight = u;
   ec.partial_prediction = final_prediction;
-  ec.pred.scalar = VW::math::sign(final_prediction);
+  ec.pred.scalar = vw::math::sign(final_prediction);
 
   if (ld.label == ec.pred.scalar)
     ec.loss = 0.;
@@ -118,7 +118,7 @@ void predict_or_learn(boosting& o, VW::LEARNER::single_learner& base, example& e
 // Logistic boost
 //-----------------------------------------------------------------
 template <bool is_learn>
-void predict_or_learn_logistic(boosting& o, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn_logistic(boosting& o, vw::LEARNER::single_learner& base, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -164,7 +164,7 @@ void predict_or_learn_logistic(boosting& o, VW::LEARNER::single_learner& base, e
 
   ec.weight = u;
   ec.partial_prediction = final_prediction;
-  ec.pred.scalar = VW::math::sign(final_prediction);
+  ec.pred.scalar = vw::math::sign(final_prediction);
 
   if (ld.label == ec.pred.scalar)
     ec.loss = 0.;
@@ -173,7 +173,7 @@ void predict_or_learn_logistic(boosting& o, VW::LEARNER::single_learner& base, e
 }
 
 template <bool is_learn>
-void predict_or_learn_adaptive(boosting& o, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn_adaptive(boosting& o, vw::LEARNER::single_learner& base, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -244,7 +244,7 @@ void predict_or_learn_adaptive(boosting& o, VW::LEARNER::single_learner& base, e
 
   ec.weight = u;
   ec.partial_prediction = final_prediction;
-  ec.pred.scalar = VW::math::sign(final_prediction);
+  ec.pred.scalar = vw::math::sign(final_prediction);
 
   if (ld.label == ec.pred.scalar)
     ec.loss = 0.;
@@ -312,10 +312,10 @@ void save_load_sampling(boosting& o, io_buf& model_file, bool read, bool text)
   logger::errlog_info("{}", fmt::to_string(buffer));
 }
 
-void return_example(vw& all, boosting& /* a */, example& ec)
+void return_example(workspace& all, boosting& /* a */, example& ec)
 {
   output_and_account_example(all, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void save_load(boosting& o, io_buf& model_file, bool read, bool text)
@@ -363,7 +363,7 @@ void save_load(boosting& o, io_buf& model_file, bool read, bool text)
   }
 }
 
-VW::LEARNER::base_learner* boosting_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* boosting_setup(options_i& options, workspace& all)
 {
   free_ptr<boosting> data = scoped_calloc_or_throw<boosting>();
   option_group_definition new_options("Boosting");

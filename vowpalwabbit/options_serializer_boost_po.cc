@@ -4,7 +4,7 @@
 
 #include "options_serializer_boost_po.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 std::string options_serializer_boost_po::str() const { return m_output_stream.str(); }
 

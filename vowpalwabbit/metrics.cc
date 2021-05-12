@@ -14,13 +14,13 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
-using namespace VW::LEARNER;
+using namespace vw::config;
+using namespace vw::LEARNER;
 using namespace rapidjson;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-namespace VW
+namespace vw
 {
 namespace metrics
 {
@@ -37,7 +37,7 @@ void list_to_json_file(std::string filename, std::vector<std::tuple<std::string,
 {
   FILE* fp;
 
-  if (VW::file_open(&fp, filename.c_str(), "wt") == 0)
+  if (vw::file_open(&fp, filename.c_str(), "wt") == 0)
   {
     char writeBuffer[1024];
     FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
@@ -59,7 +59,7 @@ void list_to_json_file(std::string filename, std::vector<std::tuple<std::string,
   }
 }
 
-void output_metrics(vw& all)
+void output_metrics(workspace& all)
 {
   if (all.options->was_supplied("extra_metrics"))
   {
@@ -129,7 +129,7 @@ void persist(metrics_data& data, std::vector<std::tuple<std::string, size_t>>& m
   metrics.emplace_back("predicted_not_first", data.predicted_not_first);
 }
 
-VW::LEARNER::base_learner* metrics_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* metrics_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<metrics_data>();
 
@@ -163,4 +163,4 @@ VW::LEARNER::base_learner* metrics_setup(options_i& options, vw& all)
 }
 
 }  // namespace metrics
-}  // namespace VW
+}  // namespace vw

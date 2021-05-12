@@ -86,23 +86,23 @@ BOOST_AUTO_TEST_CASE(ccb_parse_label)
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "shared", *label.get()), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "shared", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other shared", *label.get()), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other shared", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other", *label.get()), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb unknown", *label.get()), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb unknown", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb slot 1:1.0:0.5,4:0.7", *label.get()), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb slot 1:1.0:0.5,4:0.7", *label.get()), vw::vw_exception);
   }
 }
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(ccb_cache_label)
 {
   auto backing_vector = std::make_shared<std::vector<char>>();
   io_buf io_writer;
-  io_writer.add_file(VW::io::create_vector_writer(backing_vector));
+  io_writer.add_file(vw::io::create_vector_writer(backing_vector));
   // io.init();      TODO: figure out and fix leak caused by double init()
 
   parser p{8 /*ring_size*/, false /*strict parse*/};
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(ccb_cache_label)
   io_writer.flush();
 
   io_buf io_reader;
-  io_reader.add_file(VW::io::create_buffer_view(backing_vector->data(), backing_vector->size()));
+  io_reader.add_file(vw::io::create_buffer_view(backing_vector->data(), backing_vector->size()));
 
   auto uncached_label = scoped_calloc_or_throw<CCB::label>();
   CCB::default_label(*uncached_label);

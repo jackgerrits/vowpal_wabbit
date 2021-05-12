@@ -29,31 +29,31 @@ const char* to_string(prediction_type_t prediction_type)
   }
 }
 
-namespace VW
+namespace vw
 {
 namespace LEARNER
 {
-void learn_ex(example& ec, vw& all)
+void learn_ex(example& ec, workspace& all)
 {
   all.learn(ec);
   as_singleline(all.l)->finish_example(all, ec);
 }
 
-void learn_multi_ex(multi_ex& ec_seq, vw& all)
+void learn_multi_ex(multi_ex& ec_seq, workspace& all)
 {
   all.learn(ec_seq);
   as_multiline(all.l)->finish_example(all, ec_seq);
 }
 
-void end_pass(example& ec, vw& all)
+void end_pass(example& ec, workspace& all)
 {
   all.current_pass++;
   all.l->end_pass();
 
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-void save(example& ec, vw& all)
+void save(example& ec, workspace& all)
 {
   // save state command
   std::string final_regressor_name = all.final_regressor_name;
@@ -64,11 +64,11 @@ void save(example& ec, vw& all)
   if (!all.logger.quiet) *(all.trace_message) << "saving regressor to " << final_regressor_name << std::endl;
   save_predictor(all, final_regressor_name, 0);
 
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 /* is this just a newline */
-inline bool example_is_newline_not_header(example& ec, vw& all)
+inline bool example_is_newline_not_header(example& ec, workspace& all)
 {
   // If we are using CCB, test against CCB implementation otherwise fallback to previous behavior.
   bool is_header = false;
@@ -86,12 +86,12 @@ bool inline is_save_cmd(example* ec)
   return (ec->tag.size() >= 4) && (0 == strncmp((const char*)ec->tag.begin(), "save", 4));
 }
 
-void drain_examples(vw& all)
+void drain_examples(workspace& all)
 {
   if (all.early_terminate)
   {  // drain any extra examples from parser.
     example* ec = nullptr;
-    while ((ec = VW::get_example(all.example_parser)) != nullptr) VW::finish_example(all, *ec);
+    while ((ec = vw::get_example(all.example_parser)) != nullptr) vw::finish_example(all, *ec);
   }
   all.l->end_examples();
 }
@@ -102,28 +102,28 @@ void drain_examples(vw& all)
 class single_instance_context
 {
 public:
-  single_instance_context(vw& all) : _all(all) {}
+  single_instance_context(workspace& all) : _all(all) {}
 
-  vw& get_master() const { return _all; }
+  workspace& get_master() const { return _all; }
 
-  template <class T, void (*process_impl)(T&, vw&)>
+  template <class T, void (*process_impl)(T&, workspace&)>
   void process(T& ec)
   {
     process_impl(ec, _all);
   }
 
 private:
-  vw& _all;
+  workspace& _all;
 };
 
 class multi_instance_context
 {
 public:
-  multi_instance_context(const std::vector<vw*>& all) : _all(all) {}
+  multi_instance_context(const std::vector<workspace*>& all) : _all(all) {}
 
-  vw& get_master() const { return *_all.front(); }
+  workspace& get_master() const { return *_all.front(); }
 
-  template <class T, void (*process_impl)(T&, vw&)>
+  template <class T, void (*process_impl)(T&, workspace&)>
   void process(T& ec)
   {
     // start with last as the first instance will free the example as it is the owner
@@ -131,7 +131,7 @@ public:
   }
 
 private:
-  std::vector<vw*> _all;
+  std::vector<workspace*> _all;
 };
 
 // single_example_handler / multi_example_handler - consumer classes with on_example handle method, incapsulating
@@ -170,7 +170,7 @@ private:
     if (!is_newline) { ec_seq.push_back(ec); }
     else
     {
-      VW::finish_example(master, *ec);
+      vw::finish_example(master, *ec);
     }
     return is_newline;
   }
@@ -215,12 +215,12 @@ private:
 class ready_examples_queue
 {
 public:
-  ready_examples_queue(vw& master) : _master(master) {}
+  ready_examples_queue(workspace& master) : _master(master) {}
 
-  example* pop() { return !_master.early_terminate ? VW::get_example(_master.example_parser) : nullptr; }
+  example* pop() { return !_master.early_terminate ? vw::get_example(_master.example_parser) : nullptr; }
 
 private:
-  vw& _master;
+  workspace& _master;
 };
 
 class custom_examples_queue
@@ -261,14 +261,14 @@ void generic_driver(ready_examples_queue& examples, context_type& context)
   drain_examples(context.get_master());
 }
 
-void generic_driver(vw& all)
+void generic_driver(workspace& all)
 {
   single_instance_context context(all);
   ready_examples_queue examples(all);
   generic_driver(examples, context);
 }
 
-void generic_driver(const std::vector<vw*>& all)
+void generic_driver(const std::vector<workspace*>& all)
 {
   multi_instance_context context(all);
   ready_examples_queue examples(context.get_master());
@@ -276,11 +276,11 @@ void generic_driver(const std::vector<vw*>& all)
 }
 
 template <typename handler_type>
-void generic_driver_onethread(vw& all)
+void generic_driver_onethread(workspace& all)
 {
   single_instance_context context(all);
   handler_type handler(context);
-  auto multi_ex_fptr = [&handler](vw& all, v_array<example*> examples) {
+  auto multi_ex_fptr = [&handler](workspace& all, v_array<example*> examples) {
     all.example_parser->end_parsed_examples += examples.size();  // divergence: lock & signal
     custom_examples_queue examples_queue(examples);
     process_examples(examples_queue, handler);
@@ -289,7 +289,7 @@ void generic_driver_onethread(vw& all)
   all.l->end_examples();
 }
 
-void generic_driver_onethread(vw& all)
+void generic_driver_onethread(workspace& all)
 {
   if (all.l->is_multiline)
     generic_driver_onethread<multi_example_handler<single_instance_context>>(all);
@@ -300,4 +300,4 @@ void generic_driver_onethread(vw& all)
 float recur_sensitivity(void*, base_learner& base, example& ec) { return base.sensitivity(ec); }
 
 }  // namespace LEARNER
-}  // namespace VW
+}  // namespace vw

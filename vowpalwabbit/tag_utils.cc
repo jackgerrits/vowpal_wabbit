@@ -1,7 +1,7 @@
 #include "tag_utils.h"
 #include "example.h"
 
-namespace VW
+namespace vw
 {
 bool try_extract_random_seed(const example& ex, std::string_view& view)
 {
@@ -17,4 +17,4 @@ bool try_extract_random_seed(const example& ex, std::string_view& view)
   }
   return false;
 }
-}  // namespace VW
+}  // namespace vw

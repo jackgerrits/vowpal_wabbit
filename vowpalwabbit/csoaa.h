@@ -6,9 +6,9 @@
 
 namespace CSOAA
 {
-VW::LEARNER::base_learner* csoaa_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* csoaa_setup(vw::config::options_i& options, workspace& all);
 
-VW::LEARNER::base_learner* csldf_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* csldf_setup(vw::config::options_i& options, workspace& all);
 struct csoaa;
-void finish_example(vw& all, csoaa&, example& ec);
+void finish_example(workspace& all, csoaa&, example& ec);
 }  // namespace CSOAA

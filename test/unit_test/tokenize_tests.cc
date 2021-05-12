@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_escape_final_character) {
 
 BOOST_AUTO_TEST_CASE(tokenize_to_argv_with_space) {
   int argc = 0;
-  char** argv = VW::to_argv_escaped("--ring_size 1024 -f my_model\\ best.model", argc);
+  char** argv = vw::to_argv_escaped("--ring_size 1024 -f my_model\\ best.model", argc);
   BOOST_CHECK_EQUAL(argc, 5);
   BOOST_CHECK_EQUAL(argv[0], "b");
   BOOST_CHECK_EQUAL(argv[1], "--ring_size");
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(tokenize_to_argv_with_space) {
 
 BOOST_AUTO_TEST_CASE(basic_tokenize_to_argv) {
   int argc = 0;
-  char** argv = VW::to_argv_escaped("--ccb_explore_adf --json --no_stdin --quiet", argc);
+  char** argv = vw::to_argv_escaped("--ccb_explore_adf --json --no_stdin --quiet", argc);
 
   BOOST_CHECK_EQUAL(argc, 5);
   BOOST_CHECK_EQUAL(argv[0], "b");

@@ -22,7 +22,7 @@
 #include "vw_math.h"
 #include "shared_data.h"
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -54,7 +54,7 @@ inline size_t fill_tied(const v_array<ACTION_SCORE::action_score>& preds)
   size_t ret = 1;
   for (size_t i = 1; i < preds.size(); ++i)
   {
-    if (VW::math::are_same_rel(preds[i].score, preds[0].score)) { ++ret; }
+    if (vw::math::are_same_rel(preds[i].score, preds[0].score)) { ++ret; }
     else
     {
       return ret;
@@ -86,25 +86,25 @@ public:
 
   ~cb_explore_adf_base() { _saved_pred.delete_v(); }
 
-  static void finish_multiline_example(vw& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq);
-  static void print_multiline_example(vw& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq);
+  static void finish_multiline_example(workspace& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq);
+  static void print_multiline_example(workspace& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq);
   static void save_load(cb_explore_adf_base<ExploreType>& data, io_buf& io, bool read, bool text);
   static void persist_metrics(
       cb_explore_adf_base<ExploreType>& data, std::vector<std::tuple<std::string, size_t>>& metrics);
-  static void predict(cb_explore_adf_base<ExploreType>& data, VW::LEARNER::multi_learner& base, multi_ex& examples);
-  static void learn(cb_explore_adf_base<ExploreType>& data, VW::LEARNER::multi_learner& base, multi_ex& examples);
+  static void predict(cb_explore_adf_base<ExploreType>& data, vw::LEARNER::multi_learner& base, multi_ex& examples);
+  static void learn(cb_explore_adf_base<ExploreType>& data, vw::LEARNER::multi_learner& base, multi_ex& examples);
 
 public:
   ExploreType explore;
 
 private:
-  void output_example_seq(vw& all, multi_ex& ec_seq);
-  void output_example(vw& all, multi_ex& ec_seq);
+  void output_example_seq(workspace& all, multi_ex& ec_seq);
+  void output_example(workspace& all, multi_ex& ec_seq);
 };
 
 template <typename ExploreType>
 inline void cb_explore_adf_base<ExploreType>::predict(
-    cb_explore_adf_base<ExploreType>& data, VW::LEARNER::multi_learner& base, multi_ex& examples)
+    cb_explore_adf_base<ExploreType>& data, vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   example* label_example = CB_ADF::test_adf_sequence(examples);
   data._known_cost = CB_ADF::get_observed_cost_or_default_cb_adf(examples);
@@ -127,7 +127,7 @@ inline void cb_explore_adf_base<ExploreType>::predict(
 
 template <typename ExploreType>
 inline void cb_explore_adf_base<ExploreType>::learn(
-    cb_explore_adf_base<ExploreType>& data, VW::LEARNER::multi_learner& base, multi_ex& examples)
+    cb_explore_adf_base<ExploreType>& data, vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   example* label_example = CB_ADF::test_adf_sequence(examples);
   if (label_example != nullptr)
@@ -145,7 +145,7 @@ inline void cb_explore_adf_base<ExploreType>::learn(
 }
 
 template <typename ExploreType>
-void cb_explore_adf_base<ExploreType>::output_example(vw& all, multi_ex& ec_seq)
+void cb_explore_adf_base<ExploreType>::output_example(workspace& all, multi_ex& ec_seq)
 {
   if (ec_seq.size() <= 0) return;
 
@@ -198,7 +198,7 @@ void cb_explore_adf_base<ExploreType>::output_example(vw& all, multi_ex& ec_seq)
 }
 
 template <typename ExploreType>
-void cb_explore_adf_base<ExploreType>::output_example_seq(vw& all, multi_ex& ec_seq)
+void cb_explore_adf_base<ExploreType>::output_example_seq(workspace& all, multi_ex& ec_seq)
 {
   if (ec_seq.size() > 0)
   {
@@ -209,16 +209,16 @@ void cb_explore_adf_base<ExploreType>::output_example_seq(vw& all, multi_ex& ec_
 
 template <typename ExploreType>
 void cb_explore_adf_base<ExploreType>::finish_multiline_example(
-    vw& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq)
+    workspace& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq)
 {
   print_multiline_example(all, data, ec_seq);
 
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 template <typename ExploreType>
 void cb_explore_adf_base<ExploreType>::print_multiline_example(
-    vw& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq)
+    workspace& all, cb_explore_adf_base<ExploreType>& data, multi_ex& ec_seq)
 {
   if (ec_seq.size() > 0)
   {
@@ -243,4 +243,4 @@ inline void cb_explore_adf_base<ExploreType>::persist_metrics(
 }
 
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

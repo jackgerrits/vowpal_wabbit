@@ -17,10 +17,10 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 struct direction
 {
@@ -322,7 +322,7 @@ void learn(ect& e, single_learner& base, example& ec)
   ec.pred.multiclass = pred;
 }
 
-base_learner* ect_setup(options_i& options, vw& all)
+base_learner* ect_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<ect>();
   std::string link;

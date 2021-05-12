@@ -10,11 +10,11 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
-using namespace VW::math;
+using namespace vw::LEARNER;
+using namespace vw::config;
+using namespace vw::math;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 #define W_XT 0  // current parameter
 #define W_ZT 1  // in proximal is "accumulated z(t) = z(t-1) + g(t) + sigma*w(t)", in general is the dual weight vector
@@ -37,7 +37,7 @@ struct ftrl_update_data
 
 struct ftrl
 {
-  vw* all;  // features, finalize, l1, l2,
+  workspace* all;  // features, finalize, l1, l2,
   float ftrl_alpha;
   float ftrl_beta;
   struct ftrl_update_data data;
@@ -86,7 +86,7 @@ template <bool audit>
 void multipredict(
     ftrl& b, base_learner&, example& ec, size_t count, size_t step, polyprediction* pred, bool finalize_predictions)
 {
-  vw& all = *b.all;
+  workspace& all = *b.all;
   for (size_t c = 0; c < count; c++)
   {
     const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
@@ -291,7 +291,7 @@ void learn_coin_betting(ftrl& a, single_learner& base, example& ec)
 
 void save_load(ftrl& b, io_buf& model_file, bool read, bool text)
 {
-  vw* all = b.all;
+  workspace* all = b.all;
   if (read) initialize_regressor(*all);
 
   if (model_file.num_files() != 0)
@@ -310,7 +310,7 @@ void save_load(ftrl& b, io_buf& model_file, bool read, bool text)
 
 void end_pass(ftrl& g)
 {
-  vw& all = *g.all;
+  workspace& all = *g.all;
 
   if (!all.holdout_set_off)
   {
@@ -321,7 +321,7 @@ void end_pass(ftrl& g)
   }
 }
 
-base_learner* ftrl_setup(options_i& options, vw& all)
+base_learner* ftrl_setup(options_i& options, workspace& all)
 {
   auto b = scoped_calloc_or_throw<ftrl>();
   bool ftrl_option = false;

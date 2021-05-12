@@ -23,12 +23,12 @@ struct obj_initializer
 BOOST_AUTO_TEST_CASE(object_pool_test)
 {
   {
-    VW::object_pool<obj> pool_with_size{50};
+    vw::object_pool<obj> pool_with_size{50};
     BOOST_CHECK_EQUAL(pool_with_size.size(), 50);
   }
 
   {
-    VW::object_pool<obj, obj_initializer> pool_with_small_chunks{0, obj_initializer{}, 2};
+    vw::object_pool<obj, obj_initializer> pool_with_small_chunks{0, obj_initializer{}, 2};
     BOOST_CHECK_EQUAL(pool_with_small_chunks.size(), 0);
 
     auto o1 = pool_with_small_chunks.get_object();
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(object_pool_test)
     pool_with_small_chunks.return_object(o3);
   }
 
-  VW::object_pool<obj, obj_initializer> pool{0, obj_initializer{}, 1};
+  vw::object_pool<obj, obj_initializer> pool{0, obj_initializer{}, 1};
   BOOST_CHECK_EQUAL(pool.size(), 0);
   BOOST_CHECK_EQUAL(pool.empty(), true);
 

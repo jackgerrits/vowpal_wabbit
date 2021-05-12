@@ -18,14 +18,14 @@
 
 std::shared_ptr<std::vector<char>> get_cache_buffer(const std::string& es)
 {
-  auto vw = VW::initialize("--cb 2 --quiet");
+  auto vw = vw::initialize("--cb 2 --quiet");
   auto buffer = std::make_shared<std::vector<char>>();
-  vw->example_parser->output = VW::make_unique<io_buf>();
-  vw->example_parser->output->add_file(VW::io::create_vector_writer(buffer));
+  vw->example_parser->output = vw::make_unique<io_buf>();
+  vw->example_parser->output->add_file(vw::io::create_vector_writer(buffer));
   vw->example_parser->write_cache = true;
-  auto ae = &VW::get_unused_example(vw);
+  auto ae = &vw::get_unused_example(vw);
 
-  VW::read_line(*vw, ae, const_cast<char*>(es.c_str()));
+  vw::read_line(*vw, ae, const_cast<char*>(es.c_str()));
 
   if (vw->example_parser->write_cache)
   {
@@ -33,7 +33,7 @@ std::shared_ptr<std::vector<char>> get_cache_buffer(const std::string& es)
     cache_features(*(vw->example_parser->output), ae, vw->parse_mask);
   }
   vw->example_parser->output->flush();
-  VW::finish_example(*vw, *ae);
+  vw::finish_example(*vw, *ae);
 
   return buffer;
 }
@@ -45,18 +45,18 @@ static void bench_cache_io_buf(benchmark::State& state, ExtraArgs&&... extra_arg
   auto example_string = res[0];
 
   auto buffer = get_cache_buffer(example_string);
-  auto vw = VW::initialize("--cb 2 --quiet");
+  auto vw = vw::initialize("--cb 2 --quiet");
 
   auto examples = v_init<example*>();
-  examples.push_back(&VW::get_unused_example(vw));
+  examples.push_back(&vw::get_unused_example(vw));
 
-  vw->example_parser->input = VW::make_unique<io_buf>();
+  vw->example_parser->input = vw::make_unique<io_buf>();
 
   for (auto _ : state)
   {
-    vw->example_parser->input->add_file(VW::io::create_buffer_view(buffer->data(), buffer->size()));
+    vw->example_parser->input->add_file(vw::io::create_buffer_view(buffer->data(), buffer->size()));
     read_cached_features(vw, examples);
-    VW::empty_example(*vw, *examples[0]);
+    vw::empty_example(*vw, *examples[0]);
     benchmark::ClobberMemory();
   }
   examples.delete_v();
@@ -70,17 +70,17 @@ static void bench_cache_io_buf_collections(benchmark::State& state, ExtraArgs&&.
   auto examples_size = std::stoi(res[1]);
 
   auto buffer = get_cache_buffer(example_string);
-  auto vw = VW::initialize("--cb 2 --quiet");
-  vw->example_parser->input = VW::make_unique<io_buf>();
+  auto vw = vw::initialize("--cb 2 --quiet");
+  vw->example_parser->input = vw::make_unique<io_buf>();
 
   auto examples = v_init<example*>();
-  examples.push_back(&VW::get_unused_example(vw));
+  examples.push_back(&vw::get_unused_example(vw));
 
   for (auto _ : state)
   {
     for (size_t i = 0; i < examples_size; i++)
-    { vw->example_parser->input->add_file(VW::io::create_buffer_view(buffer->data(), buffer->size())); }
-    while (read_cached_features(vw, examples)) { VW::empty_example(*vw, *examples[0]); }
+    { vw->example_parser->input->add_file(vw::io::create_buffer_view(buffer->data(), buffer->size())); }
+    while (read_cached_features(vw, examples)) { vw::empty_example(*vw, *examples[0]); }
     benchmark::ClobberMemory();
   }
   examples.delete_v();
@@ -92,17 +92,17 @@ static void bench_text_io_buf(benchmark::State& state, ExtraArgs&&... extra_args
   std::string res[sizeof...(extra_args)] = {extra_args...};
   auto example_string = res[0];
 
-  auto vw = VW::initialize("--cb 2 --quiet");
+  auto vw = vw::initialize("--cb 2 --quiet");
   auto examples = v_init<example*>();
-  examples.push_back(&VW::get_unused_example(vw));
+  examples.push_back(&vw::get_unused_example(vw));
 
-  vw->example_parser->input = VW::make_unique<io_buf>();
+  vw->example_parser->input = vw::make_unique<io_buf>();
 
   for (auto _ : state)
   {
-    vw->example_parser->input->add_file(VW::io::create_buffer_view(example_string.data(), example_string.size()));
+    vw->example_parser->input->add_file(vw::io::create_buffer_view(example_string.data(), example_string.size()));
     vw->example_parser->reader(vw, examples);
-    VW::empty_example(*vw, *examples[0]);
+    vw::empty_example(*vw, *examples[0]);
     benchmark::ClobberMemory();
   }
   examples.delete_v();
@@ -114,18 +114,18 @@ static void benchmark_example_reuse(benchmark::State& state)
       "1 1.0 zebra|MetricFeatures:3.28 height:1.5 length:2.0 |Says black with white stripes |OtherFeatures "
       "NumberOfLegs:4.0 HasStripes";
 
-  auto vw = VW::initialize("--quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--quiet", nullptr, false, nullptr, nullptr);
 
   auto examples = v_init<example*>();
 
-  vw->example_parser->input = VW::make_unique<io_buf>();
+  vw->example_parser->input = vw::make_unique<io_buf>();
 
   for (auto _ : state)
   {
-    examples.push_back(&VW::get_unused_example(vw));
-    vw->example_parser->input->add_file(VW::io::create_buffer_view(example_string.data(), example_string.size()));
+    examples.push_back(&vw::get_unused_example(vw));
+    vw->example_parser->input->add_file(vw::io::create_buffer_view(example_string.data(), example_string.size()));
     vw->example_parser->reader(vw, examples);
-    VW::finish_example(*vw, *examples[0]);
+    vw::finish_example(*vw, *examples[0]);
     examples.clear();
     benchmark::ClobberMemory();
   }

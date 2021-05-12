@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 void add_grams(
     size_t ngram, size_t skip_gram, features& fs, size_t initial_length, std::vector<size_t>& gram_mask, size_t skips)
@@ -68,7 +68,7 @@ void compile_gram(const std::vector<std::string>& grams, std::array<uint32_t, NU
   }
 }
 
-void VW::kskip_ngram_transformer::generate_grams(example* ex)
+void vw::kskip_ngram_transformer::generate_grams(example* ex)
 {
   for (namespace_index index : ex->indices)
   {
@@ -82,7 +82,7 @@ void VW::kskip_ngram_transformer::generate_grams(example* ex)
   }
 }
 
-VW::kskip_ngram_transformer VW::kskip_ngram_transformer::build(
+vw::kskip_ngram_transformer vw::kskip_ngram_transformer::build(
     const std::vector<std::string>& grams, const std::vector<std::string>& skips, bool quiet)
 {
   kskip_ngram_transformer transformer(grams, skips);
@@ -92,7 +92,7 @@ VW::kskip_ngram_transformer VW::kskip_ngram_transformer::build(
   return transformer;
 }
 
-VW::kskip_ngram_transformer::kskip_ngram_transformer(std::vector<std::string> grams, std::vector<std::string> skips)
+vw::kskip_ngram_transformer::kskip_ngram_transformer(std::vector<std::string> grams, std::vector<std::string> skips)
     : initial_ngram_definitions(std::move(grams)), initial_skip_definitions(std::move(skips))
 {
   ngram_definition.fill(0);

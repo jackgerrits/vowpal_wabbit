@@ -3,7 +3,7 @@
 // license as described in the file LICENSE.
 
 #pragma once
-// Forward declaration header to declare the basic components used by VW reductions
+// Forward declaration header to declare the basic components used by vw reductions
 
 #include <vector>
 #include "v_array.h"
@@ -12,9 +12,9 @@
 struct example;
 using multi_ex = std::vector<example*>;
 struct random_state;
-struct vw;
+struct workspace;
 
-namespace VW
+namespace vw
 {
 namespace LEARNER
 {
@@ -28,4 +28,4 @@ namespace config
 {
 struct options_i;
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

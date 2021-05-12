@@ -8,7 +8,7 @@
 
 #include "config.h"
 
-namespace VW
+namespace vw
 {
 struct version_struct
 {
@@ -49,4 +49,4 @@ struct version_struct
 
 extern const version_struct version;
 extern const std::string git_commit;
-}  // namespace VW
+}  // namespace vw

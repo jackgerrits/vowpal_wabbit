@@ -13,14 +13,14 @@
 #include "options_boost_po.h"
 #include "vw_to_flat.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 vw* setup(std::unique_ptr<options_i, options_deleter_type> options)
 {
   vw* all = nullptr;
   try
   {
-    all = VW::initialize(std::move(options));
+    all = vw::initialize(std::move(options));
   }
   catch (const std::exception& ex)
   {
@@ -69,15 +69,15 @@ int main(int argc, char* argv[])
   argv[argc++] = const_cast<char*>(q.c_str());
 
   std::unique_ptr<options_boost_po, options_deleter_type> ptr(
-      new options_boost_po(argc, argv), [](VW::config::options_i* ptr) { delete ptr; });
+      new options_boost_po(argc, argv), [](vw::config::options_i* ptr) { delete ptr; });
   ptr->add_and_parse(driver_config);
   alls.push_back(setup(std::move(ptr)));
   if (converter.collection_size > 0) { converter.collection = true; }
 
   vw& all = *alls[0];
 
-  VW::start_parser(all);
+  vw::start_parser(all);
   converter.convert_txt_to_flat(all);
-  VW::end_parser(all);
+  vw::end_parser(all);
   return 0;
 }

@@ -10,7 +10,7 @@
 #include "constant.h"
 #include "example.h"
 
-namespace VW
+namespace vw
 {
 struct kskip_ngram_transformer
 {
@@ -47,4 +47,4 @@ private:
   std::vector<std::string> initial_ngram_definitions;
   std::vector<std::string> initial_skip_definitions;
 };
-}  // namespace VW
+}  // namespace vw

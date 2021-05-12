@@ -6,13 +6,13 @@
 #pragma once
 #include "reductions_fwd.h"
 
-struct vw;
+struct workspace;
 
-namespace VW
+namespace vw
 {
 namespace shared_feature_merger
 {
-VW::LEARNER::base_learner* shared_feature_merger_setup(config::options_i& options, vw& all);
+vw::LEARNER::base_learner* shared_feature_merger_setup(config::options_i& options, workspace& all);
 
 }  // namespace shared_feature_merger
-}  // namespace VW
+}  // namespace vw

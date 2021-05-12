@@ -34,7 +34,7 @@ typedef struct gzFile_s* gzFile;
 #  define O_LARGEFILE 0
 #endif
 
-using namespace VW::io;
+using namespace vw::io;
 
 enum class file_mode
 {
@@ -154,7 +154,7 @@ private:
   size_t _len;
 };
 
-namespace VW
+namespace vw
 {
 namespace io
 {
@@ -201,7 +201,7 @@ std::unique_ptr<reader> create_buffer_view(const char* data, size_t len)
   return std::unique_ptr<reader>(new buffer_view(data, len));
 }
 }  // namespace io
-}  // namespace VW
+}  // namespace vw
 
 //
 // stdio_adapter

@@ -11,8 +11,8 @@
 #include "cbify.h"
 #include "cb_label_parser.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct cb_to_cb_adf
 {
@@ -39,7 +39,7 @@ void predict_or_learn(cb_to_cb_adf& data, multi_learner& base, example& ec)
     data.adf_data.ecs[chosen_action]->l.cb = std::move(ec.l.cb);
   }
 
-  auto restore_guard = VW::scope_exit([&ld, &data, &ec, &chosen_action, &is_test_label] {
+  auto restore_guard = vw::scope_exit([&ld, &data, &ec, &chosen_action, &is_test_label] {
     if (!is_test_label && chosen_action < data.adf_data.num_actions)
     {
       ec.l.cb = std::move(data.adf_data.ecs[chosen_action]->l.cb);
@@ -55,13 +55,13 @@ void predict_or_learn(cb_to_cb_adf& data, multi_learner& base, example& ec)
   if (!data.explore_mode) ec.pred.multiclass = ec.pred.a_s[0].action + 1;
 }
 
-void finish_example(vw& all, cb_to_cb_adf& c, example& ec)
+void finish_example(workspace& all, cb_to_cb_adf& c, example& ec)
 {
   c.adf_data.ecs[0]->pred.a_s = std::move(ec.pred.a_s);
 
   c.adf_learner->print_example(all, c.adf_data.ecs);
 
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 /*
@@ -73,7 +73,7 @@ void finish_example(vw& all, cb_to_cb_adf& c, example& ec)
 
     Related files: cb_algs.cc, cb_explore.cc, cbify.cc
 */
-VW::LEARNER::base_learner* cb_to_cb_adf_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* cb_to_cb_adf_setup(options_i& options, workspace& all)
 {
   bool compat_old_cb = false;
   bool force_legacy = false;

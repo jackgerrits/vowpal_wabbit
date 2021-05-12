@@ -13,11 +13,11 @@
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_sample
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace VW
+namespace vw
 {
 // cb_sample is used to automatically sample and swap from a cb explore pdf.
 struct cb_sample_data
@@ -99,7 +99,7 @@ struct cb_sample_data
 private:
   std::shared_ptr<rand_state> _random_state;
 };
-}  // namespace VW
+}  // namespace vw
 
 template <bool is_learn>
 void learn_or_predict(cb_sample_data &data, multi_learner &base, multi_ex &examples)
@@ -107,7 +107,7 @@ void learn_or_predict(cb_sample_data &data, multi_learner &base, multi_ex &examp
   data.learn_or_predict<is_learn>(base, examples);
 }
 
-base_learner *cb_sample_setup(options_i &options, vw &all)
+base_learner *cb_sample_setup(options_i &options, workspace &all)
 {
   bool cb_sample_option = false;
 

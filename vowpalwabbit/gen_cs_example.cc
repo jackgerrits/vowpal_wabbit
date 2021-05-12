@@ -11,11 +11,11 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace GEN_CS
 {
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace CB_ALGS;
 using namespace CB;
 

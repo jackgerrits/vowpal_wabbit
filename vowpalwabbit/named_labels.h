@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <string_view>
 
-namespace VW
+namespace vw
 {
 class named_labels
 {
@@ -36,4 +36,4 @@ public:
   uint32_t get(std::string_view s) const;
   std::string_view get(uint32_t v) const;
 };
-}  // namespace VW
+}  // namespace vw

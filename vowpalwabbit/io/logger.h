@@ -12,7 +12,7 @@
 // needed for custom types (like string_view)
 #include <fmt/ostream.h>
 
-namespace VW
+namespace vw
 {
 namespace io
 {
@@ -136,4 +136,4 @@ void log_set_level(log_level lvl);
 void initialize_logger();
 }  // namespace logger
 }  // namespace io
-}  // namespace VW
+}  // namespace vw

@@ -89,8 +89,8 @@ class io_buf
   internal_buffer _buffer;
   char* head = nullptr;
 
-  std::vector<std::unique_ptr<VW::io::reader>> input_files;
-  std::vector<std::unique_ptr<VW::io::writer>> output_files;
+  std::vector<std::unique_ptr<vw::io::reader>> input_files;
+  std::vector<std::unique_ptr<vw::io::writer>> output_files;
 
 public:
   io_buf()
@@ -104,8 +104,8 @@ public:
   io_buf(io_buf&& other) = delete;
   io_buf& operator=(io_buf&& other) = delete;
 
-  const std::vector<std::unique_ptr<VW::io::reader>>& get_input_files() const { return input_files; }
-  const std::vector<std::unique_ptr<VW::io::writer>>& get_output_files() const { return output_files; }
+  const std::vector<std::unique_ptr<vw::io::reader>>& get_input_files() const { return input_files; }
+  const std::vector<std::unique_ptr<vw::io::writer>>& get_output_files() const { return output_files; }
 
   // file descriptor currently being used.
   size_t current = 0;
@@ -124,13 +124,13 @@ public:
     return _hash;
   }
 
-  void add_file(std::unique_ptr<VW::io::reader>&& file)
+  void add_file(std::unique_ptr<vw::io::reader>&& file)
   {
     assert(output_files.empty());
     input_files.push_back(std::move(file));
   }
 
-  void add_file(std::unique_ptr<VW::io::writer>&& file)
+  void add_file(std::unique_ptr<vw::io::writer>&& file)
   {
     assert(input_files.empty());
     output_files.push_back(std::move(file));
@@ -142,7 +142,7 @@ public:
     head = _buffer._begin;
   }
 
-  void reset_file(VW::io::reader* f)
+  void reset_file(vw::io::reader* f)
   {
     f->reset();
     reset_buffer();
@@ -157,12 +157,12 @@ public:
 
   // You can definitely call read directly on the reader object. This function hasn't been changed yet to reduce churn
   // in the refactor.
-  static ssize_t read_file(VW::io::reader* f, void* buf, size_t nbytes)
+  static ssize_t read_file(vw::io::reader* f, void* buf, size_t nbytes)
   {
     return f->read(static_cast<char*>(buf), nbytes);
   }
 
-  ssize_t fill(VW::io::reader* f)
+  ssize_t fill(vw::io::reader* f)
   {
     // if the loaded values have reached the allocated space
     if (_buffer._end_array - _buffer._end == 0)
@@ -189,7 +189,7 @@ public:
   size_t unflushed_bytes_count() { return head - _buffer._begin; }
 
   void flush();
-  
+
   bool close_file()
   {
     if (!input_files.empty())

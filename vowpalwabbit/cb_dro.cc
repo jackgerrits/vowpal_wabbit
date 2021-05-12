@@ -6,13 +6,13 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-namespace VW
+namespace vw
 {
 struct cb_dro_data
 {
@@ -25,7 +25,7 @@ struct cb_dro_data
   {
     // Some explanation required.
     //
-    // VW currently is either
+    // vw currently is either
     //    in prediction mode with exploration (aka --cb_explore_adf)
     //    or in (off-policy) learning without exploration (aka --cb_adf)
     //
@@ -89,10 +89,10 @@ struct cb_dro_data
   }
 
 private:
-  VW::distributionally_robust::ChiSquared chisq;
+  vw::distributionally_robust::ChiSquared chisq;
   std::vector<float> save_weight;
 };
-}  // namespace VW
+}  // namespace vw
 
 template <bool is_learn, bool is_explore>
 void learn_or_predict(cb_dro_data &data, multi_learner &base, multi_ex &examples)
@@ -100,7 +100,7 @@ void learn_or_predict(cb_dro_data &data, multi_learner &base, multi_ex &examples
   data.learn_or_predict<is_learn, is_explore>(base, examples);
 }
 
-base_learner *cb_dro_setup(options_i &options, vw &all)
+base_learner *cb_dro_setup(options_i &options, workspace &all)
 {
   double alpha;
   double tau;

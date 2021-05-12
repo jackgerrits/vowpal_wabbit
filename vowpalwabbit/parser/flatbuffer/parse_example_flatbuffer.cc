@@ -13,7 +13,7 @@
 #include "../../best_constant.h"
 #include "parse_example_flatbuffer.h"
 
-namespace VW
+namespace vw
 {
 namespace parsers
 {
@@ -24,7 +24,7 @@ int flatbuffer_to_examples(vw* all, v_array<example*>& examples)
   return static_cast<int>(all->flat_converter->parse_examples(all, examples));
 }
 
-const VW::parsers::flatbuffer::ExampleRoot* parser::data() { return _data; }
+const vw::parsers::flatbuffer::ExampleRoot* parser::data() { return _data; }
 
 bool parser::parse(vw* all, uint8_t* buffer_pointer)
 {
@@ -32,7 +32,7 @@ bool parser::parse(vw* all, uint8_t* buffer_pointer)
   {
     _flatbuffer_pointer = buffer_pointer;
 
-    _data = VW::parsers::flatbuffer::GetSizePrefixedExampleRoot(_flatbuffer_pointer);
+    _data = vw::parsers::flatbuffer::GetSizePrefixedExampleRoot(_flatbuffer_pointer);
     return true;
   }
 
@@ -47,7 +47,7 @@ bool parser::parse(vw* all, uint8_t* buffer_pointer)
   all->example_parser->input->buf_read(line, _object_size);
 
   _flatbuffer_pointer = reinterpret_cast<uint8_t*>(line);
-  _data = VW::parsers::flatbuffer::GetExampleRoot(_flatbuffer_pointer);
+  _data = vw::parsers::flatbuffer::GetExampleRoot(_flatbuffer_pointer);
   return true;
 }
 
@@ -100,14 +100,14 @@ bool parser::parse_examples(vw* all, v_array<example*>& examples, uint8_t* buffe
 
     switch (_data->example_obj_type())
     {
-      case VW::parsers::flatbuffer::ExampleType_Example:
+      case vw::parsers::flatbuffer::ExampleType_Example:
       {
         const auto example = _data->example_obj_as_Example();
         parse_example(all, examples[0], example);
         return true;
       }
       break;
-      case VW::parsers::flatbuffer::ExampleType_MultiExample:
+      case vw::parsers::flatbuffer::ExampleType_MultiExample:
       {
         _multi_example_object = _data->example_obj_as_MultiExample();
         _active_multi_ex = true;
@@ -115,7 +115,7 @@ bool parser::parse_examples(vw* all, v_array<example*>& examples, uint8_t* buffe
         return true;
       }
       break;
-      case VW::parsers::flatbuffer::ExampleType_ExampleCollection:
+      case vw::parsers::flatbuffer::ExampleType_ExampleCollection:
       {
         _active_collection = true;
         process_collection_item(all, examples);
@@ -264,4 +264,4 @@ void parser::parse_flat_label(shared_data* sd, example* ae, const Example* eg)
 
 }  // namespace flatbuffer
 }  // namespace parsers
-}  // namespace VW
+}  // namespace vw

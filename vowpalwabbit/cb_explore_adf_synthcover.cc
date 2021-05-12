@@ -19,12 +19,12 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 // All exploration algorithms return a vector of id, probability tuples, sorted in order of scores. The probabilities
 // are the probability with which each action should be replaced to the top of the list.
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -38,7 +38,7 @@ private:
   size_t _synthcoversize;
   std::shared_ptr<rand_state> _random_state;
 
-  VW::version_struct _model_file_version;
+  vw::version_struct _model_file_version;
 
   v_array<ACTION_SCORE::action_score> _action_probs;
   float _min_cost;
@@ -46,20 +46,20 @@ private:
 
 public:
   cb_explore_adf_synthcover(float epsilon, float psi, size_t synthcoversize, std::shared_ptr<rand_state> random_state,
-      VW::version_struct model_file_version);
+      vw::version_struct model_file_version);
 
   // Should be called through cb_explore_adf_base for pre/post-processing
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
   void save_load(io_buf& model_file, bool read, bool text);
 
 private:
   template <bool is_learn>
-  void predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples);
 };
 
 cb_explore_adf_synthcover::cb_explore_adf_synthcover(float epsilon, float psi, size_t synthcoversize,
-    std::shared_ptr<rand_state> random_state, VW::version_struct model_file_version)
+    std::shared_ptr<rand_state> random_state, vw::version_struct model_file_version)
     : _epsilon(epsilon)
     , _psi(psi)
     , _synthcoversize(synthcoversize)
@@ -72,9 +72,9 @@ cb_explore_adf_synthcover::cb_explore_adf_synthcover(float epsilon, float psi, s
 }
 
 template <bool is_learn>
-void cb_explore_adf_synthcover::predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void cb_explore_adf_synthcover::predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
-  VW::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
+  vw::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
 
   const auto it =
       std::find_if(examples.begin(), examples.end(), [](example* item) { return !item->l.cb.costs.empty(); });
@@ -157,7 +157,7 @@ void cb_explore_adf_synthcover::save_load(io_buf& model_file, bool read, bool te
   }
 }
 
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -202,15 +202,15 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
   }
 
   size_t problem_multiplier = 1;
-  VW::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
+  vw::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
   all.example_parser->lbl_parser = CB::cb_label;
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_synthcover>;
   auto data =
       scoped_calloc_or_throw<explore_type>(epsilon, psi, synthcoversize, all.get_random_state(), all.model_file_ver);
 
-  VW::LEARNER::learner<explore_type, multi_ex>& l =
-      VW::LEARNER::init_learner(data, base, explore_type::learn, explore_type::predict, problem_multiplier,
+  vw::LEARNER::learner<explore_type, multi_ex>& l =
+      vw::LEARNER::init_learner(data, base, explore_type::learn, explore_type::predict, problem_multiplier,
           prediction_type_t::action_probs, all.get_setupfn_name(setup) + "-synthcover");
 
   l.set_finish_example(explore_type::finish_multiline_example);
@@ -222,4 +222,4 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
 
 }  // namespace synthcover
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

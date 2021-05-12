@@ -42,11 +42,11 @@ void validate(boost::any& v, std::vector<std::string> const& values, parser_type
 int main(int argc, char** argv)
 {
   // clang-format off
-  po::options_description desc("Parser throughput tool - determine throughput of VW parser");
+  po::options_description desc("Parser throughput tool - determine throughput of vw parser");
   desc.add_options()
     ("help,h", "Produce help message")
     ("data,d", po::value<std::string>(), "Data file to read")
-    ("args,a", po::value<std::string>(), "VW args to setup parser correctly")
+    ("args,a", po::value<std::string>(), "vw args to setup parser correctly")
     ("type,t", po::value<parser_type>(), "Type of input format. [text, djson]");
   // clang-format on
   po::variables_map vm;
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     args += " --dsjson";
   }
 
-  auto vw = VW::initialize(args, nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize(args, nullptr, false, nullptr, nullptr);
   const auto is_multiline = vw->l->is_multiline;
 
   const auto start = std::chrono::high_resolution_clock::now();
@@ -137,11 +137,11 @@ int main(int argc, char** argv)
       {
         if (line.empty() && !exs.empty())
         {
-          VW::finish_example(*vw, exs);
+          vw::finish_example(*vw, exs);
           exs.clear();
         }
 
-        auto* ae = &VW::get_unused_example(vw);
+        auto* ae = &vw::get_unused_example(vw);
         std::string_view example(line.c_str(), line.size());
         substring_to_example(vw, ae, example);
         exs.push_back(ae);
@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 
       if (!exs.empty())
       {
-        VW::finish_example(*vw, exs);
+        vw::finish_example(*vw, exs);
         exs.clear();
       }
     }
@@ -157,10 +157,10 @@ int main(int argc, char** argv)
     {
       for (const auto& line : lines)
       {
-        example& ae = VW::get_unused_example(vw);
+        example& ae = vw::get_unused_example(vw);
         std::string_view example(line.c_str(), line.size());
         substring_to_example(vw, &ae, example);
-        VW::finish_example(*vw, ae);
+        vw::finish_example(*vw, ae);
       }
     }
   }
@@ -170,9 +170,9 @@ int main(int argc, char** argv)
     for (const auto& line : lines)
     {
       v_array<example*> examples = v_init<example*>();
-      examples.push_back(&VW::get_unused_example(vw));
-      VW::read_line_decision_service_json<false>(*vw, examples, const_cast<char*>(line.data()), line.length(), false,
-          (VW::example_factory_t)&VW::get_unused_example, (void*)vw, &interaction);
+      examples.push_back(&vw::get_unused_example(vw));
+      vw::read_line_decision_service_json<false>(*vw, examples, const_cast<char*>(line.data()), line.length(), false,
+          (vw::example_factory_t)&vw::get_unused_example, (void*)vw, &interaction);
       multi_ex result;
       result.reserve(examples.size());
       for (size_t i = 0; i < examples.size(); ++i)
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
         result.push_back(examples[i]);
       }
       // TODO - finish_example should support a v_array as input.
-      VW::finish_example(*vw, result);
+      vw::finish_example(*vw, result);
       examples.delete_v();
     }
   }
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
   std::cout << bytes << " bytes parsed in " << time_in_microseconds << "μs" << std::endl;
   std::cout << megabytes_per_second << "MB/s" << std::endl;
 
-  VW::finish(*vw);
+  vw::finish(*vw);
 
   return 0;
 }

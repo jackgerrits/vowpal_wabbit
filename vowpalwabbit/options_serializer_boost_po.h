@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-namespace VW
+namespace vw
 {
 namespace config
 {
@@ -74,4 +74,4 @@ void options_serializer_boost_po::serialize<bool>(typed_option<bool>& typed_argu
 template <>
 void options_serializer_boost_po::add_impl<typelist<>>(base_option& options);
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

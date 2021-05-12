@@ -18,11 +18,11 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace COST_SENSITIVE;
-using namespace VW::config;
+using namespace vw::config;
 
 #ifdef VW_DEBUG_LOG
 #  undef VW_DEBUG_LOG
@@ -68,7 +68,7 @@ void predict_or_learn(csoaa& c, single_learner& base, example& ec)
   COST_SENSITIVE::label ld = std::move(ec.l.cs);
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([&ld, &ec] { ec.l.cs = std::move(ld); });
+  auto restore_guard = vw::scope_exit([&ld, &ec] { ec.l.cs = std::move(ld); });
 
   uint32_t prediction = 1;
   float score = FLT_MAX;
@@ -129,9 +129,9 @@ void predict_or_learn(csoaa& c, single_learner& base, example& ec)
   ec.pred.multiclass = prediction;
 }
 
-void finish_example(vw& all, csoaa&, example& ec) { COST_SENSITIVE::finish_example(all, ec); }
+void finish_example(workspace& all, csoaa&, example& ec) { COST_SENSITIVE::finish_example(all, ec); }
 
-base_learner* csoaa_setup(options_i& options, vw& all)
+base_learner* csoaa_setup(options_i& options, workspace& all)
 {
   auto c = scoped_calloc_or_throw<csoaa>();
   option_group_definition new_options("Cost Sensitive One Against All");
@@ -167,7 +167,7 @@ struct ldf
   bool treat_as_classifier;
   bool is_probabilities;
   float csoaa_example_t;
-  vw* all;
+  workspace* all;
 
   bool rank;
   action_scores a_s;
@@ -220,7 +220,7 @@ void subtract_feature(example& ec, float feature_value_x, uint64_t weight_index)
 }
 
 // Iterate over all features of ecsub including quadratic and cubic features and subtract them from ec.
-void subtract_example(vw& all, example* ec, example* ecsub)
+void subtract_example(workspace& all, example* ec, example* ecsub)
 {
   features& wap_fs = ec->feature_space[wap_ldf_namespace];
   wap_fs.sum_feat_sq = 0;
@@ -259,7 +259,7 @@ void make_single_prediction(ldf& data, single_learner& base, example& ec)
 
   LabelDict::add_example_namespace_from_memory(data.label_features, ec, ec.l.cs.costs[0].class_index);
 
-  auto restore_guard = VW::scope_exit([&data, old_offset, &ec] {
+  auto restore_guard = vw::scope_exit([&data, old_offset, &ec] {
     ec.ft_offset = old_offset;
     // WARNING: Access of label information when making prediction is
     // problematic.
@@ -321,7 +321,7 @@ void do_actual_learning_wap(ldf& data, single_learner& base, multi_ex& ec_seq)
     LabelDict::add_example_namespace_from_memory(data.label_features, *ec1, costs1[0].class_index);
 
     // Guard example state restore against throws
-    auto restore_guard = VW::scope_exit([&data, &save_cs_label, &costs1, &ec1] {
+    auto restore_guard = vw::scope_exit([&data, &save_cs_label, &costs1, &ec1] {
       LabelDict::del_example_namespace_from_memory(data.label_features, *ec1, costs1[0].class_index);
 
       // restore original cost-sensitive label, sum of importance weights
@@ -352,7 +352,7 @@ void do_actual_learning_wap(ldf& data, single_learner& base, multi_ex& ec_seq)
       ec1->ft_offset = data.ft_offset;
 
       // Guard inner example state restore against throws
-      auto restore_guard_inner = VW::scope_exit([&data, old_offset, old_weight, &costs2, &ec2, &ec1] {
+      auto restore_guard_inner = vw::scope_exit([&data, old_offset, old_weight, &costs2, &ec2, &ec1] {
         ec1->ft_offset = old_offset;
         ec1->weight = old_weight;
         unsubtract_example(ec1);
@@ -414,7 +414,7 @@ void do_actual_learning_oaa(ldf& data, single_learner& base, multi_ex& ec_seq)
     ec->ft_offset = data.ft_offset;
 
     // Guard example state restore against throws
-    auto restore_guard = VW::scope_exit([&save_cs_label, &data, &costs, old_offset, old_weight, &ec] {
+    auto restore_guard = vw::scope_exit([&save_cs_label, &data, &costs, old_offset, old_weight, &ec] {
       ec->ft_offset = old_offset;
       LabelDict::del_example_namespace_from_memory(data.label_features, *ec, costs[0].class_index);
       ec->weight = old_weight;
@@ -491,7 +491,7 @@ void predict_csoaa_ldf(ldf& data, single_learner& base, multi_ex& ec_seq_all)
   uint32_t K = static_cast<uint32_t>(ec_seq.size());
   uint32_t predicted_K = 0;
 
-  auto restore_guard = VW::scope_exit([&data, &ec_seq, K, &predicted_K] {
+  auto restore_guard = vw::scope_exit([&data, &ec_seq, K, &predicted_K] {
     // Mark the predicted sub-example with its class_index, all other with 0
     for (size_t k = 0; k < K; k++)
     {
@@ -537,7 +537,7 @@ void predict_csoaa_ldf_rank(ldf& data, single_learner& base, multi_ex& ec_seq_al
   data.a_s.clear();
   data.stored_preds.clear();
 
-  auto restore_guard = VW::scope_exit([&data, &ec_seq, K] {
+  auto restore_guard = vw::scope_exit([&data, &ec_seq, K] {
     qsort((void*)data.a_s.begin(), data.a_s.size(), sizeof(action_score), score_comp);
 
     data.stored_preds[0].clear();
@@ -563,7 +563,7 @@ void predict_csoaa_ldf_rank(ldf& data, single_learner& base, multi_ex& ec_seq_al
   }
 }
 
-void global_print_newline(vw& all)
+void global_print_newline(workspace& all)
 {
   char temp[1];
   temp[0] = '\n';
@@ -571,11 +571,11 @@ void global_print_newline(vw& all)
   {
     ssize_t t;
     t = sink->write(temp, 1);
-    if (t != 1) logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
+    if (t != 1) logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
   }
 }
 
-void output_example(vw& all, example& ec, bool& hit_loss, multi_ex* ec_seq, ldf& data)
+void output_example(workspace& all, example& ec, bool& hit_loss, multi_ex* ec_seq, ldf& data)
 {
   label& ld = ec.l.cs;
   const auto& costs = ld.costs;
@@ -645,7 +645,7 @@ void output_example(vw& all, example& ec, bool& hit_loss, multi_ex* ec_seq, ldf&
   COST_SENSITIVE::print_update(all, COST_SENSITIVE::cs_label.test_label(&ec.l), ec, ec_seq, false, predicted_class);
 }
 
-void output_rank_example(vw& all, example& head_ec, bool& hit_loss, multi_ex* ec_seq)
+void output_rank_example(workspace& all, example& head_ec, bool& hit_loss, multi_ex* ec_seq)
 {
   const auto& costs = head_ec.l.cs.costs;
 
@@ -693,7 +693,7 @@ void output_rank_example(vw& all, example& head_ec, bool& hit_loss, multi_ex* ec
   COST_SENSITIVE::print_update(all, COST_SENSITIVE::cs_label.test_label(&head_ec.l), head_ec, ec_seq, true, 0);
 }
 
-void output_example_seq(vw& all, ldf& data, multi_ex& ec_seq)
+void output_example_seq(workspace& all, ldf& data, multi_ex& ec_seq)
 {
   size_t K = ec_seq.size();
   if ((K > 0) && !ec_seq_is_label_definition(ec_seq))
@@ -750,7 +750,7 @@ void output_example_seq(vw& all, ldf& data, multi_ex& ec_seq)
 
 void end_pass(ldf& data) { data.first_pass = false; }
 
-void finish_multiline_example(vw& all, ldf& data, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, ldf& data, multi_ex& ec_seq)
 {
   if (!ec_seq.empty())
   {
@@ -758,7 +758,7 @@ void finish_multiline_example(vw& all, ldf& data, multi_ex& ec_seq)
     global_print_newline(all);
   }
 
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 /*
@@ -817,7 +817,7 @@ multi_ex process_labels(ldf& data, const multi_ex& ec_seq_all)
   return ret;
 }
 
-base_learner* csldf_setup(options_i& options, vw& all)
+base_learner* csldf_setup(options_i& options, workspace& all)
 {
   auto ld = scoped_calloc_or_throw<ldf>();
 

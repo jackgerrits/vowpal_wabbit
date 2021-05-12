@@ -17,7 +17,7 @@ struct cb_to_cs
   size_t cb_type;
   uint32_t num_actions;
   COST_SENSITIVE::label pred_scores;
-  VW::LEARNER::single_learner* scorer;
+  vw::LEARNER::single_learner* scorer;
   float avg_loss_regressors;
   size_t nb_ex_regressors;
   float last_pred_reg;
@@ -39,7 +39,7 @@ struct cb_to_cs_adf
   // for DR
   COST_SENSITIVE::label pred_scores;
   CB::cb_class known_cost;
-  VW::LEARNER::single_learner* scorer;
+  vw::LEARNER::single_learner* scorer;
 };
 
 float safe_probability(float prob);
@@ -249,7 +249,7 @@ void cs_prep_labels(multi_ex& examples, std::vector<CB::label>& cb_labels, COST_
     std::vector<COST_SENSITIVE::label>& prepped_cs_labels, uint64_t offset);
 
 template <bool is_learn>
-void cs_ldf_learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& examples, std::vector<CB::label>& cb_labels,
+void cs_ldf_learn_or_predict(vw::LEARNER::multi_learner& base, multi_ex& examples, std::vector<CB::label>& cb_labels,
     COST_SENSITIVE::label& cs_labels, std::vector<COST_SENSITIVE::label>& prepped_cs_labels, bool predict_first,
     uint64_t offset, size_t id = 0)
 {
@@ -263,7 +263,7 @@ void cs_ldf_learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& example
   uint64_t saved_offset = examples[0]->ft_offset;
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([&cb_labels, &prepped_cs_labels, saved_offset, &examples] {
+  auto restore_guard = vw::scope_exit([&cb_labels, &prepped_cs_labels, saved_offset, &examples] {
     // 3rd: restore cb_label for each example
     // (**ec).l.cb = array.element.
     // and restore offsets

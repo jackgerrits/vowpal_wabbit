@@ -11,18 +11,18 @@
 
 // Aliases
 using std::endl;
-using VW::cb_continuous::continuous_label;
-using VW::cb_continuous::continuous_label_elm;
-using VW::config::make_option;
-using VW::config::option_group_definition;
-using VW::config::options_i;
-using VW::LEARNER::single_learner;
+using vw::cb_continuous::continuous_label;
+using vw::cb_continuous::continuous_label_elm;
+using vw::config::make_option;
+using vw::config::option_group_definition;
+using vw::config::options_i;
+using vw::LEARNER::single_learner;
 
 // Enable/Disable indented debug statements
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_sample_pdf
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
@@ -47,7 +47,7 @@ void sample_pdf::learn(example& ec)
   // predict buffer
   _pred_pdf.clear();
   {  // scope to predict & restore prediction
-    auto restore = VW::swap_guard(ec.pred.pdf, _pred_pdf);
+    auto restore = vw::swap_guard(ec.pred.pdf, _pred_pdf);
     _base->learn(ec);
   }
 }
@@ -57,7 +57,7 @@ void sample_pdf::predict(example& ec)
   _pred_pdf.clear();
 
   {  // scope to predict & restore prediction
-    auto restore = VW::swap_guard(ec.pred.pdf, _pred_pdf);
+    auto restore = vw::swap_guard(ec.pred.pdf, _pred_pdf);
     _base->predict(ec);
   }
 
@@ -89,7 +89,7 @@ void predict_or_learn(sample_pdf& reduction, single_learner&, example& ec)
 // END sample_pdf reduction and reduction methods
 ////////////////////////////////////////////////////
 
-LEARNER::base_learner* sample_pdf_setup(options_i& options, vw& all)
+LEARNER::base_learner* sample_pdf_setup(options_i& options, workspace& all)
 {
   option_group_definition new_options("Continuous actions - sample pdf");
   bool invoked = false;
@@ -110,4 +110,4 @@ LEARNER::base_learner* sample_pdf_setup(options_i& options, vw& all)
   return make_base(l);
 }
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

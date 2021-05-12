@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace VW
+namespace vw
 {
 namespace slates
 {
@@ -45,14 +45,14 @@ private:
     ccb slot 3:0.8:0.6 3,4
   */
   template <bool is_learn>
-  void learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void learn_or_predict(vw::LEARNER::multi_learner& base, multi_ex& examples);
 
 public:
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& examples);
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& examples);
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& examples);
 };
 
-VW::LEARNER::base_learner* slates_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* slates_setup(vw::config::options_i& options, workspace& all);
 std::string generate_slates_label_printout(const std::vector<example*>& slots);
 }  // namespace slates
-}  // namespace VW
+}  // namespace vw

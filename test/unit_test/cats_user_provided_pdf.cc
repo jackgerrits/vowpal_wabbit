@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(cats_no_model_action_provided)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet --first_only",
       nullptr, false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(cats_no_model_action_provided)
   BOOST_CHECK_EQUAL(examples.size(), 1);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), false);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), true);
@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE(cats_no_model_action_provided)
   BOOST_CHECK_GE(examples[0]->pred.pdf_value.action, 185);
   BOOST_CHECK_GT(examples[0]->pred.pdf_value.pdf_value, 0.);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(cats_pdf_no_model_action_provided)
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_action_provided)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats_pdf 32 --min_value=185 --max_value=23959 --bandwidth 1000 --no_stdin --quiet "
       "--first_only",
       nullptr, false, nullptr, nullptr);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_action_provided)
   BOOST_CHECK_EQUAL(examples.size(), 1);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), false);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), true);
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_action_provided)
   for (auto& p : examples[0]->pred.pdf) { sum += (p.right - p.left) * p.pdf_value; }
   BOOST_CHECK_CLOSE(sum, 1.f, FLOAT_TOL);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(cats_pdf_no_model_uniform_random)
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_uniform_random)
   float min_value = 185;
   float max_value = 23959;
   float epsilon = 0.1f;
-  auto vw = VW::initialize("--dsjson --chain_hash --cats_pdf 4 --min_value=" + std::to_string(min_value) +
+  auto vw = vw::initialize("--dsjson --chain_hash --cats_pdf 4 --min_value=" + std::to_string(min_value) +
           " --max_value=" + std::to_string(max_value) + " --epsilon " + std::to_string(epsilon) +
           " --bandwidth 1 --no_stdin --quiet --first_only",
       nullptr, false, nullptr, nullptr);
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_uniform_random)
   BOOST_CHECK_EQUAL(examples.size(), 1);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), false);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), false);
@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_uniform_random)
   BOOST_CHECK_CLOSE(examples[0]->pred.pdf[0].right, max_value, FLOAT_TOL);
   BOOST_CHECK_CLOSE(examples[0]->pred.pdf[0].pdf_value, static_cast<float>(1.f / (max_value - min_value)), FLOAT_TOL);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(cats_pdf_no_model_pdf_provided)
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_pdf_provided)
   float min_value = 185;
   float max_value = 23959;
   float epsilon = 0.1f;
-  auto vw = VW::initialize("--dsjson --chain_hash --cats_pdf 32 --min_value=" + std::to_string(min_value) +
+  auto vw = vw::initialize("--dsjson --chain_hash --cats_pdf 32 --min_value=" + std::to_string(min_value) +
           " --max_value=" + std::to_string(max_value) + " --epsilon " + std::to_string(epsilon) +
           " --bandwidth 1000 --no_stdin --quiet --first_only",
       nullptr, false, nullptr, nullptr);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_pdf_provided)
   BOOST_CHECK_EQUAL(examples.size(), 1);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), true);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), false);
@@ -192,6 +192,6 @@ BOOST_AUTO_TEST_CASE(cats_pdf_no_model_pdf_provided)
   BOOST_CHECK_CLOSE(examples[0]->pred.pdf[1].right, max_value, FLOAT_TOL);
   BOOST_CHECK_CLOSE(examples[0]->pred.pdf[1].pdf_value, 6.20426e-05, FLOAT_TOL);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
