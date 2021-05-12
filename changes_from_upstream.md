@@ -31,3 +31,6 @@
 - Remove log multi
 - Remove memory tree
 - Remove parse args
+- Remove daemon mode
+- Remove allreduce
+- Remove spanning tree

@@ -46,7 +46,6 @@
 #include "decision_scores.h"
 #include "feature_group.h"
 #include "rand_state.h"
-#include "allreduce.h"
 
 #include "options.h"
 #include "version.h"
@@ -67,14 +66,6 @@ struct dictionary_info
   uint64_t file_hash;
   std::shared_ptr<feature_dict> dict;
 };
-
-enum AllReduceType
-{
-  Socket,
-  Thread
-};
-
-class AllReduce;
 
 struct vw_logger
 {
@@ -132,9 +123,6 @@ public:
   parser* example_parser;
   std::thread parse_thread;
 
-  AllReduceType all_reduce_type;
-  AllReduce* all_reduce;
-
   bool chain_hash_json = false;
 
   VW::LEARNER::base_learner* l;         // the top level learner
@@ -166,9 +154,6 @@ public:
   std::unique_ptr<VW::external::parser> external_parser;
 #endif
   std::string data_filename;
-
-  bool daemon;
-  size_t num_children;
 
   bool save_per_pass;
   float initial_weight;
@@ -246,7 +231,6 @@ public:
   vw_logger logger;
   bool audit;     // should I print lots of debugging information?
   bool training;  // Should I train if lable data is available?
-  bool active;
   bool invariant_updates;  // Should we use importance aware/safe updates
   uint64_t random_seed;
   bool random_weights;
@@ -291,9 +275,6 @@ public:
   char* program_name;
 
   bool stdin_off;
-
-  bool no_daemon = false;  // If a model was saved in daemon or active learning mode, force it to accept local input
-                           // when loaded instead.
 
   // runtime accounting variables.
   float initial_t;
@@ -341,10 +322,6 @@ private:
 VW_DEPRECATED("Use print_result_by_ref instead")
 void print_result(VW::io::writer* f, float res, float weight, v_array<char> tag);
 void print_result_by_ref(VW::io::writer* f, float res, float weight, const v_array<char>& tag);
-
-VW_DEPRECATED("Use binary_print_result_by_ref instead")
-void binary_print_result(VW::io::writer* f, float res, float weight, v_array<char> tag);
-void binary_print_result_by_ref(VW::io::writer* f, float res, float weight, const v_array<char>& tag);
 
 void noop_mm(shared_data*, float label);
 void get_prediction(VW::io::reader* f, float& res, float& weight);

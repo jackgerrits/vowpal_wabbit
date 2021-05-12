@@ -5,12 +5,8 @@
 #include "io_adapter.h"
 
 #ifdef _WIN32
-#  define NOMINMAX
-#  define ssize_t int64_t
-#  include <winsock2.h>
 #  include <io.h>
 #else
-#  include <sys/socket.h>
 #  include <unistd.h>
 #endif
 
@@ -63,20 +59,6 @@ int get_stdout_fileno()
   return fileno(stdout);
 #endif
 }
-
-struct socket_adapter : public writer, public reader
-{
-  socket_adapter(int fd, const std::shared_ptr<details::socket_closer>& closer)
-      : reader(false /*is_resettable*/), _socket_fd{fd}, _closer{closer}
-  {
-  }
-  ssize_t read(char* buffer, size_t num_bytes) override;
-  ssize_t write(const char* buffer, size_t num_bytes) override;
-
-private:
-  int _socket_fd;
-  std::shared_ptr<details::socket_closer> _closer;
-};
 
 struct file_adapter : public writer, public reader
 {
@@ -204,8 +186,6 @@ std::unique_ptr<reader> open_stdin() { return std::unique_ptr<reader>(new stdio_
 
 std::unique_ptr<writer> open_stdout() { return std::unique_ptr<writer>(new stdio_adapter); }
 
-std::unique_ptr<socket> wrap_socket_descriptor(int fd) { return std::unique_ptr<socket>(new socket(fd)); }
-
 std::unique_ptr<writer> create_custom_writer(void* context, write_func_t write_func)
 {
   return std::unique_ptr<writer>(new custom_func_writer(context, write_func));
@@ -222,49 +202,6 @@ std::unique_ptr<reader> create_buffer_view(const char* data, size_t len)
 }
 }  // namespace io
 }  // namespace VW
-
-//
-// socket_adapter
-//
-
-ssize_t socket_adapter::read(char* buffer, size_t num_bytes)
-{
-#ifdef _WIN32
-  return recv(_socket_fd, buffer, (int)(num_bytes), 0);
-#else
-  return ::read(_socket_fd, buffer, static_cast<unsigned int>(num_bytes));
-#endif
-}
-
-ssize_t socket_adapter::write(const char* buffer, size_t num_bytes)
-{
-#ifdef _WIN32
-  return send(_socket_fd, buffer, (int)(num_bytes), 0);
-#else
-  return ::write(_socket_fd, buffer, static_cast<unsigned int>(num_bytes));
-#endif
-}
-
-details::socket_closer::socket_closer(int fd) : _socket_fd(fd) {}
-
-details::socket_closer::~socket_closer()
-{
-#ifdef _WIN32
-  closesocket(_socket_fd);
-#else
-  close(_socket_fd);
-#endif
-}
-
-std::unique_ptr<reader> socket::get_reader()
-{
-  return std::unique_ptr<reader>(new socket_adapter(_socket_fd, _closer));
-}
-
-std::unique_ptr<writer> socket::get_writer()
-{
-  return std::unique_ptr<writer>(new socket_adapter(_socket_fd, _closer));
-}
 
 //
 // stdio_adapter

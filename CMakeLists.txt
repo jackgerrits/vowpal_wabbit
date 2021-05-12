@@ -244,7 +244,6 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 add_subdirectory(explore)
-add_subdirectory(cluster)
 include(ext_libs/ext_libs.cmake)
 add_subdirectory(vowpalwabbit)
 
@@ -293,7 +292,7 @@ if(BUILD_TESTS)
   # This target ensures all dependencies are built and also uses verbose mode allowing the test output to be seen.
   add_custom_target(test_with_output
     COMMAND ${CMAKE_CTEST_COMMAND} ${cmake_test_configuration} ${cmake_test_verbosity}
-    DEPENDS spanning_tree vw-unit-test.out vw-bin ${vw_c_api_unit_test_target}
+    DEPENDS vw-unit-test.out vw-bin ${vw_c_api_unit_test_target}
   )
 endif()
 

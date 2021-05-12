@@ -10,7 +10,6 @@
 #include "options.h"
 #include "parse_args.h"
 #include "parse_regressor.h"
-#include "accumulate.h"
 #include "best_constant.h"
 #include "vw_exception.h"
 #include "options_boost_po.h"

@@ -20,15 +20,6 @@ Weight options:
   --truncated_normal_weights      make initial weights truncated normal
   --sparse_weights                Use a sparse datastructure for weights
   --input_feature_regularizer arg Per feature regularization input file
-Parallelization options:
-  --span_server arg                 Location of server for setting up spanning 
-                                    tree
-  --unique_id arg (=0, )            unique id used for cluster parallel jobs
-  --total arg (=1, )                total number of nodes used in cluster 
-                                    parallel job
-  --node arg (=0, )                 node number in cluster parallel job
-  --span_server_port arg (=26543, ) Port of the server for setting up spanning 
-                                    tree
 Diagnostic options:
   --version             Version information
   -a [ --audit ]        print weights of features
@@ -144,12 +135,8 @@ Output options:
   -r [ --raw_predictions ] arg File to output unnormalized predictions to
 Input options:
   -d [ --data ] arg     Example set
-  --daemon              persistent daemon mode on port 26542
-  --foreground          in persistent daemon mode, do not run in the background
   --port arg            port to listen on; use 0 to pick unused port
-  --num_children arg    number of children for persistent daemon mode
   --pid_file arg        Write pid file in persistent daemon mode
-  --port_file arg       Write port used in persistent daemon mode
   -c [ --cache ]        Use a cache.  The default is <data>.cache
   --cache_file arg      The location(s) of cache_file.
   --json                Enable JSON parsing.
@@ -160,8 +147,6 @@ Input options:
                         file. A mixture of raw-text & compressed inputs are 
                         supported with autodetection.
   --no_stdin            do not default to reading from stdin
-  --no_daemon           Force a loaded daemon or active learning model to 
-                        accept local input instead of starting in daemon mode
   --chain_hash          Enable chain hash in JSON for feature name and string 
                         feature value. e.g. {'A': {'B': 'C'}} is hashed as 
                         A^B^C. Note: this will become the default in a future 

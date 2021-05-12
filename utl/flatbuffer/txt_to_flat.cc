@@ -2,17 +2,9 @@
 // individual contributors. All rights reserved. Released under a BSD (revised)
 // license as described in the file LICENSE.
 
-#ifdef _WIN32
-#  define NOMINMAX
-#  include <WinSock2.h>
-#else
-#  include <sys/socket.h>
-#  include <arpa/inet.h>
-#endif
 #include <sys/timeb.h>
 #include "parse_args.h"
 #include "parse_regressor.h"
-#include "accumulate.h"
 #include "best_constant.h"
 #include "vw_exception.h"
 #include <fstream>

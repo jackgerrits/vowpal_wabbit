@@ -52,9 +52,7 @@
 #include "parse_example.h"
 #include "best_constant.h"
 #include "vw_exception.h"
-#include "accumulate.h"
 #include "vw_validate.h"
-#include "vw_allreduce.h"
 #include "audit_regressor.h"
 #include "marginal.h"
 #include "metrics.h"
@@ -350,9 +348,6 @@ void parse_diagnostics(options_i& options, vw& all)
 
   if(all.logger.quiet) logger::log_set_level(logger::log_level::off);
 
-  // pass all.logger.quiet around
-  if (all.all_reduce) all.all_reduce->quiet = all.logger.quiet;
-
   // Upon direct query for version -- spit it out directly to stdout
   if (version_arg)
   {
@@ -403,13 +398,8 @@ input_options parse_source(vw& all, options_i& options)
 
   option_group_definition input_options("Input options");
   input_options.add(make_option("data", all.data_filename).short_name("d").help("Example set"))
-      .add(make_option("daemon", parsed_options.daemon).help("persistent daemon mode on port 26542"))
-      .add(make_option("foreground", parsed_options.foreground)
-               .help("in persistent daemon mode, do not run in the background"))
       .add(make_option("port", parsed_options.port).help("port to listen on; use 0 to pick unused port"))
-      .add(make_option("num_children", all.num_children).help("number of children for persistent daemon mode"))
       .add(make_option("pid_file", parsed_options.pid_file).help("Write pid file in persistent daemon mode"))
-      .add(make_option("port_file", parsed_options.port_file).help("Write port used in persistent daemon mode"))
       .add(make_option("cache", parsed_options.cache).short_name("c").help("Use a cache.  The default is <data>.cache"))
       .add(make_option("cache_file", parsed_options.cache_files).help("The location(s) of cache_file."))
       .add(make_option("json", parsed_options.json).help("Enable JSON parsing."))
@@ -423,9 +413,6 @@ input_options parse_source(vw& all, options_i& options)
                   "use gzip format whenever possible. If a cache file is being created, this option creates a "
                   "compressed cache file. A mixture of raw-text & compressed inputs are supported with autodetection."))
       .add(make_option("no_stdin", all.stdin_off).help("do not default to reading from stdin"))
-      .add(make_option("no_daemon", all.no_daemon)
-               .help("Force a loaded daemon or active learning model to accept local input instead of starting in "
-                     "daemon mode"))
       .add(make_option("chain_hash", parsed_options.chain_hash_json)
                .help("Enable chain hash in JSON for feature name and string feature value. e.g. {'A': {'B': 'C'}} is "
                      "hashed as "
@@ -448,13 +435,6 @@ input_options parse_source(vw& all, options_i& options)
     *(all.trace_message) << "Warning: Multiple data files passed as positional parameters, only the first one will be "
                             "read and the rest will be ignored."
                          << endl;
-  }
-
-  if (parsed_options.daemon || options.was_supplied("pid_file") || (options.was_supplied("port") && !all.active))
-  {
-    all.daemon = true;
-    // allow each child to process up to 1e5 connections
-    all.numpasses = static_cast<size_t>(1e5);
   }
 
   // Add an implicit cache file based on the data filename.
@@ -1401,39 +1381,6 @@ vw& parse_args(
                  .help("Per feature regularization input file"));
     all.options->add_and_parse(weight_args);
 
-    std::string span_server_arg;
-    int span_server_port_arg;
-    // bool threads_arg;
-    size_t unique_id_arg;
-    size_t total_arg;
-    size_t node_arg;
-    option_group_definition parallelization_args("Parallelization options");
-    parallelization_args
-        .add(make_option("span_server", span_server_arg).help("Location of server for setting up spanning tree"))
-        //(make_option("threads", threads_arg).help("Enable multi-threading")) Unused option?
-        .add(make_option("unique_id", unique_id_arg).default_value(0).help("unique id used for cluster parallel jobs"))
-        .add(
-            make_option("total", total_arg).default_value(1).help("total number of nodes used in cluster parallel job"))
-        .add(make_option("node", node_arg).default_value(0).help("node number in cluster parallel job"))
-        .add(make_option("span_server_port", span_server_port_arg)
-                 .default_value(26543)
-                 .help("Port of the server for setting up spanning tree"));
-    all.options->add_and_parse(parallelization_args);
-
-    // total, unique_id and node must be specified together.
-    if ((all.options->was_supplied("total") || all.options->was_supplied("node") ||
-            all.options->was_supplied("unique_id")) &&
-        !(all.options->was_supplied("total") && all.options->was_supplied("node") &&
-            all.options->was_supplied("unique_id")))
-    { THROW("you must specificy unique_id, total, and node if you specify any"); }
-
-    if (all.options->was_supplied("span_server"))
-    {
-      all.all_reduce_type = AllReduceType::Socket;
-      all.all_reduce = new AllReduceSockets(
-          span_server_arg, span_server_port_arg, unique_id_arg, total_arg, node_arg, all.logger.quiet);
-    }
-
     parse_diagnostics(*all.options.get(), all);
 
     all.initial_t = static_cast<float>(all.sd->t);
@@ -1864,25 +1811,6 @@ vw* seed_vw_model(vw* vw_model, const std::string extra_args, trace_message_t tr
   new_model->example_parser->_shared_data = new_model->sd;
 
   return new_model;
-}
-
-void sync_stats(vw& all)
-{
-  if (all.all_reduce != nullptr)
-  {
-    float loss = static_cast<float>(all.sd->sum_loss);
-    all.sd->sum_loss = static_cast<double>(accumulate_scalar(all, loss));
-    float weighted_labeled_examples = static_cast<float>(all.sd->weighted_labeled_examples);
-    all.sd->weighted_labeled_examples = static_cast<double>(accumulate_scalar(all, weighted_labeled_examples));
-    float weighted_labels = static_cast<float>(all.sd->weighted_labels);
-    all.sd->weighted_labels = static_cast<double>(accumulate_scalar(all, weighted_labels));
-    float weighted_unlabeled_examples = static_cast<float>(all.sd->weighted_unlabeled_examples);
-    all.sd->weighted_unlabeled_examples = static_cast<double>(accumulate_scalar(all, weighted_unlabeled_examples));
-    float example_number = static_cast<float>(all.sd->example_number);
-    all.sd->example_number = static_cast<uint64_t>(accumulate_scalar(all, example_number));
-    float total_features = static_cast<float>(all.sd->total_features);
-    all.sd->total_features = static_cast<uint64_t>(accumulate_scalar(all, total_features));
-  }
 }
 
 void finish(vw& all, bool delete_all)

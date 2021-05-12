@@ -8,7 +8,6 @@
 #include <cstdio>
 
 #include "cache.h"
-#include "accumulate.h"
 #include "best_constant.h"
 #include <string_view>
 #include "example.h"
@@ -63,7 +62,6 @@ bool summarize_holdout_set(vw& all, size_t& no_win_counter)
   float thisLoss = (all.sd->weighted_holdout_examples_since_last_pass > 0)
       ? static_cast<float>(all.sd->holdout_sum_loss_since_last_pass / all.sd->weighted_holdout_examples_since_last_pass)
       : FLT_MAX * 0.5f;
-  if (all.all_reduce != nullptr) thisLoss = accumulate_scalar(all, thisLoss);
 
   all.sd->weighted_holdout_examples_since_last_pass = 0;
   all.sd->holdout_sum_loss_since_last_pass = 0;

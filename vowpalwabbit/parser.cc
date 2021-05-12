@@ -23,8 +23,6 @@ typedef int socklen_t;
 // windows doesn't define SOL_TCP and use an enum for the later, so can't check for its presence with a macro.
 #  define SOL_TCP IPPROTO_TCP
 
-int daemon(int /*a*/, int /*b*/) { exit(0); }
-
 // Starting with v142 the fix in the else block no longer works due to mismatching linkage. Going forward we should just
 // use the actual isocpp version.
 // use VW_getpid instead of getpid to avoid name collisions with process.h
@@ -163,27 +161,6 @@ void set_json_reader(vw& all, bool dsjson = false)
   all.example_parser->decision_service_json = dsjson;
 }
 
-void set_daemon_reader(vw& all, bool json = false, bool dsjson = false)
-{
-  if (all.example_parser->input->isbinary())
-  {
-    all.example_parser->reader = read_cached_features;
-    VW_WARNING_STATE_PUSH
-    VW_WARNING_DISABLE_DEPRECATED_USAGE
-    all.print = binary_print_result;
-    VW_WARNING_STATE_POP
-    all.print_by_ref = binary_print_result_by_ref;
-  }
-  else if (json || dsjson)
-  {
-    set_json_reader(all, dsjson);
-  }
-  else
-  {
-    set_string_reader(all);
-  }
-}
-
 void reset_source(vw& all, size_t numbits)
 {
   io_buf* input = all.example_parser->input.get();
@@ -212,45 +189,10 @@ void reset_source(vw& all, size_t numbits)
 
   if (all.example_parser->resettable == true)
   {
-    if (all.daemon)
+    for (auto& file : input->get_input_files())
     {
-      // wait for all predictions to be sent back to client
-      {
-        std::unique_lock<std::mutex> lock(all.example_parser->output_lock);
-        all.example_parser->output_done.wait(lock, [&] {
-          return all.example_parser->finished_examples == all.example_parser->end_parsed_examples &&
-              all.example_parser->ready_parsed_examples.size() == 0;
-        });
-      }
-
-      all.final_prediction_sink.clear();
-      all.example_parser->input->close_files();
-
-      sockaddr_in client_address;
-      socklen_t size = sizeof(client_address);
-      int f =
-          static_cast<int>(accept(all.example_parser->bound_sock, reinterpret_cast<sockaddr*>(&client_address), &size));
-      if (f < 0) THROW("accept: " << VW::strerror_to_string(errno));
-
-      // Disable Nagle delay algorithm due to daemon mode's interactive workload
-      int one = 1;
-      setsockopt(f, SOL_TCP, TCP_NODELAY, reinterpret_cast<char*>(&one), sizeof(one));
-
-      // note: breaking cluster parallel online learning by dropping support for id
-
-      auto socket = VW::io::wrap_socket_descriptor(f);
-      all.final_prediction_sink.push_back(socket->get_writer());
-      all.example_parser->input->add_file(socket->get_reader());
-
-      set_daemon_reader(all, is_currently_json_reader(all), is_currently_dsjson_reader(all));
-    }
-    else
-    {
-      for (auto& file : input->get_input_files())
-      {
-        input->reset_file(file.get());
-        if (cache_numbits(input, file.get()) < numbits) THROW("argh, a bug in caching of some sort!");
-      }
+      input->reset_file(file.get());
+      if (cache_numbits(input, file.get()) < numbits) THROW("argh, a bug in caching of some sort!");
     }
   }
 }
@@ -353,190 +295,7 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
   // default text reader
   all.example_parser->text_reader = VW::read_lines;
 
-  if (!all.no_daemon && (all.daemon || all.active))
-  {
-#ifdef _WIN32
-    WSAData wsaData;
-    int lastError = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (lastError != 0) THROWERRNO("WSAStartup() returned error:" << lastError);
-#endif
-    all.example_parser->bound_sock = static_cast<int>(socket(PF_INET, SOCK_STREAM, 0));
-    if (all.example_parser->bound_sock < 0)
-    {
-      std::stringstream msg;
-      msg << "socket: " << VW::strerror_to_string(errno);
-      *(all.trace_message) << msg.str() << endl;
-      THROW(msg.str().c_str());
-    }
 
-    int on = 1;
-    if (setsockopt(all.example_parser->bound_sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&on), sizeof(on)) <
-        0)
-      *(all.trace_message) << "setsockopt SO_REUSEADDR: " << VW::strerror_to_string(errno) << endl;
-
-    // Enable TCP Keep Alive to prevent socket leaks
-    int enableTKA = 1;
-    if (setsockopt(all.example_parser->bound_sock, SOL_SOCKET, SO_KEEPALIVE, reinterpret_cast<char*>(&enableTKA),
-            sizeof(enableTKA)) < 0)
-      *(all.trace_message) << "setsockopt SO_KEEPALIVE: " << VW::strerror_to_string(errno) << endl;
-
-    sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = htonl(INADDR_ANY);
-    short unsigned int port = 26542;
-    if (all.options->was_supplied("port")) port = static_cast<uint16_t>(input_options.port);
-    address.sin_port = htons(port);
-
-    // attempt to bind to socket
-    if (::bind(all.example_parser->bound_sock, reinterpret_cast<sockaddr*>(&address), sizeof(address)) < 0)
-      THROWERRNO("bind");
-
-    // listen on socket
-    if (listen(all.example_parser->bound_sock, 1) < 0) THROWERRNO("listen");
-
-    // write port file
-    if (all.options->was_supplied("port_file"))
-    {
-      socklen_t address_size = sizeof(address);
-      if (getsockname(all.example_parser->bound_sock, reinterpret_cast<sockaddr*>(&address), &address_size) < 0)
-      { *(all.trace_message) << "getsockname: " << VW::strerror_to_string(errno) << endl; }
-      std::ofstream port_file;
-      port_file.open(input_options.port_file.c_str());
-      if (!port_file.is_open()) THROW("error writing port file: " << input_options.port_file);
-
-      port_file << ntohs(address.sin_port) << endl;
-      port_file.close();
-    }
-
-    // background process (if foreground is not set)
-    if (!input_options.foreground)
-    {
-      // FIXME switch to posix_spawn
-      if (!all.active && daemon(1, 1)) THROWERRNO("daemon");
-    }
-
-    // write pid file
-    if (all.options->was_supplied("pid_file"))
-    {
-      std::ofstream pid_file;
-      pid_file.open(input_options.pid_file.c_str());
-      if (!pid_file.is_open()) THROW("error writing pid file");
-
-#ifdef _WIN32
-#  pragma warning(push)  // This next line is inappropriately triggering the Windows-side warning about getpid()
-#  pragma warning( \
-      disable : 4996)  // In newer toolchains, we are properly calling _getpid(), via the #define above (line 33).
-#endif
-
-      pid_file << VW_getpid() << endl;
-      pid_file.close();
-
-#ifdef _WIN32
-#  pragma warning(pop)
-#endif
-    }
-
-    if (all.daemon && !all.active)
-    {
-#ifdef _WIN32
-      THROW("not supported on windows");
-#else
-      fclose(stdin);
-      // weights will be shared across processes, accessible to children
-      all.weights.share(all.length());
-
-      // learning state to be shared across children=
-      shared_data* sd = static_cast<shared_data*>(
-          mmap(nullptr, sizeof(shared_data), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0));
-      memcpy(sd, all.sd, sizeof(shared_data));
-      free(all.sd);
-      all.sd = sd;
-      all.example_parser->_shared_data = sd;
-
-      // create children
-      size_t num_children = all.num_children;
-      v_array<int> children = v_init<int>();
-      children.resize_but_with_stl_behavior(num_children);
-      for (size_t i = 0; i < num_children; i++)
-      {
-        // fork() returns pid if parent, 0 if child
-        // store fork value and run child process if child
-        if ((children[i] = fork()) == 0)
-        {
-          all.logger.quiet |= (i > 0);
-          goto child;
-        }
-      }
-
-      // install signal handler so we can kill children when killed
-      {
-        struct sigaction sa;
-        // specifically don't set SA_RESTART in sa.sa_flags, so that
-        // waitid will be interrupted by SIGTERM with handler installed
-        memset(&sa, 0, sizeof(sa));
-        sa.sa_handler = handle_sigterm;
-        sigaction(SIGTERM, &sa, nullptr);
-      }
-
-      while (true)
-      {
-        // wait for child to change state; if finished, then respawn
-        int status;
-        pid_t pid = wait(&status);
-        if (got_sigterm)
-        {
-          for (size_t i = 0; i < num_children; i++) kill(children[i], SIGTERM);
-          VW::finish(all);
-          exit(0);
-        }
-        if (pid < 0) continue;
-        for (size_t i = 0; i < num_children; i++)
-          if (pid == children[i])
-          {
-            if ((children[i] = fork()) == 0)
-            {
-              all.logger.quiet |= (i > 0);
-              goto child;
-            }
-            break;
-          }
-      }
-
-#endif
-    }
-
-#ifndef _WIN32
-  child:
-#endif
-    sockaddr_in client_address;
-    socklen_t size = sizeof(client_address);
-    if (!all.logger.quiet) *(all.trace_message) << "calling accept" << endl;
-    auto f_a =
-        static_cast<int>(accept(all.example_parser->bound_sock, reinterpret_cast<sockaddr*>(&client_address), &size));
-    if (f_a < 0) THROWERRNO("accept");
-
-    // Disable Nagle delay algorithm due to daemon mode's interactive workload
-    int one = 1;
-    setsockopt(f_a, SOL_TCP, TCP_NODELAY, reinterpret_cast<char*>(&one), sizeof(one));
-
-    auto socket = VW::io::wrap_socket_descriptor(f_a);
-
-    all.final_prediction_sink.push_back(socket->get_writer());
-
-    all.example_parser->input->add_file(socket->get_reader());
-    if (!all.logger.quiet) *(all.trace_message) << "reading data from port " << port << endl;
-
-    if (all.active) { set_string_reader(all); }
-    else
-    {
-      all.example_parser->sorted_cache = true;
-      set_daemon_reader(all, input_options.json, input_options.dsjson);
-      all.example_parser->sorted_cache = true;
-    }
-    all.example_parser->resettable = all.example_parser->write_cache || all.daemon;
-  }
-  else
-  {
     if (all.example_parser->input->num_files() != 0)
     {
       if (!quiet) *(all.trace_message) << "ignoring text input in favor of cache input" << endl;
@@ -611,12 +370,11 @@ void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_opt
       all.example_parser->resettable = all.example_parser->write_cache;
       all.chain_hash_json = input_options.chain_hash_json;
     }
-  }
 
   if (passes > 1 && !all.example_parser->resettable)
     THROW("need a cache file for multiple passes : try using --cache_file");
 
-  if (!quiet && !all.daemon) *(all.trace_message) << "num sources = " << all.example_parser->input->num_files() << endl;
+  if (!quiet) *(all.trace_message) << "num sources = " << all.example_parser->input->num_files() << endl;
 }
 
 void lock_done(parser& p)
