@@ -198,14 +198,14 @@ public:
   inline size_t size() const { return _end - _begin; }
   inline size_t capacity() const { return _end_array - _begin; }
 
-  // maintain the original (deprecated) interface for compatibility. To be removed in VW 10
+  // maintain the original (deprecated) interface for compatibility. To be removed in vw 10
   VW_DEPRECATED(
       "v_array::resize() is deprecated. Use reserve() instead. For standard resize behavior, use "
       "resize_but_with_stl_behavior()")
   void resize(size_t length) { reserve_nocheck(length); }
 
   // change the number of elements in the vector
-  // to be renamed to resize() in VW 10
+  // to be renamed to resize() in vw 10
   void resize_but_with_stl_behavior(size_t length)
   {
     auto old_size = size();

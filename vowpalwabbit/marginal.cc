@@ -8,8 +8,8 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 namespace MARGINAL
 {
@@ -44,7 +44,7 @@ struct data
   std::unordered_map<uint64_t, expert_pair>
       expert_state;  // pair of weights on marginal and feature based predictors, one per marginal feature
 
-  vw* all;
+  workspace* all;
 };
 
 float get_adanormalhedge_weights(float R, float C)
@@ -59,7 +59,7 @@ void make_marginal(data& sm, example& ec)
 {
   uint64_t mask = sm.all->weights.mask();
   float label = ec.l.simple.label;
-  vw& all = *sm.all;
+  workspace& all = *sm.all;
   sm.alg_loss = 0.;
   sm.net_weight = 0.;
   sm.net_feature_weight = 0.;
@@ -129,7 +129,7 @@ void undo_marginal(data& sm, example& ec)
 template <bool is_learn>
 void compute_expert_loss(data& sm, example& ec)
 {
-  vw& all = *sm.all;
+  workspace& all = *sm.all;
   // add in the feature-based expert and normalize,
   float label = ec.l.simple.label;
 
@@ -154,7 +154,7 @@ void compute_expert_loss(data& sm, example& ec)
 
 void update_marginal(data& sm, example& ec)
 {
-  vw& all = *sm.all;
+  workspace& all = *sm.all;
   uint64_t mask = sm.all->weights.mask();
   float label = ec.l.simple.label;
   float weight = ec.weight;
@@ -193,7 +193,7 @@ void update_marginal(data& sm, example& ec)
 }
 
 template <bool is_learn>
-void predict_or_learn(data& sm, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn(data& sm, vw::LEARNER::single_learner& base, example& ec)
 {
   make_marginal<is_learn>(sm, ec);
   if (is_learn)
@@ -345,7 +345,7 @@ void save_load(data& sm, io_buf& io, bool read, bool text)
 
 using namespace MARGINAL;
 
-VW::LEARNER::base_learner* marginal_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* marginal_setup(options_i& options, workspace& all)
 {
   free_ptr<MARGINAL::data> d = scoped_calloc_or_throw<MARGINAL::data>();
   std::string marginal;
@@ -372,7 +372,7 @@ VW::LEARNER::base_learner* marginal_setup(options_i& options, vw& all)
   for (size_t u = 0; u < 256; u++)
     if (marginal.find(static_cast<char>(u)) != std::string::npos) d->id_features[u] = true;
 
-  VW::LEARNER::learner<MARGINAL::data, example>& ret = init_learner(d, as_singleline(setup_base(options, all)),
+  vw::LEARNER::learner<MARGINAL::data, example>& ret = init_learner(d, as_singleline(setup_base(options, all)),
       predict_or_learn<true>, predict_or_learn<false>, all.get_setupfn_name(marginal_setup), true);
   ret.set_save_load(save_load);
 

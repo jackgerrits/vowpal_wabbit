@@ -97,7 +97,7 @@ inline FORCE_INLINE float parseFloat(const char* p, size_t& end_idx, const char*
   }
   if (*p == ' ' || *p == '\n' || *p == '\t' || p == endLine)  // easy case succeeded.
   {
-    acc *= VW::fast_pow10(static_cast<int8_t>(exp_acc - num_dec));
+    acc *= vw::fast_pow10(static_cast<int8_t>(exp_acc - num_dec));
     end_idx = p - start;
     return s * acc;
   }
@@ -117,7 +117,7 @@ inline float float_of_string(std::string_view s)
   float f = parseFloat(s.data(), end_idx, s.data() + s.size());
   if ((end_idx == 0 && s.size() > 0) || std::isnan(f))
   {
-    VW::io::logger::log_warn("warning: {} is not a good float, replacing with 0", s);
+    vw::io::logger::log_warn("warning: {} is not a good float, replacing with 0", s);
     f = 0;
   }
   return f;
@@ -129,7 +129,7 @@ inline int int_of_string(std::string_view s, char*& end)
   int i = strtol(s.data(), &end, 10);
   if (end <= s.data() && s.size() > 0)
   {
-    VW::io::logger::log_warn("warning: {} is not a good int, replacing with 0", s);
+    vw::io::logger::log_warn("warning: {} is not a good int, replacing with 0", s);
     i = 0;
   }
 

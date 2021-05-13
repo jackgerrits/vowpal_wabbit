@@ -14,7 +14,7 @@
 #include "../../best_constant.h"
 #include "parse_example_flatbuffer.h"
 
-namespace VW
+namespace vw
 {
 namespace parsers
 {
@@ -133,22 +133,22 @@ void parser::parse_multi_label(polylabel* l, const MultiLabel* label)
 void parser::parse_slates_label(polylabel* l, const Slates_Label* label)
 {
   l->slates.weight = label->weight();
-  if (label->example_type() == VW::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_shared)
+  if (label->example_type() == vw::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_shared)
   {
     l->slates.labeled = label->labeled();
     l->slates.cost = label->cost();
-    l->slates.type = VW::slates::shared;
+    l->slates.type = vw::slates::shared;
   }
-  else if (label->example_type() == VW::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_action)
+  else if (label->example_type() == vw::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_action)
   {
     l->slates.slot_id = label->slot();
-    l->slates.type = VW::slates::action;
+    l->slates.type = vw::slates::action;
   }
-  else if (label->example_type() == VW::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_slot)
+  else if (label->example_type() == vw::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_slot)
   {
     l->slates.labeled = label->labeled();
     l->slates.probabilities = v_init<ACTION_SCORE::action_score>();
-    l->slates.type = VW::slates::slot;
+    l->slates.type = vw::slates::slot;
 
     for (auto const& as : *(label->probabilities())) l->slates.probabilities.push_back({as->action(), as->score()});
   }
@@ -158,7 +158,7 @@ void parser::parse_slates_label(polylabel* l, const Slates_Label* label)
   }
 }
 
-void parser::parse_continuous_action_label(polylabel* l, const VW::parsers::flatbuffer::ContinuousLabel* label)
+void parser::parse_continuous_action_label(polylabel* l, const vw::parsers::flatbuffer::ContinuousLabel* label)
 {
   for (auto const& continuous_element : *(label->costs()))
   {
@@ -168,4 +168,4 @@ void parser::parse_continuous_action_label(polylabel* l, const VW::parsers::flat
 }
 }  // namespace flatbuffer
 }  // namespace parsers
-}  // namespace VW
+}  // namespace vw

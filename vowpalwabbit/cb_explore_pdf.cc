@@ -9,16 +9,16 @@
 
 // Aliases
 using std::endl;
-using VW::config::make_option;
-using VW::config::option_group_definition;
-using VW::config::options_i;
-using VW::LEARNER::single_learner;
+using vw::config::make_option;
+using vw::config::option_group_definition;
+using vw::config::options_i;
+using vw::LEARNER::single_learner;
 
 // Enable/Disable indented debug statements
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_explore_pdf
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
@@ -44,12 +44,12 @@ void cb_explore_pdf::learn(example& ec) { _base->learn(ec); }
 
 void cb_explore_pdf::predict(example& ec)
 {
-  const auto& reduction_features = ec._reduction_features.template get<VW::continuous_actions::reduction_features>();
+  const auto& reduction_features = ec._reduction_features.template get<vw::continuous_actions::reduction_features>();
   if (first_only && !reduction_features.is_pdf_set() && !reduction_features.is_chosen_action_set())
   {
     // uniform random
     ec.pred.pdf.push_back(
-        VW::continuous_actions::pdf_segment{min_value, max_value, static_cast<float>(1. / (max_value - min_value))});
+        vw::continuous_actions::pdf_segment{min_value, max_value, static_cast<float>(1. / (max_value - min_value))});
     return;
   }
   else if (first_only && reduction_features.is_pdf_set())
@@ -82,7 +82,7 @@ void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, vw& all)
+LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, workspace& all)
 {
   option_group_definition new_options("Continuous actions - cb_explore_pdf");
   bool invoked = false;
@@ -128,4 +128,4 @@ LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, vw& all)
   return make_base(l);
 }
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

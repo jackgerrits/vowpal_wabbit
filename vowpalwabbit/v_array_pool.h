@@ -7,8 +7,8 @@
 #include "v_array.h"
 #include "object_pool.h"
 
-namespace VW
+namespace vw
 {
 template <typename T>
-using v_array_pool = VW::moved_object_pool<v_array<T>>;
-}  // namespace VW
+using v_array_pool = vw::moved_object_pool<v_array<T>>;
+}  // namespace vw

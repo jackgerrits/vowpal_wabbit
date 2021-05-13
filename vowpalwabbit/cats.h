@@ -6,13 +6,13 @@
 #include "learner.h"
 #include "options.h"
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
 namespace cats
 {
-LEARNER::base_learner* setup(config::options_i& options, vw& all);
+LEARNER::base_learner* setup(config::options_i& options, workspace& all);
 struct cats
 {
   uint32_t num_actions;
@@ -24,11 +24,11 @@ struct cats
 
   void learn(example& ec);
   void predict(example& ec);
-  float get_loss(const VW::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const;
+  float get_loss(const vw::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const;
 
 private:
   LEARNER::single_learner* _base = nullptr;
 };
 }  // namespace cats
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

@@ -13,7 +13,7 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace MULTILABEL
 {
@@ -111,7 +111,7 @@ label_parser multilabel = {
 };
 // clang-format on
 
-void print_update(vw& all, bool is_test, example& ec)
+void print_update(workspace& all, bool is_test, example& ec)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -129,7 +129,7 @@ void print_update(vw& all, bool is_test, example& ec)
   }
 }
 
-void output_example(vw& all, example& ec)
+void output_example(workspace& all, example& ec)
 {
   auto& ld = ec.l.multilabels;
 

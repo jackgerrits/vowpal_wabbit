@@ -5,11 +5,11 @@
 
 #include "reductions_fwd.h"
 
-namespace VW
+namespace vw
 {
 namespace metrics
 {
-VW::LEARNER::base_learner* metrics_setup(VW::config::options_i& options, vw& all);
-void output_metrics(vw& all);
+vw::LEARNER::base_learner* metrics_setup(vw::config::options_i& options, workspace& all);
+void output_metrics(workspace& all);
 }  // namespace metrics
-}  // namespace VW
+}  // namespace vw

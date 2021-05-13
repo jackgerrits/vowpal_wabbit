@@ -12,7 +12,7 @@
 #include "parse_primitives.h"
 #include <numeric>
 
-namespace VW
+namespace vw
 {
 namespace slates
 {
@@ -67,8 +67,8 @@ void cache_label(slates::label& ld, io_buf& cache)
   WRITE_CACHED_VALUE(ld.weight, float);
   WRITE_CACHED_VALUE(ld.labeled, bool);
   WRITE_CACHED_VALUE(ld.cost, float);
-  WRITE_CACHED_VALUE(VW::convert(ld.slot_id), uint32_t);
-  WRITE_CACHED_VALUE(VW::convert(ld.probabilities.size()), uint32_t);
+  WRITE_CACHED_VALUE(vw::convert(ld.slot_id), uint32_t);
+  WRITE_CACHED_VALUE(vw::convert(ld.probabilities.size()), uint32_t);
   for (const auto& score : ld.probabilities) { WRITE_CACHED_VALUE(score, ACTION_SCORE::action_score); }
 }
 
@@ -147,7 +147,7 @@ void parse_label(
               return result_so_far + action_pred.score;
             });
 
-        if (!VW::math::are_same(total_pred, 1.f))
+        if (!vw::math::are_same(total_pred, 1.f))
         {
           THROW(
               "When providing all prediction probabilities they must add up to 1.0, instead summed to " << total_pred);
@@ -189,4 +189,4 @@ label_parser slates_label_parser = {
 // clang-format on
 
 }  // namespace slates
-}  // namespace VW
+}  // namespace vw

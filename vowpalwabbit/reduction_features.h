@@ -10,7 +10,7 @@
 /*
  * class reduction_features
  * Description:
- *   This data structure manages access and lifetime of the features data used in various VW reductions.
+ *   This data structure manages access and lifetime of the features data used in various vw reductions.
  *
  *   All contained data types MUST instantiate a `clear()` function that readies the object for reuse.
  *
@@ -31,7 +31,7 @@ class reduction_features
 {
 private:
   CCB::reduction_features _ccb_reduction_features;
-  VW::continuous_actions::reduction_features _contact_reduction_features;
+  vw::continuous_actions::reduction_features _contact_reduction_features;
   simple_label_reduction_features _simple_label_reduction_features;
 
 public:
@@ -62,14 +62,14 @@ inline const CCB::reduction_features& reduction_features::get<CCB::reduction_fea
 }
 
 template <>
-inline VW::continuous_actions::reduction_features& reduction_features::get<VW::continuous_actions::reduction_features>()
+inline vw::continuous_actions::reduction_features& reduction_features::get<vw::continuous_actions::reduction_features>()
 {
   return _contact_reduction_features;
 }
 
 template <>
-inline const VW::continuous_actions::reduction_features&
-reduction_features::get<VW::continuous_actions::reduction_features>() const
+inline const vw::continuous_actions::reduction_features&
+reduction_features::get<vw::continuous_actions::reduction_features>() const
 {
   return _contact_reduction_features;
 }

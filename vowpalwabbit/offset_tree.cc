@@ -7,10 +7,10 @@
 #include "learner.h"     // init_learner()
 #include "action_score.h"
 
-using namespace VW::config;
-using namespace VW::LEARNER;
+using namespace vw::config;
+using namespace vw::LEARNER;
 
-namespace VW
+namespace vw
 {
 namespace offset_tree
 {
@@ -249,7 +249,7 @@ void learn(offset_tree& tree, single_learner& base, example& ec)
   copy_to_action_scores(saved_scores, ec.pred.a_s);
 }
 
-base_learner* setup(VW::config::options_i& options, vw& all)
+base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   option_group_definition new_options("Offset tree Options");
   uint32_t num_actions;
@@ -274,4 +274,4 @@ base_learner* setup(VW::config::options_i& options, vw& all)
   return make_base(l);
 }
 }  // namespace offset_tree
-}  // namespace VW
+}  // namespace vw

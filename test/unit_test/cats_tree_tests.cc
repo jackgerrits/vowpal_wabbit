@@ -5,10 +5,10 @@
 #include "cb_label_parser.h"
 #include "test_common.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using std::vector;
 
-namespace VW
+namespace vw
 {
 namespace cats_tree
 {
@@ -81,9 +81,9 @@ learner<T, example>* get_test_harness_reduction(const predictions_t& base_reduct
   return &test_learner;
 }
 }  // namespace cats_tree
-}  // namespace VW
+}  // namespace vw
 
-using namespace VW::cats_tree;
+using namespace vw::cats_tree;
 
 bool operator!=(const label_data& lhs, const label_data& rhs) { return !(lhs.label == rhs.label); }
 
@@ -471,29 +471,29 @@ BOOST_AUTO_TEST_CASE(otc_algo_learn_2_action_separate_bandwidth_1_asym)
 BOOST_AUTO_TEST_CASE(offset_tree_cont_predict)
 {
   // 0 node tree
-  VW::cats_tree::predict_test_helper({}, 0, 0, 0);
+  vw::cats_tree::predict_test_helper({}, 0, 0, 0);
   // 2 node trees
-  VW::cats_tree::predict_test_helper({-1}, 1, 2, 0);
-  VW::cats_tree::predict_test_helper({1}, 2, 2, 0);
+  vw::cats_tree::predict_test_helper({-1}, 1, 2, 0);
+  vw::cats_tree::predict_test_helper({1}, 2, 2, 0);
   // 4 node tree
-  VW::cats_tree::predict_test_helper({-1, 1}, 2, 4, 0);
-  VW::cats_tree::predict_test_helper({1, 1}, 4, 4, 0);
+  vw::cats_tree::predict_test_helper({-1, 1}, 2, 4, 0);
+  vw::cats_tree::predict_test_helper({1, 1}, 4, 4, 0);
   // 4 node tree with bandwidth 1
-  VW::cats_tree::predict_test_helper({-1}, 2, 4, 1);
-  VW::cats_tree::predict_test_helper({1}, 3, 4, 1);
+  vw::cats_tree::predict_test_helper({-1}, 2, 4, 1);
+  vw::cats_tree::predict_test_helper({1}, 3, 4, 1);
   // 8 node tree with bandwidth 1
-  VW::cats_tree::predict_test_helper({-1, -1}, 2, 8, 1);
-  VW::cats_tree::predict_test_helper({-1, 1, -1}, 3, 8, 1);
+  vw::cats_tree::predict_test_helper({-1, -1}, 2, 8, 1);
+  vw::cats_tree::predict_test_helper({-1, 1, -1}, 3, 8, 1);
   // 8 node tree with bandwidth 2
-  VW::cats_tree::predict_test_helper({-1, -1}, 3, 8, 2);
-  VW::cats_tree::predict_test_helper({1, 1}, 6, 8, 2);
+  vw::cats_tree::predict_test_helper({-1, -1}, 3, 8, 2);
+  vw::cats_tree::predict_test_helper({1, 1}, 6, 8, 2);
 }
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_cont_5)
 {
-  VW::cats_tree::min_depth_binary_tree tree;
+  vw::cats_tree::min_depth_binary_tree tree;
   tree.build_tree(4, 1);
-  std::vector<VW::cats_tree::tree_node> expected = {
+  std::vector<vw::cats_tree::tree_node> expected = {
       {0, 1, 2, 0, 0, false, false, false},
       {1, 3, 4, 0, 1, false, true, false},
       {2, 5, 6, 0, 1, true, false, false},
@@ -507,13 +507,13 @@ BOOST_AUTO_TEST_CASE(build_min_depth_tree_cont_5)
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_cont_1)
 {
-  VW::cats_tree::min_depth_binary_tree tree;
+  vw::cats_tree::min_depth_binary_tree tree;
   tree.build_tree(1, 0);
-  std::vector<VW::cats_tree::tree_node> expected = {{0, 0, 0, 0, 0, false, false, true}};
+  std::vector<vw::cats_tree::tree_node> expected = {{0, 0, 0, 0, 0, false, false, true}};
   BOOST_CHECK_EQUAL_COLLECTIONS(tree.nodes.begin(), tree.nodes.end(), expected.begin(), expected.end());
 }
 
-namespace VW
+namespace vw
 {
 namespace cats_tree
 {
@@ -521,7 +521,7 @@ void predict_test_helper(const predictions_t& base_reduction_predictions, const 
     uint32_t num_leaves, uint32_t bandwidth)
 {
   const auto test_base = get_test_harness_reduction(base_reduction_predictions);
-  VW::cats_tree::cats_tree tree;
+  vw::cats_tree::cats_tree tree;
   tree.init(num_leaves, bandwidth);
   example ec;
   ec.l.cb.costs = v_init<CB::cb_class>();
@@ -530,4 +530,4 @@ void predict_test_helper(const predictions_t& base_reduction_predictions, const 
   delete test_base;
 }
 }  // namespace cats_tree
-}  // namespace VW
+}  // namespace vw

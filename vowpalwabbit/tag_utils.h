@@ -4,7 +4,7 @@
 
 struct example;
 
-namespace VW
+namespace vw
 {
 bool try_extract_random_seed(const example& ex, std::string_view& view);
 }

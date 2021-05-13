@@ -38,7 +38,7 @@ struct shared_data
   float min_label = 0.f;  // minimum label encountered
   float max_label = 0.f;  // maximum label encountered
 
-  std::unique_ptr<VW::named_labels> ldict;
+  std::unique_ptr<vw::named_labels> ldict;
 
   // for holdout
   double weighted_holdout_examples = 0.0;

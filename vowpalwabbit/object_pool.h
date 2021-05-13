@@ -22,7 +22,7 @@
 #  include <condition_variable>
 #endif
 
-namespace VW
+namespace vw
 {
 template <typename T>
 struct default_cleanup
@@ -191,4 +191,4 @@ private:
   mutable std::mutex m_lock;
   no_lock_object_pool<T, TInitializer, TCleanup> inner_pool;
 };
-}  // namespace VW
+}  // namespace vw

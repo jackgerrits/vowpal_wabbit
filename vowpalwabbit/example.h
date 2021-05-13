@@ -35,9 +35,9 @@ struct polylabel
   MULTICLASS::label_t multi;
   COST_SENSITIVE::label cs;
   CB::label cb;
-  VW::cb_continuous::continuous_label cb_cont;
+  vw::cb_continuous::continuous_label cb_cont;
   CCB::label conditional_contextual_bandit;
-  VW::slates::label slates;
+  vw::slates::label slates;
   CB_EVAL::label cb_eval;
   MULTILABEL::labels multilabels;
 };
@@ -56,13 +56,13 @@ struct polyprediction
   float scalar = 0.f;
   v_array<float> scalars;           // a sequence of scalar predictions
   ACTION_SCORE::action_scores a_s;  // a sequence of classes with scores.  Also used for probabilities.
-  VW::decision_scores_t decision_scores;
+  vw::decision_scores_t decision_scores;
   uint32_t multiclass;
   MULTILABEL::labels multilabels;
   float prob = 0.f;                                          // for --probabilities --csoaa_ldf=mc
-  VW::continuous_actions::probability_density_function pdf;  // probability density defined over an action range
-  VW::continuous_actions::probability_density_function_value pdf_value;  // probability density value for a given action
-  VW::active_multiclass_prediction active_multiclass;
+  vw::continuous_actions::probability_density_function pdf;  // probability density defined over an action range
+  vw::continuous_actions::probability_density_function_value pdf_value;  // probability density value for a given action
+  vw::active_multiclass_prediction active_multiclass;
 };
 
 VW_WARNING_STATE_PUSH
@@ -111,7 +111,7 @@ struct example : public example_predict  // core example datatype.
 };
 VW_WARNING_STATE_POP
 
-struct vw;
+struct workspace;
 
 struct flat_example
 {
@@ -130,8 +130,8 @@ struct flat_example
   features fs;              // all the features
 };
 
-flat_example* flatten_example(vw& all, example* ec);
-flat_example* flatten_sort_example(vw& all, example* ec);
+flat_example* flatten_example(workspace& all, example* ec);
+flat_example* flatten_sort_example(workspace& all, example* ec);
 void free_flatten_example(flat_example* fec);
 
 inline int example_is_newline(example const& ec) { return ec.is_newline; }
@@ -148,13 +148,13 @@ inline void add_passthrough_feature_magic(example& ec, uint64_t magic, uint64_t 
 
 typedef std::vector<example*> multi_ex;
 
-namespace VW
+namespace vw
 {
-void return_multiple_example(vw& all, v_array<example*>& examples);
+void return_multiple_example(workspace& all, v_array<example*>& examples);
 
 typedef example& (*example_factory_t)(void*);
 
-}  // namespace VW
+}  // namespace vw
 
 std::string simple_label_to_string(const example& ec);
 std::string cb_label_to_string(const example& ec);

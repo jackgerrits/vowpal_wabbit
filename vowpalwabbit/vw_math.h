@@ -4,7 +4,7 @@
 
 #include "future_compat.h"
 
-namespace VW
+namespace vw
 {
 namespace math
 {
@@ -62,4 +62,4 @@ VW_STD14_CONSTEXPR inline int64_t choose(int64_t n, int64_t k) noexcept
 }
 
 }  // namespace math
-}  // namespace VW
+}  // namespace vw

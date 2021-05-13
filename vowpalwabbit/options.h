@@ -18,7 +18,7 @@
 #include "options_types.h"
 #include "vw_exception.h"
 
-namespace VW
+namespace vw
 {
 namespace config
 {
@@ -423,4 +423,4 @@ inline bool operator==(const base_option& lhs, const base_option& rhs)
 inline bool operator!=(const base_option& lhs, const base_option& rhs) { return !(lhs == rhs); }
 
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

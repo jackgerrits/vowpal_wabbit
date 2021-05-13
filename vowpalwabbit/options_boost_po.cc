@@ -14,7 +14,7 @@
 #include <boost/exception/exception.hpp>
 #include <boost/throw_exception.hpp>
 
-using namespace VW::config;
+using namespace vw::config;
 
 std::ostream& std::operator<<(std::ostream& os, const std::vector<bool>& vec)
 {
@@ -119,17 +119,17 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
 #if BOOST_VERSION >= 106900
   catch (boost::wrapexcept<boost::program_options::invalid_option_value>& ex)
   {
-    THROW_EX(VW::vw_argument_invalid_value_exception, ex.what());
+    THROW_EX(vw::vw_argument_invalid_value_exception, ex.what());
   }
 #endif
   catch (boost::exception_detail::clone_impl<
       boost::exception_detail::error_info_injector<boost::program_options::invalid_option_value>>& ex)
   {
-    THROW_EX(VW::vw_argument_invalid_value_exception, ex.what());
+    THROW_EX(vw::vw_argument_invalid_value_exception, ex.what());
   }
   catch (boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::bad_lexical_cast>>& ex)
   {
-    THROW_EX(VW::vw_argument_invalid_value_exception, ex.what());
+    THROW_EX(vw::vw_argument_invalid_value_exception, ex.what());
   }
   catch (boost::exception_detail::clone_impl<
       boost::exception_detail::error_info_injector<boost::program_options::ambiguous_option>>& ex)
@@ -197,7 +197,7 @@ std::vector<std::shared_ptr<base_option>> options_boost_po::get_all_options()
   return output_values;
 }
 
-std::vector<std::shared_ptr<const base_option>> VW::config::options_boost_po::get_all_options() const
+std::vector<std::shared_ptr<const base_option>> vw::config::options_boost_po::get_all_options() const
 {
   std::vector<std::shared_ptr<const base_option>> output_values;
   output_values.reserve(m_options.size());
@@ -208,7 +208,7 @@ std::vector<std::shared_ptr<const base_option>> VW::config::options_boost_po::ge
 // This function is called by both the const and non-const version. The const version will implicitly upgrade the
 // shared_ptr to const
 std::shared_ptr<base_option> internal_get_option(
-    const std::string& key, const std::map<std::string, std::shared_ptr<VW::config::base_option>>& options)
+    const std::string& key, const std::map<std::string, std::shared_ptr<vw::config::base_option>>& options)
 {
   auto it = options.find(key);
   if (it != options.end()) { return it->second; }
@@ -216,12 +216,12 @@ std::shared_ptr<base_option> internal_get_option(
   throw std::out_of_range(key + " was not found.");
 }
 
-std::shared_ptr<base_option> VW::config::options_boost_po::get_option(const std::string& key)
+std::shared_ptr<base_option> vw::config::options_boost_po::get_option(const std::string& key)
 {
   return internal_get_option(key, m_options);
 }
 
-std::shared_ptr<const base_option> VW::config::options_boost_po::get_option(const std::string& key) const
+std::shared_ptr<const base_option> vw::config::options_boost_po::get_option(const std::string& key) const
 {
   // shared_ptr can implicitly upgrade to const from non-const
   return internal_get_option(key, m_options);
@@ -233,7 +233,7 @@ void options_boost_po::check_unregistered()
   for (auto const& supplied : m_supplied_options)
   {
     if (m_defined_options.count(supplied) == 0 && m_ignore_supplied.count(supplied) == 0)
-    { THROW_EX(VW::vw_unrecognised_option_exception, "unrecognised option '--" << supplied << "'"); }
+    { THROW_EX(vw::vw_unrecognised_option_exception, "unrecognised option '--" << supplied << "'"); }
   }
 }
 

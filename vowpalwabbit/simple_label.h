@@ -6,7 +6,7 @@
 #include <cstddef>
 
 struct example;
-struct vw;
+struct workspace;
 
 struct label_data
 {
@@ -31,7 +31,7 @@ struct simple_label_reduction_features
   }
 };
 
-void return_simple_example(vw& all, void*, example& ec);
-bool summarize_holdout_set(vw& all, size_t& no_win_counter);
-void print_update(vw& all, example& ec);
-void output_and_account_example(vw& all, example& ec);
+void return_simple_example(workspace& all, void*, example& ec);
+bool summarize_holdout_set(workspace& all, size_t& no_win_counter);
+void print_update(workspace& all, example& ec);
+void output_and_account_example(workspace& all, example& ec);

@@ -16,7 +16,7 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 char* bufread_simple_label(shared_data* sd, label_data& ld, simple_label_reduction_features& red_features, char* c)
 {

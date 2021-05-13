@@ -13,14 +13,14 @@
 #include "options.h"
 #include "options_boost_po.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
-vw* setup(options_i& options)
+workspace* setup(options_i& options)
 {
-  vw* all = nullptr;
+  workspace* all = nullptr;
   try
   {
-    all = VW::initialize(options);
+    all = vw::initialize(options);
   }
   catch (const std::exception& ex)
   {
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   {
     // support multiple vw instances for training of the same datafile for the same instance
     std::vector<std::unique_ptr<options_boost_po>> arguments;
-    std::vector<vw*> alls;
+    std::vector<workspace*> alls;
     if (argc == 3 && !std::strcmp(argv[1], "--args"))
     {
       std::fstream arg_file(argv[2]);
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
         std::cout << new_args << std::endl;
 
         int l_argc;
-        char** l_argv = VW::to_argv(new_args, l_argc);
+        char** l_argv = vw::to_argv(new_args, l_argc);
 
         std::unique_ptr<options_boost_po> ptr(new options_boost_po(l_argc, l_argv));
         ptr->add_and_parse(driver_config);
@@ -81,41 +81,41 @@ int main(int argc, char* argv[])
       arguments.push_back(std::move(ptr));
     }
 
-    vw& all = *alls[0];
+    workspace& all = *alls[0];
 
     auto skip_driver = all.options->get_typed_option<bool>("dry_run").value();
 
     if (skip_driver)
     {
-      for (vw* v : alls) { VW::finish(*v); }
+      for (workspace* v : alls) { vw::finish(*v); }
       return 0;
     }
 
     if (should_use_onethread)
     {
       if (alls.size() == 1)
-        VW::LEARNER::generic_driver_onethread(all);
+        vw::LEARNER::generic_driver_onethread(all);
       else
         THROW("--onethread doesn't make sense with multiple learners");
     }
     else
     {
-      VW::start_parser(all);
+      vw::start_parser(all);
       if (alls.size() == 1)
-        VW::LEARNER::generic_driver(all);
+        vw::LEARNER::generic_driver(all);
       else
-        VW::LEARNER::generic_driver(alls);
-      VW::end_parser(all);
+        vw::LEARNER::generic_driver(alls);
+      vw::end_parser(all);
     }
 
-    for (vw* v : alls)
+    for (workspace* v : alls)
     {
       if (v->example_parser->exc_ptr) { std::rethrow_exception(v->example_parser->exc_ptr); }
 
-      VW::finish(*v);
+      vw::finish(*v);
     }
   }
-  catch (VW::vw_exception& e)
+  catch (vw::vw_exception& e)
   {
     // TODO: If loggers are instantiated within struct vw, this line lives outside of that. Log as critical for now
     std::cerr << "[critical] vw (" << e.Filename() << ":" << e.LineNumber() << "): " << e.what() << std::endl;

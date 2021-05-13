@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-using namespace VW::config;
+using namespace vw::config;
 
 template <size_t N = 64>
 std::array<char*, N> convert_to_command_args(char* command_line, int& argc)
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(incorrect_option_type)
   option_group_definition arg_group("group");
   arg_group.add(make_option("int_opt", int_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), VW::vw_argument_invalid_value_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_argument_invalid_value_exception);
 }
 
 BOOST_AUTO_TEST_CASE(multiple_locations_one_option)
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(multiple_locations_one_option)
   arg_group.add(make_option("str_opt", str_opt_1));
   arg_group.add(make_option("str_opt", str_opt_2));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), VW::vw_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_exception);
 }
 
 BOOST_AUTO_TEST_CASE(duplicate_option_clash)
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(duplicate_option_clash)
   arg_group.add(make_option("the_opt", int_opt));
   arg_group.add(make_option("the_opt", char_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), VW::vw_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_exception);
 }
 
 BOOST_AUTO_TEST_CASE(mismatched_values_duplicate_command_line)
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(mismatched_values_duplicate_command_line)
   option_group_definition arg_group("group");
   arg_group.add(make_option("int_opt", int_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), VW::vw_argument_disagreement_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_argument_disagreement_exception);
 }
 
 BOOST_AUTO_TEST_CASE(get_positional_tokens)
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(get_positional_tokens)
   int argc;
   // Only the returned char* needs to be deleted as the individual pointers simply point into command_line.
   auto argv = convert_to_command_args(command_line, argc);
-  auto options = VW::make_unique<options_boost_po>(argc, argv.data());
+  auto options = vw::make_unique<options_boost_po>(argc, argv.data());
 
   int int_opt;
   option_group_definition arg_group("group");
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(unregistered_options)
   BOOST_CHECK_NO_THROW(options->add_and_parse(arg_group));
   BOOST_CHECK_EQUAL(int_opt, 3);
 
-  BOOST_CHECK_THROW(options->check_unregistered(), VW::vw_exception);
+  BOOST_CHECK_THROW(options->check_unregistered(), vw::vw_exception);
 }
 
 BOOST_AUTO_TEST_CASE(check_necessary)

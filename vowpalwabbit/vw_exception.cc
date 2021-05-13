@@ -9,7 +9,7 @@
 #  include <Windows.h>
 #endif
 
-namespace VW
+namespace vw
 {
 #ifdef _WIN32
 
@@ -86,4 +86,4 @@ bool launchDebugger()
   return true;
 }
 #endif
-}  // namespace VW
+}  // namespace vw

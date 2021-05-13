@@ -11,14 +11,14 @@
 
 #include <cfloat>
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 struct confidence
 {
-  vw* all;
+  workspace* all;
 };
 
 template <bool is_learn, bool is_confidence_after_training>
@@ -49,7 +49,7 @@ void predict_or_learn_with_confidence(confidence& /* c */, single_learner& base,
   ec.confidence = fabsf(ec.pred.scalar - threshold) / sensitivity;
 }
 
-void confidence_print_result(VW::io::writer* f, float res, float confidence, v_array<char> tag)
+void confidence_print_result(vw::io::writer* f, float res, float confidence, v_array<char> tag)
 {
   if (f != nullptr)
   {
@@ -61,14 +61,11 @@ void confidence_print_result(VW::io::writer* f, float res, float confidence, v_a
     auto ss_string(ss.str());
     ssize_t len = ss_string.size();
     ssize_t t = f->write(ss_string.c_str(), static_cast<unsigned int>(len));
-    if (t != len)
-    {
-      logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
-    }
+    if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
   }
 }
 
-void output_and_account_confidence_example(vw& all, example& ec)
+void output_and_account_confidence_example(workspace& all, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -83,13 +80,13 @@ void output_and_account_confidence_example(vw& all, example& ec)
   print_update(all, ec);
 }
 
-void return_confidence_example(vw& all, confidence& /* c */, example& ec)
+void return_confidence_example(workspace& all, confidence& /* c */, example& ec)
 {
   output_and_account_confidence_example(all, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-base_learner* confidence_setup(options_i& options, vw& all)
+base_learner* confidence_setup(options_i& options, workspace& all)
 {
   bool confidence_arg = false;
   bool confidence_after_training = false;

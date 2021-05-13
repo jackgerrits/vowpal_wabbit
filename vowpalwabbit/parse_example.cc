@@ -15,9 +15,9 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-size_t read_features(vw* all, char*& line, size_t& num_chars)
+size_t read_features(workspace* all, char*& line, size_t& num_chars)
 {
   line = nullptr;
   size_t num_chars_initial = all->example_parser->input->readto(line, '\n');
@@ -33,7 +33,7 @@ size_t read_features(vw* all, char*& line, size_t& num_chars)
   return num_chars_initial;
 }
 
-int read_features_string(vw* all, v_array<example*>& examples)
+int read_features_string(workspace* all, v_array<example*>& examples)
 {
   char* line;
   size_t num_chars;
@@ -94,7 +94,7 @@ public:
     {
       // maintain newline behavior
       ss << std::endl;
-      THROW_EX(VW::strict_parse_exception, ss.str());
+      THROW_EX(vw::strict_parse_exception, ss.str());
     }
     else
     {
@@ -449,7 +449,7 @@ public:
     }
   }
 
-  TC_parser(std::string_view line, vw& all, example* ae) : _line(line)
+  TC_parser(std::string_view line, workspace& all, example* ae) : _line(line)
   {
     _spelling = v_init<char>();
     if (!_line.empty())
@@ -473,7 +473,7 @@ public:
   }
 };
 
-void substring_to_example(vw* all, example* ae, std::string_view example)
+void substring_to_example(workspace* all, example* ae, std::string_view example)
 {
   if (example.empty()) { ae->is_newline = true; }
 
@@ -520,26 +520,26 @@ void substring_to_example(vw* all, example* ae, std::string_view example)
   }
 }
 
-namespace VW
+namespace vw
 {
-void read_line(vw& all, example* ex, std::string_view line)
+void read_line(workspace& all, example* ex, std::string_view line)
 {
   while (line.size() > 0 && line.back() == '\n') line.remove_suffix(1);
   substring_to_example(&all, ex, line);
 }
 
-void read_line(vw& all, example* ex, char* line) { return read_line(all, ex, std::string_view(line)); }
+void read_line(workspace& all, example* ex, char* line) { return read_line(all, ex, std::string_view(line)); }
 
-void read_lines(vw* all, const char* line, size_t /*len*/, v_array<example*>& examples)
+void read_lines(workspace* all, const char* line, size_t /*len*/, v_array<example*>& examples)
 {
   std::vector<std::string_view> lines;
   tokenize('\n', line, lines);
   for (size_t i = 0; i < lines.size(); i++)
   {
     // Check if a new empty example needs to be added.
-    if (examples.size() < i + 1) { examples.push_back(&VW::get_unused_example(all)); }
+    if (examples.size() < i + 1) { examples.push_back(&vw::get_unused_example(all)); }
     read_line(*all, examples[i], lines[i]);
   }
 }
 
-}  // namespace VW
+}  // namespace vw

@@ -99,7 +99,7 @@ float get_probability(LabelElmT& elm)
 }
 
 template <>
-inline float get_probability(VW::cb_continuous::continuous_label_elm& elm)
+inline float get_probability(vw::cb_continuous::continuous_label_elm& elm)
 {
   return elm.pdf_value;
 }

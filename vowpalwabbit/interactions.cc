@@ -279,7 +279,7 @@ inline size_t factor(const size_t n, const size_t start_from = 1)
 
 // returns number of new features that will be generated for example and sum of their squared values
 
-void eval_count_of_generated_ft(vw& all, example& ec, size_t& new_features_cnt, float& new_features_value)
+void eval_count_of_generated_ft(workspace& all, example& ec, size_t& new_features_cnt, float& new_features_value)
 {
   new_features_cnt = 0;
   new_features_value = 0.;
@@ -393,7 +393,7 @@ void eval_count_of_generated_ft(vw& all, example& ec, size_t& new_features_cnt, 
           if (cnt_ft_value_non_1 == 0)  // number of generated simple combinations is C(n,k)
           {
             n = static_cast<size_t>(
-                VW::math::choose(static_cast<int64_t>(ft_size), static_cast<int64_t>(order_of_inter)));
+                vw::math::choose(static_cast<int64_t>(ft_size), static_cast<int64_t>(order_of_inter)));
           }
           else
           {
@@ -401,10 +401,10 @@ void eval_count_of_generated_ft(vw& all, example& ec, size_t& new_features_cnt, 
             for (size_t l = 0; l <= order_of_inter; ++l)
             {
               // C(l+m-1, l) * C(n-m, k-l)
-              size_t num = (l == 0) ? 1 : static_cast<size_t>(VW::math::choose(l + cnt_ft_value_non_1 - 1, l));
+              size_t num = (l == 0) ? 1 : static_cast<size_t>(vw::math::choose(l + cnt_ft_value_non_1 - 1, l));
 
               if (ft_size - cnt_ft_value_non_1 >= order_of_inter - l)
-                num *= static_cast<size_t>(VW::math::choose(ft_size - cnt_ft_value_non_1, order_of_inter - l));
+                num *= static_cast<size_t>(vw::math::choose(ft_size - cnt_ft_value_non_1, order_of_inter - l));
               else
                 num = 0;
 

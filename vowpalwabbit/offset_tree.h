@@ -6,11 +6,11 @@
 #include "learner.h"
 #include "options.h"
 
-namespace VW
+namespace vw
 {
 namespace offset_tree
 {
-LEARNER::base_learner* setup(config::options_i& options, vw& all);
+LEARNER::base_learner* setup(config::options_i& options, workspace& all);
 
 struct tree_node
 {
@@ -58,4 +58,4 @@ private:
   std::vector<float> _scores{};
 };
 }  // namespace offset_tree
-}  // namespace VW
+}  // namespace vw

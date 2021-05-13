@@ -22,7 +22,7 @@
 #    define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #  endif
 
-namespace VW
+namespace vw
 {
 class vw_exception : public std::exception
 {
@@ -153,7 +153,7 @@ inline std::string strerror_to_string(int error_number)
 void vw_trace(const char* filename, int linenumber, const char* fmt, ...);
 
 // useful when hunting down release mode bugs
-#    define VW_TRACE(fmt, ...) VW::vw_trace(__FILE__, __LINE__, fmt, __VA_ARGS__)
+#    define VW_TRACE(fmt, ...) vw::vw_trace(__FILE__, __LINE__, fmt, __VA_ARGS__)
 
 struct StopWatchData;
 
@@ -175,16 +175,16 @@ bool launchDebugger();
       {                                                              \
         std::stringstream __msg;                                     \
         __msg << args;                                               \
-        __msg << ", errno = " << VW::strerror_to_string(errno);      \
-        throw VW::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
+        __msg << ", errno = " << vw::strerror_to_string(errno);      \
+        throw vw::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
       }
 #  else
 #    define THROWERRNO(args)                                         \
       {                                                              \
         std::stringstream __msg;                                     \
         __msg << args;                                               \
-        __msg << ", errno = " << VW::strerror_to_string(errno);      \
-        throw VW::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
+        __msg << ", errno = " << vw::strerror_to_string(errno);      \
+        throw vw::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
       }
 #  endif
 
@@ -193,7 +193,7 @@ bool launchDebugger();
     {                                                              \
       std::stringstream __msg;                                     \
       __msg << args;                                               \
-      throw VW::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
+      throw vw::vw_exception(__FILENAME__, __LINE__, __msg.str()); \
     }
 
 #  define THROW_EX(ex, args)                         \
@@ -202,7 +202,7 @@ bool launchDebugger();
       __msg << args;                                 \
       throw ex(__FILENAME__, __LINE__, __msg.str()); \
     }
-}  // namespace VW
+}  // namespace vw
 
 #  define VW_ASSERT(condition, args) \
     if (!(condition)) { THROW(args); }
@@ -237,7 +237,7 @@ bool launchDebugger();
     {                                                           \
       std::stringstream __msgA;                                 \
       __msgA << args;                                           \
-      throw VW::vw_exception(__FILE__, __LINE__, __msgA.str()); \
+      throw vw::vw_exception(__FILE__, __LINE__, __msgA.str()); \
     } while (0)
 
 #  define THROW_OR_RETURN_VOID(args)                            \
@@ -245,7 +245,7 @@ bool launchDebugger();
     {                                                           \
       std::stringstream __msgB;                                 \
       __msgB << args;                                           \
-      throw VW::vw_exception(__FILE__, __LINE__, __msgB.str()); \
+      throw vw::vw_exception(__FILE__, __LINE__, __msgB.str()); \
     } while (0)
 
 #endif

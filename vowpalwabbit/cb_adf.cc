@@ -18,15 +18,15 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace CB;
 using namespace ACTION_SCORE;
 using namespace GEN_CS;
 using namespace CB_ALGS;
-using namespace VW::config;
+using namespace vw::config;
 using namespace exploration;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CB_ADF
 {
@@ -66,7 +66,7 @@ private:
   shared_data* _sd;
   // model_file_ver is only used to conditionally run save_load(). In the setup function
   // model_file_ver is not always set.
-  VW::version_struct* _model_file_ver;
+  vw::version_struct* _model_file_ver;
 
   cb_to_cs_adf _gen_cs;
   std::vector<CB::label> _cb_labels;
@@ -85,24 +85,24 @@ private:
   const float _clip_p;
 
 public:
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& ec_seq);
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& ec_seq);
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& ec_seq);
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& ec_seq);
   bool update_statistics(example& ec, multi_ex* ec_seq);
 
   cb_adf(
-      shared_data* sd, size_t cb_type, VW::version_struct* model_file_ver, bool rank_all, float clip_p, bool no_predict)
+      shared_data* sd, size_t cb_type, vw::version_struct* model_file_ver, bool rank_all, float clip_p, bool no_predict)
       : _sd(sd), _model_file_ver(model_file_ver), _no_predict(no_predict), _rank_all(rank_all), _clip_p(clip_p)
   {
     _gen_cs.cb_type = cb_type;
   }
 
-  void set_scorer(VW::LEARNER::single_learner* scorer) { _gen_cs.scorer = scorer; }
+  void set_scorer(vw::LEARNER::single_learner* scorer) { _gen_cs.scorer = scorer; }
 
   bool get_rank_all() const { return _rank_all; }
 
   const cb_to_cs_adf& get_gen_cs() const { return _gen_cs; }
 
-  const VW::version_struct* get_model_file_ver() const { return _model_file_ver; }
+  const vw::version_struct* get_model_file_ver() const { return _model_file_ver; }
 
   bool learn_returns_prediction()
   {
@@ -177,7 +177,7 @@ void cb_adf::learn_SM(multi_learner& base, multi_ex& examples)
   // better.
   generate_softmax(-1.0, begin_scores(_a_s), end_scores(_a_s), begin_scores(_prob_s), end_scores(_prob_s));
 
-  // TODO: Check Marco's example that causes VW to report prob > 1.
+  // TODO: Check Marco's example that causes vw to report prob > 1.
 
   for (auto const& action_score : _prob_s)  // Scale example_wt by prob of chosen action
   {
@@ -328,14 +328,14 @@ void cb_adf::predict(multi_learner& base, multi_ex& ec_seq)
   cs_ldf_learn_or_predict<false>(base, ec_seq, _cb_labels, _cs_labels, _prepped_cs_labels, false, _offset);
 }
 
-void global_print_newline(const std::vector<std::unique_ptr<VW::io::writer>>& final_prediction_sink)
+void global_print_newline(const std::vector<std::unique_ptr<vw::io::writer>>& final_prediction_sink)
 {
   char temp[1];
   temp[0] = '\n';
   for (auto& sink : final_prediction_sink)
   {
     ssize_t t = sink->write(temp, 1);
-    if (t != 1) logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
+    if (t != 1) logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
   }
 }
 
@@ -362,7 +362,7 @@ bool cb_adf::update_statistics(example& ec, multi_ex* ec_seq)
   return labeled_example;
 }
 
-void output_example(vw& all, cb_adf& c, example& ec, multi_ex* ec_seq)
+void output_example(workspace& all, cb_adf& c, example& ec, multi_ex* ec_seq)
 {
   if (example_is_newline_not_header(ec)) return;
 
@@ -391,7 +391,7 @@ void output_example(vw& all, cb_adf& c, example& ec, multi_ex* ec_seq)
     CB::print_update(all, !labeled_example, ec, ec_seq, true, nullptr);
 }
 
-void output_rank_example(vw& all, cb_adf& c, example& ec, multi_ex* ec_seq)
+void output_rank_example(workspace& all, cb_adf& c, example& ec, multi_ex* ec_seq)
 {
   const auto& costs = ec.l.cb.costs;
 
@@ -419,7 +419,7 @@ void output_rank_example(vw& all, cb_adf& c, example& ec, multi_ex* ec_seq)
     CB::print_update(all, !labeled_example, ec, ec_seq, true, nullptr);
 }
 
-void output_example_seq(vw& all, cb_adf& data, multi_ex& ec_seq)
+void output_example_seq(workspace& all, cb_adf& data, multi_ex& ec_seq)
 {
   if (!ec_seq.empty())
   {
@@ -434,7 +434,7 @@ void output_example_seq(vw& all, cb_adf& data, multi_ex& ec_seq)
   }
 }
 
-void update_and_output(vw& all, cb_adf& data, multi_ex& ec_seq)
+void update_and_output(workspace& all, cb_adf& data, multi_ex& ec_seq)
 {
   if (!ec_seq.empty())
   {
@@ -443,10 +443,10 @@ void update_and_output(vw& all, cb_adf& data, multi_ex& ec_seq)
   }
 }
 
-void finish_multiline_example(vw& all, cb_adf& data, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, cb_adf& data, multi_ex& ec_seq)
 {
   update_and_output(all, data, ec_seq);
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 void save_load(cb_adf& c, io_buf& model_file, bool read, bool text)
@@ -468,7 +468,7 @@ void predict(cb_adf& c, multi_learner& base, multi_ex& ec_seq) { c.predict(base,
 
 }  // namespace CB_ADF
 using namespace CB_ADF;
-base_learner* cb_adf_setup(options_i& options, vw& all)
+base_learner* cb_adf_setup(options_i& options, workspace& all)
 {
   bool cb_adf_option = false;
   std::string type_string = "mtr";

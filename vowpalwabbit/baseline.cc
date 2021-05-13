@@ -9,8 +9,8 @@
 #include "vw.h"
 #include "shared_data.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 namespace
 {
@@ -62,7 +62,7 @@ bool baseline_enabled(example* ec)
 struct baseline
 {
   example* ec;
-  vw* all;
+  workspace* all;
   bool lr_scaling;  // whether to scale baseline learning rate based on max label
   float lr_multiplier;
   bool global_only;  // only use a global constant for the baseline
@@ -71,7 +71,7 @@ struct baseline
 
   ~baseline()
   {
-    if (ec) VW::dealloc_examples(ec, 1);
+    if (ec) vw::dealloc_examples(ec, 1);
   }
 };
 
@@ -108,7 +108,7 @@ void predict_or_learn(baseline& data, single_learner& base, example& ec)
       init_global(data);
       data.global_initialized = true;
     }
-    VW::copy_example_metadata(data.ec, &ec);
+    vw::copy_example_metadata(data.ec, &ec);
     base.predict(*data.ec);
     auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
     simple_red_features.initial = data.ec->pred.scalar;
@@ -126,8 +126,8 @@ void predict_or_learn(baseline& data, single_learner& base, example& ec)
     if (!data.global_only)
     {
       // move label & constant features data over to baseline example
-      VW::copy_example_metadata(data.ec, &ec);
-      VW::move_feature_namespace(data.ec, &ec, constant_namespace);
+      vw::copy_example_metadata(data.ec, &ec);
+      vw::move_feature_namespace(data.ec, &ec, constant_namespace);
     }
 
     // regress baseline on label
@@ -154,7 +154,7 @@ void predict_or_learn(baseline& data, single_learner& base, example& ec)
     if (!data.global_only)
     {
       // move feature data back to the original example
-      VW::move_feature_namespace(&ec, data.ec, constant_namespace);
+      vw::move_feature_namespace(&ec, data.ec, constant_namespace);
     }
 
     // return the safe prediction
@@ -170,7 +170,7 @@ float sensitivity(baseline& data, base_learner& base, example& ec)
   if (!data.global_only) THROW("sensitivity for baseline without --global_only not implemented");
 
   // sensitivity of baseline term
-  VW::copy_example_metadata(data.ec, &ec);
+  vw::copy_example_metadata(data.ec, &ec);
   data.ec->l.simple.label = ec.l.simple.label;
   data.ec->pred.scalar = ec.pred.scalar;
   const float baseline_sens = base.sensitivity(*data.ec);
@@ -183,7 +183,7 @@ float sensitivity(baseline& data, base_learner& base, example& ec)
   return baseline_sens + sens;
 }
 
-base_learner* baseline_setup(options_i& options, vw& all)
+base_learner* baseline_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<baseline>();
   bool baseline_option = false;
@@ -206,7 +206,7 @@ base_learner* baseline_setup(options_i& options, vw& all)
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
   // initialize baseline example
-  data->ec = VW::alloc_examples(1);
+  data->ec = vw::alloc_examples(1);
   data->ec->interactions = &all.interactions;
 
   data->all = &all;

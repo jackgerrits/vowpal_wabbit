@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_on_scope_end)
   {
     BOOST_CHECK_EQUAL(original_location, 1);
     BOOST_CHECK_EQUAL(location_to_swap, 99999);
-    auto guard = VW::swap_guard(original_location, location_to_swap);
+    auto guard = vw::swap_guard(original_location, location_to_swap);
     BOOST_CHECK_EQUAL(original_location, 99999);
     BOOST_CHECK_EQUAL(location_to_swap, 1);
   }
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_on_scope_end_no_copy)
   {
     BOOST_CHECK_EQUAL(original_location._value, 1);
     BOOST_CHECK_EQUAL(location_to_swap._value, 99999);
-    auto guard = VW::swap_guard(original_location, location_to_swap);
+    auto guard = vw::swap_guard(original_location, location_to_swap);
     BOOST_CHECK_EQUAL(original_location._value, 99999);
     BOOST_CHECK_EQUAL(location_to_swap._value, 1);
   }
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_cancel)
   {
     BOOST_CHECK_EQUAL(original_location, 1);
     BOOST_CHECK_EQUAL(location_to_swap, 99999);
-    auto guard = VW::swap_guard(original_location, location_to_swap);
+    auto guard = vw::swap_guard(original_location, location_to_swap);
     BOOST_CHECK_EQUAL(original_location, 99999);
     BOOST_CHECK_EQUAL(location_to_swap, 1);
     guard.cancel();
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_explicit_force_swap)
   {
     BOOST_CHECK_EQUAL(original_location, 1);
     BOOST_CHECK_EQUAL(location_to_swap, 99999);
-    auto guard = VW::swap_guard(original_location, location_to_swap);
+    auto guard = vw::swap_guard(original_location, location_to_swap);
     BOOST_CHECK_EQUAL(original_location, 99999);
     BOOST_CHECK_EQUAL(location_to_swap, 1);
     BOOST_CHECK_EQUAL(guard.do_swap(), true);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_on_scope_end_swap_pointers)
     BOOST_CHECK_EQUAL(*location_to_swap, 99999);
     BOOST_CHECK_EQUAL(original_location, original_location_pre_swap);
     BOOST_CHECK_EQUAL(location_to_swap, location_to_swap_pre_swap);
-    auto guard = VW::swap_guard(original_location, location_to_swap);
+    auto guard = vw::swap_guard(original_location, location_to_swap);
     BOOST_CHECK_EQUAL(*original_location, 99999);
     BOOST_CHECK_EQUAL(*location_to_swap, 1);
     BOOST_CHECK_EQUAL(original_location, location_to_swap_pre_swap);
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_temp_value)
 
   {
     BOOST_CHECK_EQUAL(original_location, 1);
-    auto guard = VW::swap_guard(original_location, 9999);
+    auto guard = vw::swap_guard(original_location, 9999);
     BOOST_CHECK_EQUAL(original_location, 9999);
   }
   BOOST_CHECK_EQUAL(original_location, 1);
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_temp_value_no_copy)
 
   {
     BOOST_CHECK_EQUAL(original_location._value, 1);
-    auto guard = VW::swap_guard(original_location, non_copyable_struct(9999));
+    auto guard = vw::swap_guard(original_location, non_copyable_struct(9999));
     BOOST_CHECK_EQUAL(original_location._value, 9999);
   }
   BOOST_CHECK_EQUAL(original_location._value, 1);
@@ -147,13 +147,13 @@ BOOST_AUTO_TEST_CASE(swap_guard_execute_temp_value_no_copy)
 
 BOOST_AUTO_TEST_CASE(swap_guard_unique_ptr)
 {
-  std::unique_ptr<int> original_location = VW::make_unique<int>(1);
+  std::unique_ptr<int> original_location = vw::make_unique<int>(1);
 
   {
-    std::unique_ptr<int> inner_location = VW::make_unique<int>(9999);
+    std::unique_ptr<int> inner_location = vw::make_unique<int>(9999);
     BOOST_CHECK_EQUAL(*inner_location, 9999);
     BOOST_CHECK_EQUAL(*original_location, 1);
-    auto guard = VW::swap_guard(original_location, inner_location);
+    auto guard = vw::swap_guard(original_location, inner_location);
     BOOST_CHECK_EQUAL(*inner_location, 1);
     BOOST_CHECK_EQUAL(*original_location, 9999);
   }
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE(stash_guard_execute_on_scope_end)
   int target_location = 999;
   {
     BOOST_CHECK_EQUAL(target_location, 999);
-    auto guard = VW::stash_guard(target_location);
+    auto guard = vw::stash_guard(target_location);
     BOOST_CHECK_EQUAL(target_location, 0);
   }
   BOOST_CHECK_EQUAL(target_location, 999);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(stash_guard_used_default_ctor)
   target_location.value = 456;
   {
     BOOST_CHECK_EQUAL(target_location.value, 456);
-    auto guard = VW::stash_guard(target_location);
+    auto guard = vw::stash_guard(target_location);
     BOOST_CHECK_EQUAL(target_location.value, 123);
   }
   BOOST_CHECK_EQUAL(target_location.value, 456);

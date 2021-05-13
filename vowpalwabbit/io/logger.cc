@@ -5,7 +5,7 @@
 #include "logger.h"
 #include "spdlog/sinks/stdout_sinks.h"
 
-namespace VW
+namespace vw
 {
 namespace io
 {
@@ -33,4 +33,4 @@ void initialize_logger() { spdlog::set_pattern(detail::default_pattern); }
 
 }  // namespace logger
 }  // namespace io
-}  // namespace VW
+}  // namespace vw

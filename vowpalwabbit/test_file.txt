@@ -1,0 +1,2 @@
+3 |f a b c |e x y z
+2 |f a y c |e x

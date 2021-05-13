@@ -19,7 +19,7 @@
 // All exploration algorithms return a vector of id, probability tuples, sorted in order of scores. The probabilities
 // are the probability with which each action should be replaced to the top of the list.
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -36,10 +36,10 @@ private:
   bool _first_only;
   size_t _counter;
 
-  VW::LEARNER::multi_learner* _cs_ldf_learner;
+  vw::LEARNER::multi_learner* _cs_ldf_learner;
   GEN_CS::cb_to_cs_adf _gen_cs;
 
-  VW::version_struct _model_file_version;
+  vw::version_struct _model_file_version;
 
   v_array<ACTION_SCORE::action_score> _action_probs;
   std::vector<float> _scores;
@@ -50,22 +50,22 @@ private:
 
 public:
   cb_explore_adf_cover(size_t cover_size, float psi, bool nounif, float epsilon, bool epsilon_decay, bool first_only,
-      VW::LEARNER::multi_learner* cs_ldf_learner, VW::LEARNER::single_learner* scorer, size_t cb_type,
-      VW::version_struct model_file_version);
+      vw::LEARNER::multi_learner* cs_ldf_learner, vw::LEARNER::single_learner* scorer, size_t cb_type,
+      vw::version_struct model_file_version);
 
   // Should be called through cb_explore_adf_base for pre/post-processing
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
   void save_load(io_buf& io, bool read, bool text);
 
 private:
   template <bool is_learn>
-  void predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples);
 };
 
 cb_explore_adf_cover::cb_explore_adf_cover(size_t cover_size, float psi, bool nounif, float epsilon, bool epsilon_decay,
-    bool first_only, VW::LEARNER::multi_learner* cs_ldf_learner, VW::LEARNER::single_learner* scorer, size_t cb_type,
-    VW::version_struct model_file_version)
+    bool first_only, vw::LEARNER::multi_learner* cs_ldf_learner, vw::LEARNER::single_learner* scorer, size_t cb_type,
+    vw::version_struct model_file_version)
     : _cover_size(cover_size)
     , _psi(psi)
     , _nounif(nounif)
@@ -80,7 +80,7 @@ cb_explore_adf_cover::cb_explore_adf_cover(size_t cover_size, float psi, bool no
 }
 
 template <bool is_learn>
-void cb_explore_adf_cover::predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void cb_explore_adf_cover::predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   // Redundant with the call in cb_explore_adf_base, but encapsulation means we need to do this again here
   _gen_cs.known_cost = CB_ADF::get_observed_cost_or_default_cb_adf(examples);
@@ -102,16 +102,16 @@ void cb_explore_adf_cover::predict_or_learn_impl(VW::LEARNER::multi_learner& bas
       VW_DBG(examples) << "cb_explore_adf_cover: "
                           "LEARNER::multiline_learn_or_predict<false>()"
                        << std::endl;
-      VW::LEARNER::multiline_learn_or_predict<false>(base, examples, examples[0]->ft_offset);
+      vw::LEARNER::multiline_learn_or_predict<false>(base, examples, examples[0]->ft_offset);
     }
 
     VW_DBG(examples) << "cb_explore_adf_cover: LEARNER::multiline_learn_or_predict<true>()" << std::endl;
-    VW::LEARNER::multiline_learn_or_predict<true>(base, examples, examples[0]->ft_offset);
+    vw::LEARNER::multiline_learn_or_predict<true>(base, examples, examples[0]->ft_offset);
   }
   else
   {
     GEN_CS::gen_cs_example_ips(examples, _cs_labels);
-    VW::LEARNER::multiline_learn_or_predict<false>(base, examples, examples[0]->ft_offset);
+    vw::LEARNER::multiline_learn_or_predict<false>(base, examples, examples[0]->ft_offset);
   }
   v_array<ACTION_SCORE::action_score>& preds = examples[0]->pred.a_s;
   const uint32_t num_actions = static_cast<uint32_t>(preds.size());
@@ -218,7 +218,7 @@ void cb_explore_adf_cover::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-VW::LEARNER::base_learner* setup(config::options_i& options, vw& all)
+vw::LEARNER::base_learner* setup(config::options_i& options, workspace& all)
 {
   using config::make_option;
 
@@ -286,7 +286,7 @@ VW::LEARNER::base_learner* setup(config::options_i& options, vw& all)
   // Cover is using doubly robust without the cooperation of the base reduction
   if (cb_type_enum == CB_TYPE_MTR) { problem_multiplier *= 2; }
 
-  VW::LEARNER::multi_learner* base = VW::LEARNER::as_multiline(setup_base(options, all));
+  vw::LEARNER::multi_learner* base = vw::LEARNER::as_multiline(setup_base(options, all));
   all.example_parser->lbl_parser = CB::cb_label;
 
   bool epsilon_decay;
@@ -305,7 +305,7 @@ VW::LEARNER::base_learner* setup(config::options_i& options, vw& all)
   auto data = scoped_calloc_or_throw<explore_type>(cover_size, psi, nounif, epsilon, epsilon_decay, first_only,
       as_multiline(all.cost_sensitive), all.scorer, cb_type_enum, all.model_file_ver);
 
-  VW::LEARNER::learner<explore_type, multi_ex>& l = init_learner(data, base, explore_type::learn, explore_type::predict,
+  vw::LEARNER::learner<explore_type, multi_ex>& l = init_learner(data, base, explore_type::learn, explore_type::predict,
       problem_multiplier, prediction_type_t::action_probs, all.get_setupfn_name(setup) + "-cover", true);
 
   l.set_finish_example(explore_type::finish_multiline_example);
@@ -316,4 +316,4 @@ VW::LEARNER::base_learner* setup(config::options_i& options, vw& all)
 }
 }  // namespace cover
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

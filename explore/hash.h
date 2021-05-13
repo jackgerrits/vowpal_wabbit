@@ -15,7 +15,7 @@ license as described in the file LICENSE.
 //    not a problem on Intel/x86/AMD64 machines (including new Macs)
 // 2) It produces different results on little-endian and big-endian machines.
 //
-// Adopted for VW and contributed by Ariel Faigon.
+// Adopted for vw and contributed by Ariel Faigon.
 //
 
 //-----------------------------------------------------------------------------

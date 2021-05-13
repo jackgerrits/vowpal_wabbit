@@ -16,15 +16,15 @@
 #include "simple_label_parser.h"
 #include "shared_data.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace exploration;
 using namespace ACTION_SCORE;
 
-using namespace VW::config;
+using namespace vw::config;
 
 using std::endl;
-using VW::cb_continuous::continuous_label;
-using VW::cb_continuous::continuous_label_elm;
+using vw::cb_continuous::continuous_label;
+using vw::cb_continuous::continuous_label_elm;
 
 struct cbify;
 
@@ -52,7 +52,7 @@ struct cbify
   cbify_reg regression_data;
   // used as the seed
   size_t example_counter;
-  vw* all;
+  workspace* all;
   bool use_adf;  // if true, reduce to cb_explore_adf instead of cb_explore
   cbify_adf_data adf_data;
   float loss0;
@@ -116,7 +116,7 @@ void cbify_adf_data::init_adf_data(
   ecs.resize(num_actions);
   for (size_t a = 0; a < num_actions; ++a)
   {
-    ecs[a] = VW::alloc_examples(1);
+    ecs[a] = vw::alloc_examples(1);
     auto& lab = ecs[a]->l.cb;
     CB::default_label(lab);
     ecs[a]->interactions = &interactions;
@@ -137,7 +137,7 @@ void cbify_adf_data::init_adf_data(
 
 cbify_adf_data::~cbify_adf_data()
 {
-  for (auto* ex : ecs) { VW::dealloc_examples(ex, 1); }
+  for (auto* ex : ecs) { vw::dealloc_examples(ex, 1); }
 }
 
 void cbify_adf_data::copy_example_to_adf(parameters& weights, example& ec)
@@ -152,7 +152,7 @@ void cbify_adf_data::copy_example_to_adf(parameters& weights, example& ec)
     CB::default_label(lab);
 
     // copy data
-    VW::copy_example_data(&eca, &ec);
+    vw::copy_example_data(&eca, &ec);
 
     // offset indices for given action
     for (features& fs : eca)
@@ -329,7 +329,7 @@ void predict_or_learn_regression(cbify& data, single_learner& base, example& ec)
     }
   }
 
-  ec.l.cb_cont.costs = v_init<VW::cb_continuous::continuous_label_elm>();
+  ec.l.cb_cont.costs = v_init<vw::cb_continuous::continuous_label_elm>();
   ec.l.simple = regression_label;  // restore the regression label
   ec.pred.scalar = cb_cont_lbl.action;
 }
@@ -506,7 +506,7 @@ void do_actual_learning_ldf(cbify& data, multi_learner& base, multi_ex& ec_seq)
   }
 }
 
-void output_example(vw& all, example& ec, bool& hit_loss, multi_ex* ec_seq)
+void output_example(workspace& all, example& ec, bool& hit_loss, multi_ex* ec_seq)
 {
   const auto& costs = ec.l.cs.costs;
 
@@ -554,7 +554,7 @@ void output_example(vw& all, example& ec, bool& hit_loss, multi_ex* ec_seq)
   COST_SENSITIVE::print_update(all, COST_SENSITIVE::cs_label.test_label(&ec.l), ec, ec_seq, false, predicted_class);
 }
 
-void output_example_seq(vw& all, multi_ex& ec_seq)
+void output_example_seq(workspace& all, multi_ex& ec_seq)
 {
   if (ec_seq.empty()) return;
   all.sd->weighted_labeled_examples += ec_seq[0]->weight;
@@ -570,7 +570,7 @@ void output_example_seq(vw& all, multi_ex& ec_seq)
   }
 }
 
-void output_example_regression_discrete(vw& all, cbify& data, example& ec)
+void output_example_regression_discrete(workspace& all, cbify& data, example& ec)
 {
   // data contains the cb vector, which store among other things, loss
   // ec contains a simple label type
@@ -588,7 +588,7 @@ void output_example_regression_discrete(vw& all, cbify& data, example& ec)
   print_update(all, ec);
 }
 
-void output_example_regression(vw& all, cbify& data, example& ec)
+void output_example_regression(workspace& all, cbify& data, example& ec)
 {
   // data contains the cb_cont vector, which store among other things, loss
   // ec contains a simple label type
@@ -607,7 +607,7 @@ void output_example_regression(vw& all, cbify& data, example& ec)
 }
 
 void output_cb_reg_predictions(
-    std::vector<std::unique_ptr<VW::io::writer>>& predict_file_descriptors, continuous_label& label)
+    std::vector<std::unique_ptr<vw::io::writer>>& predict_file_descriptors, continuous_label& label)
 {
   std::stringstream strm;
   if (label.costs.size() == 1)
@@ -627,32 +627,32 @@ void output_cb_reg_predictions(
   for (auto& f : predict_file_descriptors) { f->write(str.c_str(), str.size()); }
 }
 
-void finish_example_cb_reg_continous(vw& all, cbify& data, example& ec)
+void finish_example_cb_reg_continous(workspace& all, cbify& data, example& ec)
 {
   // add output example
   output_example_regression(all, data, ec);
   output_cb_reg_predictions(all.final_prediction_sink, data.regression_data.cb_cont_label);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-void finish_example_cb_reg_discrete(vw& all, cbify& data, example& ec)
+void finish_example_cb_reg_discrete(workspace& all, cbify& data, example& ec)
 {
   // add output example
   output_example_regression_discrete(all, data, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-void finish_multiline_example(vw& all, cbify&, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, cbify&, multi_ex& ec_seq)
 {
   if (!ec_seq.empty())
   {
     output_example_seq(all, ec_seq);
     // global_print_newline(all);
   }
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
-base_learner* cbify_setup(options_i& options, vw& all)
+base_learner* cbify_setup(options_i& options, workspace& all)
 {
   uint32_t num_actions = 0;
   uint32_t cb_continuous_num_actions = 0;
@@ -807,7 +807,7 @@ base_learner* cbify_setup(options_i& options, vw& all)
   return make_base(*l);
 }
 
-base_learner* cbifyldf_setup(options_i& options, vw& all)
+base_learner* cbifyldf_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<cbify>();
   bool cbify_ldf_option = false;

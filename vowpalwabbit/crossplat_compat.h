@@ -22,7 +22,7 @@ constexpr uint64_t UINT64_ONE = 1i64;
 constexpr uint64_t UINT64_32ONES = 0x00000000ffffffffi64;
 #endif
 
-namespace VW
+namespace vw
 {
 inline int string_cpy(char *dest, size_t dest_size, const char *src)
 {
@@ -47,4 +47,4 @@ inline int file_open(FILE **pf, const char *filename, const char *mode)
   return 0;
 #endif
 }
-}  // namespace VW
+}  // namespace vw

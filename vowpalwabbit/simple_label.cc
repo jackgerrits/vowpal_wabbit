@@ -17,7 +17,7 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 label_data::label_data() { reset_to_default(); }
 
@@ -28,7 +28,7 @@ void label_data::reset_to_default()
   label = FLT_MAX;
 }
 
-void print_update(vw& all, example& ec)
+void print_update(workspace& all, example& ec)
 {
   if (all.sd->weighted_labeled_examples + all.sd->weighted_unlabeled_examples >= all.sd->dump_interval &&
       !all.logger.quiet && !all.bfgs)
@@ -38,7 +38,7 @@ void print_update(vw& all, example& ec)
   }
 }
 
-void output_and_account_example(vw& all, example& ec)
+void output_and_account_example(workspace& all, example& ec)
 {
   const label_data& ld = ec.l.simple;
 
@@ -51,13 +51,13 @@ void output_and_account_example(vw& all, example& ec)
   print_update(all, ec);
 }
 
-void return_simple_example(vw& all, void*, example& ec)
+void return_simple_example(workspace& all, void*, example& ec)
 {
   output_and_account_example(all, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-bool summarize_holdout_set(vw& all, size_t& no_win_counter)
+bool summarize_holdout_set(workspace& all, size_t& no_win_counter)
 {
   float thisLoss = (all.sd->weighted_holdout_examples_since_last_pass > 0)
       ? static_cast<float>(all.sd->holdout_sum_loss_since_last_pass / all.sd->weighted_holdout_examples_since_last_pass)

@@ -18,12 +18,12 @@
 
 #include <memory>
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace ACTION_SCORE;
 using namespace GEN_CS;
 using namespace CB_ALGS;
 using namespace exploration;
-using namespace VW::config;
+using namespace vw::config;
 using std::endl;
 // All exploration algorithms return a vector of probabilities, to be used by GenericExplorer downstream
 
@@ -52,7 +52,7 @@ struct cb_explore
   float psi;
   bool nounif;
   bool epsilon_decay;
-  VW::version_struct model_file_version;
+  vw::version_struct model_file_version;
 
   size_t counter;
 };
@@ -213,7 +213,7 @@ void predict_or_learn_cover(cb_explore& data, single_learner& base, example& ec)
   data.cb_label = ec.l.cb;
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([&data, &ec] { ec.l.cb = data.cb_label; });
+  auto restore_guard = vw::scope_exit([&data, &ec] { ec.l.cb = data.cb_label; });
 
   ec.l.cs = data.cs_label;
 
@@ -271,7 +271,7 @@ void predict_or_learn_cover(cb_explore& data, single_learner& base, example& ec)
   ec.pred.a_s = probs;
 }
 
-void print_update_cb_explore(vw& all, bool is_test, example& ec, std::stringstream& pred_string)
+void print_update_cb_explore(workspace& all, bool is_test, example& ec, std::stringstream& pred_string)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -305,7 +305,7 @@ float calc_loss(cb_explore& data, example& ec, const CB::label& ld)
   return loss;
 }
 
-void generic_output_example(vw& all, float loss, example& ec, CB::label& ld)
+void generic_output_example(workspace& all, float loss, example& ec, CB::label& ld)
 {
   all.sd->update(ec.test_only, !CB::is_test_label(ld), loss, 1.f, ec.num_features);
 
@@ -328,12 +328,12 @@ void generic_output_example(vw& all, float loss, example& ec, CB::label& ld)
   print_update_cb_explore(all, CB::is_test_label(ld), ec, sso);
 }
 
-void finish_example(vw& all, cb_explore& data, example& ec)
+void finish_example(workspace& all, cb_explore& data, example& ec)
 {
   float loss = calc_loss(data, ec, ec.l.cb);
 
   CB_EXPLORE::generic_output_example(all, loss, ec, ec.l.cb);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void save_load(cb_explore& cb, io_buf& io, bool read, bool text)
@@ -351,7 +351,7 @@ void save_load(cb_explore& cb, io_buf& io, bool read, bool text)
 }  // namespace CB_EXPLORE
 using namespace CB_EXPLORE;
 
-base_learner* cb_explore_setup(options_i& options, vw& all)
+base_learner* cb_explore_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<cb_explore>();
   option_group_definition new_options("Contextual Bandit Exploration");

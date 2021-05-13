@@ -54,9 +54,9 @@
 typedef float weight;
 
 typedef std::unordered_map<std::string, std::unique_ptr<features>> feature_dict;
-typedef VW::LEARNER::base_learner* (*reduction_setup_fn)(VW::config::options_i&, vw&);
+typedef vw::LEARNER::base_learner* (*reduction_setup_fn)(vw::config::options_i&, workspace&);
 
-using options_deleter_type = void (*)(VW::config::options_i*);
+using options_deleter_type = void (*)(vw::config::options_i*);
 
 struct shared_data;
 
@@ -79,17 +79,17 @@ struct vw_logger
 
 #ifdef BUILD_EXTERNAL_PARSER
 // forward declarations
-namespace VW
+namespace vw
 {
 namespace external
 {
 class parser;
 struct parser_options;
 }  // namespace external
-}  // namespace VW
+}  // namespace vw
 #endif
 
-namespace VW
+namespace vw
 {
 namespace parsers
 {
@@ -98,7 +98,7 @@ namespace flatbuffer
 class parser;
 }
 }  // namespace parsers
-}  // namespace VW
+}  // namespace vw
 
 struct trace_message_wrapper
 {
@@ -112,7 +112,7 @@ struct trace_message_wrapper
   ~trace_message_wrapper() = default;
 };
 
-struct vw
+struct workspace
 {
 private:
   std::shared_ptr<rand_state> _random_state_sp = std::make_shared<rand_state>();  // per instance random_state
@@ -125,9 +125,9 @@ public:
 
   bool chain_hash_json = false;
 
-  VW::LEARNER::base_learner* l;         // the top level learner
-  VW::LEARNER::single_learner* scorer;  // a scoring function
-  VW::LEARNER::base_learner*
+  vw::LEARNER::base_learner* l;         // the top level learner
+  vw::LEARNER::single_learner* scorer;  // a scoring function
+  vw::LEARNER::base_learner*
       cost_sensitive;  // a cost sensitive learning algorithm.  can be single or multi line learner
 
   void learn(example&);
@@ -147,11 +147,11 @@ public:
   uint32_t hash_seed;
 
 #ifdef BUILD_FLATBUFFERS
-  std::unique_ptr<VW::parsers::flatbuffer::parser> flat_converter;
+  std::unique_ptr<vw::parsers::flatbuffer::parser> flat_converter;
 #endif
 
 #ifdef BUILD_EXTERNAL_PARSER
-  std::unique_ptr<VW::external::parser> external_parser;
+  std::unique_ptr<vw::external::parser> external_parser;
 #endif
   std::string data_filename;
 
@@ -166,7 +166,7 @@ public:
   bool preserve_performance_counters;
   std::string id;
 
-  VW::version_struct model_file_ver;
+  vw::version_struct model_file_ver;
   double normalized_sum_norm_x;
   bool vw_is_main = false;  // true if vw is executable; false in library mode
 
@@ -174,12 +174,11 @@ public:
   std::shared_ptr<trace_message_wrapper> trace_message_wrapper_context;
   std::unique_ptr<std::ostream> trace_message;
 
-  std::unique_ptr<VW::config::options_i, options_deleter_type> options;
-
+  std::unique_ptr<vw::config::options_i, options_deleter_type> options;
 
   uint32_t wpp;
 
-  std::unique_ptr<VW::io::writer> stdout_adapter;
+  std::unique_ptr<vw::io::writer> stdout_adapter;
 
   std::vector<std::string> initial_regressors;
 
@@ -210,7 +209,7 @@ public:
 
   bool redefine_some;                                  // --redefine param was used
   std::array<unsigned char, NUM_NAMESPACES> redefine;  // keeps new chars for namespaces
-  std::unique_ptr<VW::kskip_ngram_transformer> skip_gram_transformer;
+  std::unique_ptr<vw::kskip_ngram_transformer> skip_gram_transformer;
   std::vector<std::string> limit_strings;      // descriptor of feature limits
   std::array<uint32_t, NUM_NAMESPACES> limit;  // count to limit features by
   std::array<uint64_t, NUM_NAMESPACES>
@@ -260,15 +259,15 @@ public:
   std::vector<std::string> enabled_reductions;
 
   // Prediction output
-  std::vector<std::unique_ptr<VW::io::writer>> final_prediction_sink;  // set to send global predictions to.
-  std::unique_ptr<VW::io::writer> raw_prediction;                      // file descriptors for text output.
+  std::vector<std::unique_ptr<vw::io::writer>> final_prediction_sink;  // set to send global predictions to.
+  std::unique_ptr<vw::io::writer> raw_prediction;                      // file descriptors for text output.
 
   VW_DEPRECATED("print has been deprecated, use print_by_ref")
-  void (*print)(VW::io::writer*, float, float, v_array<char>);
-  void (*print_by_ref)(VW::io::writer*, float, float, const v_array<char>&);
+  void (*print)(vw::io::writer*, float, float, v_array<char>);
+  void (*print_by_ref)(vw::io::writer*, float, float, const v_array<char>&);
   VW_DEPRECATED("print_text has been deprecated, use print_text_by_ref")
-  void (*print_text)(VW::io::writer*, std::string, v_array<char>);
-  void (*print_text_by_ref)(VW::io::writer*, const std::string&, const v_array<char>&);
+  void (*print_text)(vw::io::writer*, std::string, v_array<char>);
+  void (*print_text_by_ref)(vw::io::writer*, const std::string&, const v_array<char>&);
   std::unique_ptr<loss_function> loss;
 
   VW_DEPRECATED("This is unused and will be removed")
@@ -300,17 +299,17 @@ public:
   // hack to support cb model loading into ccb reduction
   bool is_ccb_input_model = false;
 
-  vw();
-  ~vw();
+  workspace();
+  ~workspace();
   std::shared_ptr<rand_state> get_random_state() { return _random_state_sp; }
 
-  vw(const vw&) = delete;
-  vw& operator=(const vw&) = delete;
+  workspace(const workspace&) = delete;
+  workspace& operator=(const workspace&) = delete;
 
   // vw object cannot be moved as many objects hold a pointer to it.
   // That pointer would be invalidated if it were to be moved.
-  vw(const vw&&) = delete;
-  vw& operator=(const vw&&) = delete;
+  workspace(const workspace&&) = delete;
+  workspace& operator=(const workspace&&) = delete;
 
   std::string get_setupfn_name(reduction_setup_fn setup);
   void build_setupfn_name_dict();
@@ -320,11 +319,11 @@ private:
 };
 
 VW_DEPRECATED("Use print_result_by_ref instead")
-void print_result(VW::io::writer* f, float res, float weight, v_array<char> tag);
-void print_result_by_ref(VW::io::writer* f, float res, float weight, const v_array<char>& tag);
+void print_result(vw::io::writer* f, float res, float weight, v_array<char> tag);
+void print_result_by_ref(vw::io::writer* f, float res, float weight, const v_array<char>& tag);
 
 void noop_mm(shared_data*, float label);
-void get_prediction(VW::io::reader* f, float& res, float& weight);
+void get_prediction(vw::io::reader* f, float& res, float& weight);
 void compile_gram(
     std::vector<std::string> grams, std::array<uint32_t, NUM_NAMESPACES>& dest, char* descriptor, bool quiet);
 void compile_limits(std::vector<std::string> limits, std::array<uint32_t, NUM_NAMESPACES>& dest, bool quiet);

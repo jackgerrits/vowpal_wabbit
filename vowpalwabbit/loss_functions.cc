@@ -13,7 +13,7 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 class squaredloss : public loss_function
 {
@@ -360,16 +360,16 @@ public:
   }
 };
 
-std::unique_ptr<loss_function> getLossFunction(vw& all, const std::string& funcName, float function_parameter)
+std::unique_ptr<loss_function> getLossFunction(workspace& all, const std::string& funcName, float function_parameter)
 {
-  if (funcName == "squared" || funcName == "Huber") { return VW::make_unique<squaredloss>(); }
+  if (funcName == "squared" || funcName == "Huber") { return vw::make_unique<squaredloss>(); }
   else if (funcName == "classic")
   {
-    return VW::make_unique<classic_squaredloss>();
+    return vw::make_unique<classic_squaredloss>();
   }
   else if (funcName == "hinge")
   {
-    return VW::make_unique<hingeloss>();
+    return vw::make_unique<hingeloss>();
   }
   else if (funcName == "logistic")
   {
@@ -378,11 +378,11 @@ std::unique_ptr<loss_function> getLossFunction(vw& all, const std::string& funcN
       all.sd->min_label = -50;
       all.sd->max_label = 50;
     }
-    return VW::make_unique<logloss>();
+    return vw::make_unique<logloss>();
   }
   else if (funcName == "quantile" || funcName == "pinball" || funcName == "absolute")
   {
-    return VW::make_unique<quantileloss>(function_parameter);
+    return vw::make_unique<quantileloss>(function_parameter);
   }
   else if (funcName == "poisson")
   {
@@ -391,7 +391,7 @@ std::unique_ptr<loss_function> getLossFunction(vw& all, const std::string& funcN
       all.sd->min_label = -50;
       all.sd->max_label = 50;
     }
-    return VW::make_unique<poisson_loss>();
+    return vw::make_unique<poisson_loss>();
   }
   else
     THROW("Invalid loss function name: \'" << funcName << "\' Bailing!");

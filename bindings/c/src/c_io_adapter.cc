@@ -9,7 +9,7 @@
 #include "vw_exception.h"
 
 c_reader::c_reader(void* context, VWReadFunc* read)
-    : VW::io::reader(false /* is_resettable */), _context(context), _read_func(read)
+    : vw::io::reader(false /* is_resettable */), _context(context), _read_func(read)
 {
 }
 

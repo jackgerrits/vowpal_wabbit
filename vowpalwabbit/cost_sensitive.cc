@@ -14,7 +14,7 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace COST_SENSITIVE
 {
@@ -185,7 +185,7 @@ label_parser cs_label = {
 };
 // clang-format on
 
-void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, uint32_t prediction)
+void print_update(workspace& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, uint32_t prediction)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -230,7 +230,7 @@ void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool act
   }
 }
 
-void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label, uint32_t multiclass_prediction)
+void output_example(workspace& all, example& ec, const COST_SENSITIVE::label& cs_label, uint32_t multiclass_prediction)
 {
   float loss = 0.;
   if (!test_label(cs_label))
@@ -280,12 +280,12 @@ void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label,
   print_update(all, test_label(cs_label), ec, nullptr, false, multiclass_prediction);
 }
 
-void output_example(vw& all, example& ec) { output_example(all, ec, ec.l.cs, ec.pred.multiclass); }
+void output_example(workspace& all, example& ec) { output_example(all, ec, ec.l.cs, ec.pred.multiclass); }
 
-void finish_example(vw& all, example& ec)
+void finish_example(workspace& all, example& ec)
 {
   output_example(all, ec, ec.l.cs, ec.pred.multiclass);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 bool example_is_test(example& ec)

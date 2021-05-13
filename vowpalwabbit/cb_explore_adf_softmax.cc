@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -30,20 +30,20 @@ public:
   ~cb_explore_adf_softmax() = default;
 
   // Should be called through cb_explore_adf_base for pre/post-processing
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
 
 private:
   template <bool is_learn>
-  void predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples);
 };
 
 cb_explore_adf_softmax::cb_explore_adf_softmax(float epsilon, float lambda) : _epsilon(epsilon), _lambda(lambda) {}
 
 template <bool is_learn>
-void cb_explore_adf_softmax::predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void cb_explore_adf_softmax::predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
-  VW::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
+  vw::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
 
   v_array<ACTION_SCORE::action_score>& preds = examples[0]->pred.a_s;
   exploration::generate_softmax(
@@ -52,7 +52,7 @@ void cb_explore_adf_softmax::predict_or_learn_impl(VW::LEARNER::multi_learner& b
   exploration::enforce_minimum_probability(_epsilon, true, begin_scores(preds), end_scores(preds));
 }
 
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -80,7 +80,7 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
   // Set explore_type
   size_t problem_multiplier = 1;
 
-  VW::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
+  vw::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
   all.example_parser->lbl_parser = CB::cb_label;
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_softmax>;
@@ -88,8 +88,8 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
 
   if (epsilon < 0.0 || epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
 
-  VW::LEARNER::learner<explore_type, multi_ex>& l =
-      VW::LEARNER::init_learner(data, base, explore_type::learn, explore_type::predict, problem_multiplier,
+  vw::LEARNER::learner<explore_type, multi_ex>& l =
+      vw::LEARNER::init_learner(data, base, explore_type::learn, explore_type::predict, problem_multiplier,
           prediction_type_t::action_probs, all.get_setupfn_name(setup) + "-softmax");
 
   l.set_finish_example(explore_type::finish_multiline_example);
@@ -99,4 +99,4 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
 }
 }  // namespace softmax
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

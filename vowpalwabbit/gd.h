@@ -13,15 +13,15 @@
 
 namespace GD
 {
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 
 struct gd;
 
 float finalize_prediction(shared_data* sd, vw_logger& logger, float ret);
-void print_features(vw& all, example& ec);
-void print_audit_features(vw&, example& ec);
-void save_load_regressor(vw& all, io_buf& model_file, bool read, bool text);
-void save_load_online_state(vw& all, io_buf& model_file, bool read, bool text, double& total_weight,
+void print_features(workspace& all, example& ec);
+void print_audit_features(workspace&, example& ec);
+void save_load_regressor(workspace& all, io_buf& model_file, bool read, bool text);
+void save_load_online_state(workspace& all, io_buf& model_file, bool read, bool text, double& total_weight,
     GD::gd* g = nullptr, uint32_t ftrl_size = 0);
 
 template <class T>
@@ -63,7 +63,7 @@ inline void vec_add_multipredict(multipredict_info<T>& mp, const float fx, uint6
 
 // iterate through one namespace (or its part), callback function FuncT(some_data_R, feature_value_x, feature_weight)
 template <class DataT, class WeightOrIndexT, void (*FuncT)(DataT&, float, WeightOrIndexT)>
-inline void foreach_feature(vw& all, example& ec, DataT& dat)
+inline void foreach_feature(workspace& all, example& ec, DataT& dat)
 {
   return all.weights.sparse
       ? foreach_feature<DataT, WeightOrIndexT, FuncT, sparse_parameters>(all.weights.sparse_weights,
@@ -75,18 +75,18 @@ inline void foreach_feature(vw& all, example& ec, DataT& dat)
 // iterate through all namespaces and quadratic&cubic features, callback function T(some_data_R, feature_value_x,
 // feature_weight)
 template <class DataT, void (*FuncT)(DataT&, float, float&)>
-inline void foreach_feature(vw& all, example& ec, DataT& dat)
+inline void foreach_feature(workspace& all, example& ec, DataT& dat)
 {
   foreach_feature<DataT, float&, FuncT>(all, ec, dat);
 }
 
 template <class DataT, void (*FuncT)(DataT&, float, float)>
-inline void foreach_feature(vw& all, example& ec, DataT& dat)
+inline void foreach_feature(workspace& all, example& ec, DataT& dat)
 {
   foreach_feature<DataT, float, FuncT>(all, ec, dat);
 }
 
-inline float inline_predict(vw& all, example& ec)
+inline float inline_predict(workspace& all, example& ec)
 {
   const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
   return all.weights.sparse
@@ -98,7 +98,7 @@ inline float inline_predict(vw& all, example& ec)
 
 inline float trunc_weight(const float w, const float gravity)
 {
-  return (gravity < fabsf(w)) ? w - VW::math::sign(w) * gravity : 0.f;
+  return (gravity < fabsf(w)) ? w - vw::math::sign(w) * gravity : 0.f;
 }
 
 }  // namespace GD

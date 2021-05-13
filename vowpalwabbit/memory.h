@@ -64,14 +64,14 @@ free_ptr<T> scoped_calloc_or_throw(Args&&... args)
   return std::unique_ptr<T, free_fn>(temp, destroy_free<T>);
 }
 
-namespace VW
+namespace vw
 {
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... params)
 {
   return std::unique_ptr<T>(new T(std::forward<Args>(params)...));
 }
-}  // namespace VW
+}  // namespace vw
 
 #ifdef MADV_MERGEABLE
 template <class T>

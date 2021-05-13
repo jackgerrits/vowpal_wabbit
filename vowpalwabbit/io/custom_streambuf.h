@@ -8,7 +8,7 @@
 
 #include "io_adapter.h"
 
-namespace VW
+namespace vw
 {
 namespace io
 {
@@ -21,7 +21,7 @@ public:
 class writer_stream_buf : public std::stringbuf
 {
 public:
-  writer_stream_buf(std::unique_ptr<VW::io::writer>&& writer) : _writer(std::move(writer)) {}
+  writer_stream_buf(std::unique_ptr<vw::io::writer>&& writer) : _writer(std::move(writer)) {}
 
   virtual int sync() override
   {
@@ -42,8 +42,8 @@ public:
   }
 
 private:
-  std::unique_ptr<VW::io::writer> _writer;
+  std::unique_ptr<vw::io::writer> _writer;
 };
 
 }  // namespace io
-}  // namespace VW
+}  // namespace vw

@@ -8,7 +8,7 @@
 #include "io_buf.h"
 
 using namespace std;
-namespace VW
+namespace vw
 {
 namespace continuous_actions
 {
@@ -53,4 +53,4 @@ bool is_valid_pdf(probability_density_function& pdf)
 }
 
 }  // namespace continuous_actions
-}  // namespace VW
+}  // namespace vw
