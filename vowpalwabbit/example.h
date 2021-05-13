@@ -5,7 +5,6 @@
 #pragma once
 
 #include "v_array.h"
-#include "no_label.h"
 #include "simple_label.h"
 #include "multiclass.h"
 #include "multilabel.h"
@@ -22,7 +21,6 @@
 #include "decision_scores.h"
 #include "cb_continuous_label.h"
 #include "prob_dist_cont.h"
-#include "active_multiclass_prediction.h"
 
 #include <cstdint>
 #include <vector>
@@ -30,7 +28,6 @@
 
 struct polylabel
 {
-  no_label::no_label empty;
   label_data simple;
   MULTICLASS::label_t multi;
   COST_SENSITIVE::label cs;
@@ -62,7 +59,6 @@ struct polyprediction
   float prob = 0.f;                                          // for --probabilities --csoaa_ldf=mc
   vw::continuous_actions::probability_density_function pdf;  // probability density defined over an action range
   vw::continuous_actions::probability_density_function_value pdf_value;  // probability density value for a given action
-  vw::active_multiclass_prediction active_multiclass;
 };
 
 VW_WARNING_STATE_PUSH
