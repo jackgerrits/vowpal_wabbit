@@ -75,10 +75,6 @@ table CS_Label {
   costs:[wclass];
 }
 
-table no_label {
-  label:ubyte;
-}
-
 table Slates_Label {
   example_type:CCB_Slates_example_type;
   weight:float;
@@ -98,7 +94,7 @@ table ContinuousLabel {
   costs:[Continuous_Label_Elm];
 }
 
-union Label {SimpleLabel, CBLabel, CCBLabel, MultiClass, MultiLabel, CB_EVAL_Label, CS_Label, no_label, Slates_Label, ContinuousLabel}
+union Label {SimpleLabel, CBLabel, CCBLabel, MultiClass, MultiLabel, CB_EVAL_Label, CS_Label, Slates_Label, ContinuousLabel}
 
 table Example {
   namespaces:[Namespace];
