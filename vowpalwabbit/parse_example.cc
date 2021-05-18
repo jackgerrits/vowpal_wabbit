@@ -214,16 +214,14 @@ public:
 
       if (audit)
       {
+        std::vector<std::string> audit_name_components;
+        audit_name_components.push_back(_base.to_string());
+        audit_name_components.push_back(feature_name.to_string());
         if (!string_feature_value.empty())
         {
-          std::stringstream ss;
-          ss << feature_name << "^" << string_feature_value;
-          fs.space_names.push_back(audit_strings_ptr(new audit_strings(_base.to_string(), ss.str())));
+          audit_name_components.push_back(string_feature_value.to_string());
         }
-        else
-        {
-          fs.space_names.push_back(audit_strings_ptr(new audit_strings(_base.to_string(), feature_name.to_string())));
-        }
+        fs.space_names.push_back(audit_strings{std::move(audit_name_components)});
       }
 
       if (((*_affix_features)[_index] > 0) && (!feature_name.empty()))
@@ -250,14 +248,13 @@ public:
           affix_fs.push_back(_v, word_hash);
           if (audit)
           {
-            v_array<char> affix_v = v_init<char>();
+            std::string affix_v;
             if (_index != ' ') affix_v.push_back(_index);
             affix_v.push_back(is_prefix ? '+' : '-');
             affix_v.push_back('0' + static_cast<char>(len));
             affix_v.push_back('=');
             affix_v.insert(affix_v.end(), affix_name.begin(), affix_name.end());
-            affix_v.push_back('\0');
-            affix_fs.space_names.push_back(audit_strings_ptr(new audit_strings("affix", affix_v.begin())));
+            affix_fs.space_names.push_back(audit_strings{{"affix", affix_v}});
           }
           affix >>= 4;
         }
@@ -290,15 +287,14 @@ public:
         spell_fs.push_back(_v, word_hash);
         if (audit)
         {
-          v_array<char> spelling_v = v_init<char>();
+          std::string spelling_v;
           if (_index != ' ')
           {
             spelling_v.push_back(_index);
             spelling_v.push_back('_');
           }
           spelling_v.insert(spelling_v.end(), spelling_strview.begin(), spelling_strview.end());
-          spelling_v.push_back('\0');
-          spell_fs.space_names.push_back(audit_strings_ptr(new audit_strings("spelling", spelling_v.begin())));
+          spell_fs.space_names.push_back(audit_strings{{"spelling", spelling_v}});
         }
       }
       if ((*_namespace_dictionaries)[_index].size() > 0)
@@ -324,7 +320,7 @@ public:
                 ss << _index << '_';
                 ss << feature_name;
                 ss << '=' << id;
-                dict_fs.space_names.push_back(audit_strings_ptr(new audit_strings("dictionary", ss.str())));
+                dict_fs.space_names.push_back(audit_strings{{"dictionary", ss.str()}});
               }
           }
         }

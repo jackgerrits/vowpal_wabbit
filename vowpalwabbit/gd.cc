@@ -212,18 +212,7 @@ inline void audit_interaction(audit_results& dat, const audit_strings* f)
     return;
   }
 
-  std::string ns_pre;
-  if (!dat.ns_pre.empty()) ns_pre += '*';
-
-  if (f->first != "" && ((f->first) != " "))
-  {
-    ns_pre.append(f->first);
-    ns_pre += '^';
-  }
-
-  if (f->second != "") { ns_pre.append(f->second); }
-
-  if (!ns_pre.empty()) { dat.ns_pre.push_back(ns_pre); }
+  dat.ns_pre.push_back(f->to_string());
 }
 
 inline void audit_feature(audit_results& dat, const float ft_weight, const uint64_t ft_idx)
@@ -233,7 +222,12 @@ inline void audit_feature(audit_results& dat, const float ft_weight, const uint6
   size_t stride_shift = weights.stride_shift();
 
   std::string ns_pre;
-  for (std::string& s : dat.ns_pre) ns_pre += s;
+  std::string delimiter = "";
+  for (std::string& s : dat.ns_pre) {
+    ns_pre += delimiter;
+    ns_pre += s;
+    delimiter = "*";
+  }
 
   if (dat.all.audit)
   {
@@ -277,7 +271,7 @@ void print_lda_features(vw& all, example& ec)
   {
     for (const auto& f : fs.audit_range())
     {
-      std::cout << '\t' << f.audit()->get()->first << '^' << f.audit()->get()->second << ':'
+      std::cout << '\t' << f.audit()->to_string() << ':'
                 << ((f.index() >> stride_shift) & all.parse_mask) << ':' << f.value();
       for (size_t k = 0; k < all.lda; k++) std::cout << ':' << (&weights[f.index()])[k];
     }
@@ -298,7 +292,7 @@ void print_features(vw& all, example& ec)
       if (fs.space_names.size() > 0)
         for (const auto& f : fs.audit_range())
         {
-          audit_interaction(dat, f.audit()->get());
+          audit_interaction(dat, f.audit());
           audit_feature(dat, f.value(), f.index() + ec.ft_offset);
           audit_interaction(dat, nullptr);
         }

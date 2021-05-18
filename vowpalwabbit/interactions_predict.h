@@ -9,8 +9,9 @@
 #include "example_predict.h"
 #include <vector>
 #include <string>
+#include <string>
 
-const static std::pair<std::string, std::string> EMPTY_AUDIT_STRINGS = std::make_pair("", "");
+const static audit_strings EMPTY_AUDIT_STRINGS{{"", ""}};
 
 namespace INTERACTIONS
 {
@@ -80,7 +81,7 @@ inline void inner_kernel(DataT& dat, features::const_audit_iterator& begin, feat
   {
     for (; begin != end; ++begin)
     {
-      audit_func(dat, begin.audit() == nullptr ? &EMPTY_AUDIT_STRINGS : begin.audit()->get());
+      audit_func(dat, begin.audit() == nullptr ? &EMPTY_AUDIT_STRINGS : begin.audit());
       call_FuncT<DataT, FuncT>(
           dat, weights, INTERACTION_VALUE(ft_value, begin.value()), (begin.index() ^ halfhash) + offset);
       audit_func(dat, nullptr);
@@ -144,7 +145,10 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
           {
             feature_index halfhash = FNV_prime * static_cast<uint64_t>(first.indicies[i]);
             if (audit)
-            { audit_func(dat, i < first.space_names.size() ? first.space_names[i].get() : &EMPTY_AUDIT_STRINGS); }
+            {
+              auto audit_strings_ptr = first.get_audit_strings(i);
+              audit_func(dat, audit_strings_ptr == nullptr ? &EMPTY_AUDIT_STRINGS : audit_strings_ptr);
+            }
             // next index differs for permutations and simple combinations
             feature_value ft_value = first.values[i];
             auto begin = second.audit_cbegin();
@@ -176,7 +180,10 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
             for (size_t i = 0; i < first.indicies.size(); ++i)
             {
               if (audit)
-              { audit_func(dat, i < first.space_names.size() ? first.space_names[i].get() : &EMPTY_AUDIT_STRINGS); }
+              {
+                auto audit_strings_ptr = first.get_audit_strings(i);
+                audit_func(dat, audit_strings_ptr == nullptr ? &EMPTY_AUDIT_STRINGS : audit_strings_ptr);
+ }
               const uint64_t halfhash1 = FNV_prime * static_cast<uint64_t>(first.indicies[i]);
               float first_ft_value = first.values[i];
               size_t j = 0;
@@ -187,7 +194,8 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
               {  // f3 x k*(f2 x k*f1)
                 if (audit)
                 {
-                  audit_func(dat, j < second.space_names.size() ? second.space_names[j].get() : &EMPTY_AUDIT_STRINGS);
+                  auto audit_strings_ptr = second.get_audit_strings(i);
+                  audit_func(dat, audit_strings_ptr == nullptr ? &EMPTY_AUDIT_STRINGS : audit_strings_ptr);
                 }
                 feature_index halfhash = FNV_prime * (halfhash1 ^ static_cast<uint64_t>(second.indicies[j]));
                 feature_value ft_value = INTERACTION_VALUE(first_ft_value, second.values[j]);
@@ -311,7 +319,7 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
           else
             next_data->loop_idx = 0;
 
-          if (audit) audit_func(dat, fs.space_names[feature].get());
+          if (audit) audit_func(dat, fs.get_audit_strings(feature));
 
           if (cur_data == fgd)  // first namespace
           {

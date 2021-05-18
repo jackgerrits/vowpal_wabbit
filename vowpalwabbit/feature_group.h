@@ -17,8 +17,6 @@
 
 using feature_value = float;
 using feature_index = uint64_t;
-using audit_strings = std::pair<std::string, std::string>;
-using audit_strings_ptr = std::shared_ptr<audit_strings>;
 
 struct features;
 struct features_value_index_audit_range;
@@ -275,18 +273,45 @@ public:
   friend struct features;
 };
 
+struct audit_strings
+{
+  // Generally this is of the form namespace,name
+  // Unless this corresponds to a chain_hash in which case it is namespace,feature_name,string_feature_value
+  std::vector<std::string> feature_index_inputs;
+
+  std::string to_string() const
+  {
+    std::stringstream ss;
+    std::string delimiter = "";
+    for (const auto& term : feature_index_inputs)
+    {
+      ss << delimiter << term;
+      delimiter = "^";
+    }
+    return ss.str();
+  }
+
+  audit_strings() = default;
+  audit_strings(std::vector<std::string> components) : feature_index_inputs(std::move(components)) {}
+};
+
 /// the core definition of a set of features.
 struct features
 {
   using iterator = features_iterator<feature_value, feature_index>;
   using const_iterator = features_iterator<const feature_value, const feature_index>;
-  using audit_iterator = audit_features_iterator<feature_value, feature_index, audit_strings_ptr>;
+  using audit_iterator = audit_features_iterator<feature_value, feature_index, audit_strings>;
   using const_audit_iterator =
-      audit_features_iterator<const feature_value, const feature_index, const audit_strings_ptr>;
+      audit_features_iterator<const feature_value, const feature_index, const audit_strings>;
 
   v_array<feature_value> values;               // Always needed.
   v_array<feature_index> indicies;             // Optional for sparse data.
-  std::vector<audit_strings_ptr> space_names;  // Optional for audit mode.
+  std::vector<audit_strings> space_names;      // Optional for audit mode.
+
+  const audit_strings* get_audit_strings(size_t index) const {
+    if (index < space_names.size()) { return &space_names[index]; }
+    return nullptr;
+  }
 
   float sum_feat_sq = 0.f;
 

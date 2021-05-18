@@ -16,7 +16,7 @@ struct audit_regressor_data
   size_t increment;
   size_t cur_class;
   size_t total_class_cnt;
-  std::vector<std::string>* ns_pre;
+  std::vector<std::string> ns_pre;
   io_buf* out_file;
   size_t loaded_regressor_values;
   size_t values_audited;
@@ -27,23 +27,11 @@ inline void audit_regressor_interaction(audit_regressor_data& dat, const audit_s
   // same as audit_interaction in gd.cc
   if (f == nullptr)
   {
-    dat.ns_pre->pop_back();
+    dat.ns_pre.pop_back();
     return;
   }
 
-  std::string ns_pre;
-  if (!dat.ns_pre->empty()) ns_pre += '*';
-
-  if (f->first != "" && ((f->first) != " "))
-  {
-    ns_pre.append(f->first);
-    ns_pre += '^';
-  }
-  if (f->second != "")
-  {
-    ns_pre.append(f->second);
-    dat.ns_pre->push_back(ns_pre);
-  }
+  dat.ns_pre.push_back(f->to_string());
 }
 
 inline void audit_regressor_feature(audit_regressor_data& dat, const float, const uint64_t ft_idx)
@@ -55,8 +43,13 @@ inline void audit_regressor_feature(audit_regressor_data& dat, const float, cons
     return;
 
   std::string ns_pre;
-  for (std::vector<std::string>::const_iterator s = dat.ns_pre->begin(); s != dat.ns_pre->end(); ++s) ns_pre += *s;
-
+  std::string delimiter = "";
+  for (std::string& s : dat.ns_pre)
+  {
+    ns_pre += delimiter;
+    ns_pre += s;
+    delimiter = "*";
+  }
   std::ostringstream tempstream;
   tempstream << ':' << ((ft_idx & weights.mask()) >> weights.stride_shift()) << ':' << weights[ft_idx];
 
@@ -80,7 +73,7 @@ void audit_regressor_lda(audit_regressor_data& rd, VW::LEARNER::single_learner& 
     features& fs = ec.feature_space[*i];
     for (size_t j = 0; j < fs.size(); ++j)
     {
-      tempstream << '\t' << fs.space_names[j].get()->first << '^' << fs.space_names[j].get()->second << ':'
+      tempstream << '\t' << fs.get_audit_strings(j)->to_string() << ':'
                  << ((fs.indicies[j] >> weights.stride_shift()) & all.parse_mask);
       for (size_t k = 0; k < all.lda; k++)
       {
@@ -117,7 +110,7 @@ void audit_regressor(audit_regressor_data& rd, VW::LEARNER::single_learner& base
         if (fs.space_names.size() > 0)
           for (size_t j = 0; j < fs.size(); ++j)
           {
-            audit_regressor_interaction(rd, fs.space_names[j].get());
+            audit_regressor_interaction(rd, fs.get_audit_strings(j));
             audit_regressor_feature(rd, fs.values[j], static_cast<uint32_t>(fs.indicies[j]) + ec.ft_offset);
             audit_regressor_interaction(rd, nullptr);
           }
@@ -149,8 +142,6 @@ void end_examples(audit_regressor_data& d)
   d.out_file->close_file();
   delete (d.out_file);
   d.out_file = nullptr;
-  delete d.ns_pre;
-  d.ns_pre = nullptr;
 }
 
 inline void print_ex(vw& all, size_t ex_processed, size_t vals_found, size_t progress)
@@ -259,7 +250,6 @@ VW::LEARNER::base_learner* audit_regressor_setup(options_i& options, vw& all)
 
   auto dat = scoped_calloc_or_throw<audit_regressor_data>();
   dat->all = &all;
-  dat->ns_pre = new std::vector<std::string>();  // explicitly invoking std::vector's constructor
   dat->out_file = new io_buf();
   dat->out_file->add_file(VW::io::open_file_writer(out_file));
 
