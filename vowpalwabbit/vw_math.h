@@ -4,7 +4,6 @@
 
 #include "future_compat.h"
 
-
 namespace vw
 {
 namespace math
