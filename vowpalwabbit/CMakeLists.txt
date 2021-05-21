@@ -85,6 +85,7 @@ set(vw_all_headers
   gd_predict.h
   gd.h
   gen_cs_example.h
+  generate_interactions.h
   get_pmf.h
   global_data.h
   guard.h
@@ -100,6 +101,7 @@ set(vw_all_headers
   marginal.h
   memory.h
   metrics.h
+  metric_sink.h
   multiclass.h
   multilabel_oaa.h
   multilabel.h
@@ -209,6 +211,7 @@ set(vw_all_sources
   ftrl.cc
   gd.cc
   gen_cs_example.cc
+  generate_interactions.cc
   get_pmf.cc
   global_data.cc
   hashstring.cc
@@ -263,6 +266,10 @@ endif()
 
 if(BUILD_EXTERNAL_PARSER)
   set(vw_all_sources ${vw_all_sources} ${external_parser_sources})
+endif()
+
+if (vw_BUILD_NET_FRAMEWORK)
+set(vw_all_sources ${vw_all_sources} spanning_tree.cc)
 endif()
 
 add_library(vw STATIC ${vw_all_sources} ${vw_all_headers})

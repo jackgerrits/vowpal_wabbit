@@ -6,6 +6,7 @@
 #include <cstdint>
 #include "constant.h"
 #include "feature_group.h"
+#include "interactions.h"
 #include "example_predict.h"
 #include <vector>
 #include <string>
@@ -21,10 +22,6 @@ namespace INTERACTIONS
  * Previous behaviour was: include interactions of feature with itself only if its value != value^2.
  *
  */
-constexpr bool feature_self_interactions = true;
-// must return logical expression
-/*old: ft_value != 1.0 && feature_self_interactions_for_value_other_than_1*/
-#define PROCESS_SELF_INTERACTIONS(ft_value) feature_self_interactions
 
 // 3 template functions to pass FuncT() proper argument (feature idx in regressor, or its coefficient)
 
@@ -100,10 +97,11 @@ inline void inner_kernel(DataT& dat, features::const_audit_iterator& begin, feat
 template <class DataT, class WeightOrIndexT, void (*FuncT)(DataT&, float, WeightOrIndexT), bool audit,
     void (*audit_func)(DataT&, const audit_strings*),
     class WeightsT>  // nullptr func can't be used as template param in old compilers
-inline void generate_interactions(namespace_interactions& interactions, bool permutations, example_predict& ec,
-    DataT& dat,
-    WeightsT& weights)  // default value removed to eliminate ambiguity in old complers
+inline void generate_interactions(const std::vector<std::vector<namespace_index>>& interactions, bool permutations,
+    example_predict& ec, DataT& dat, WeightsT& weights,
+    size_t& num_features)  // default value removed to eliminate ambiguity in old complers
 {
+  num_features = 0;
   features* features_data = ec.feature_space.data();
 
   // often used values
@@ -119,7 +117,7 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
   empty_ns_data.loop_end = 0;
   empty_ns_data.self_interaction = false;
 
-  for (auto& ns : interactions.interactions)
+  for (const auto& ns : interactions)
   {  // current list of namespaces to interact.
 
 #ifndef GEN_INTER_LOOP
@@ -149,6 +147,7 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
             auto begin = second.audit_cbegin();
             if (same_namespace) { begin += (PROCESS_SELF_INTERACTIONS(ft_value)) ? i : i + 1; }
             auto end = second.audit_cend();
+            num_features += std::distance(begin, end);
             inner_kernel<DataT, WeightOrIndexT, FuncT, audit, audit_func>(
                 dat, begin, end, offset, weights, ft_value, halfhash);
 
@@ -194,6 +193,7 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
                 // next index differs for permutations and simple combinations
                 if (same_namespace2) { begin += (PROCESS_SELF_INTERACTIONS(ft_value)) ? j : j + 1; }
                 auto end = third.audit_cend();
+                num_features += std::distance(begin, end);
                 inner_kernel<DataT, WeightOrIndexT, FuncT, audit, audit_func>(
                     dat, begin, end, offset, weights, ft_value, halfhash);
                 if (audit) audit_func(dat, nullptr);
@@ -336,6 +336,7 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
 
           auto begin = fs.audit_cbegin() + start_i;
           auto end = fs.audit_cbegin() + (fgd2->loop_end + 1);
+          num_features += std::distance(begin, end);
           inner_kernel<DataT, WeightOrIndexT, FuncT, audit, audit_func, WeightsT>(
               dat, begin, end, offset, weights, ft_value, halfhash);
 
@@ -358,4 +359,5 @@ inline void generate_interactions(namespace_interactions& interactions, bool per
     }
   }  // foreach interaction in all.interactions
 }
+
 }  // namespace INTERACTIONS
