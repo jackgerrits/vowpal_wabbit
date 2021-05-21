@@ -1385,8 +1385,9 @@ printf '3 |f a b c |e x y z\n2 |f a y c |e x\n' | {VW} --oaa 3 -q ef --audit
     pred-sets/ref/cb_adf_sm.predict
 
 # Test 117: test dsjson parser correctly processes checkpoint and dangling observation lines
-{VW} -d train-sets/b1848_dsjson_parser_regression.txt --dsjson --chain_hash --cb_explore_adf -P 1
+{VW} -d train-sets/b1848_dsjson_parser_regression.txt --dsjson --chain_hash --cb_explore_adf -P 1 --extra_metrics metrics_skip.json
     train-sets/ref/b1848_dsjson_parser_regression.stderr
+    test-sets/ref/metrics_skip.json
 
 # Test 118: one-against-all with subsampling
 {VW} -k --oaa 10 --oaa_subsample 5 -c --passes 10 -d train-sets/multiclass --holdout_off
@@ -1918,3 +1919,47 @@ printf '3 |f a b c |e x y z\n2 |f a y c |e x\n' | {VW} --oaa 3 -q ef --audit
 {VW}  -d train-sets/rcv1_raw_cb_small.vw --cb 2 --cb_type dr --ngram 2 --skips 4 -b 24 -l 0.25 --extra_metrics metrics_2.json
     train-sets/ref/rcv1_raw_cb_dr_metrics.stderr
     test-sets/ref/metrics_2.json
+
+# Test 231: test extra_metrics
+{VW}  -d train-sets/rcv1_raw_cb_small.vw --cb 2 --cb_type dr --ngram 2 --skips 4 -b 24 -l 0.25 --extra_metrics metrics_2.json
+    train-sets/ref/rcv1_raw_cb_dr_metrics.stderr
+    test-sets/ref/metrics_2.json
+
+# Test 232: squarecb save_load, save model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA --squarecb -f models/sqcb_ld.model --save_resume
+    train-sets/ref/squarecb_save.stderr
+
+# Test 233: squarecb save_load, load model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA --squarecb -i models/sqcb_ld.model -t
+    train-sets/ref/squarecb_load.stderr
+
+# Test 234: test extra_metrics with djson timestamps
+{VW} -d train-sets/dsjson_cb.json --dsjson --cb_explore_adf --epsilon 0.2 --quadratic GT --extra_metrics metrics_time.json
+    train-sets/ref/metrics_time.stderr
+    test-sets/ref/metrics_time.json
+
+# Test 235: test extra_metrics with djson ccb
+{VW} -d train-sets/ccb_data.json --dsjson --ccb_explore_adf --extra_metrics metrics_ccb.json
+    train-sets/ref/metrics_ccb.stderr
+    test-sets/ref/metrics_ccb.json
+
+# Test 236: test extra_metrics with djson ccb, without event_id
+{VW} -d train-sets/ccb_data_noevent.json --dsjson --ccb_explore_adf --extra_metrics metrics_ccb_noevent.json
+    train-sets/ref/metrics_ccb_noevent.stderr
+    test-sets/ref/metrics_ccb_noevent.json
+
+# Test 237: first save_load, save model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA --first 130 -f models/first_ld.model --save_resume
+    train-sets/ref/first_save.stderr
+
+# Test 238: first save_load, load model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA -i models/first_ld.model -t
+    train-sets/ref/first_load.stderr
+
+# Test 239: regcb save_load, save model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA --regcb -f models/regcb_ld.model --save_resume --mellowness .001
+    train-sets/ref/regcb_save.stderr
+
+# Test 240: regcb save_load, load model
+{VW} -d train-sets/cb_load.dat --cb_explore_adf -q UA --regcb -i models/regcb_ld.model -t
+    train-sets/ref/regcb_load.stderr

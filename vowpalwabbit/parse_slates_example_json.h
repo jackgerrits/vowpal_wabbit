@@ -250,6 +250,8 @@ void parse_slates_example_dsjson(workspace& all, v_array<example*>& examples, ch
 
   if (document.HasMember("EventId")) { data->eventId = document["EventId"].GetString(); }
 
+  if (document.HasMember("Timestamp")) { data->timestamp = document["Timestamp"].GetString(); }
+
   if (document.HasMember("_skipLearn")) { data->skipLearn = document["_skipLearn"].GetBool(); }
 
   if (document.HasMember("pdrop")) { data->probabilityOfDrop = document["pdrop"].GetFloat(); }

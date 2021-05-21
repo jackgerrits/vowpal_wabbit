@@ -284,7 +284,7 @@ void print_update_cb_explore(workspace& all, bool is_test, example& ec, std::str
       label_string << cost.action << ":" << cost.cost << ":" << cost.probability;
     }
     all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_string.str(),
-        pred_string.str(), ec.num_features, all.progress_add, all.progress_arg);
+        pred_string.str(), ec.get_num_features(), all.progress_add, all.progress_arg);
   }
 }
 
@@ -307,7 +307,7 @@ float calc_loss(cb_explore& data, example& ec, const CB::label& ld)
 
 void generic_output_example(workspace& all, float loss, example& ec, CB::label& ld)
 {
-  all.sd->update(ec.test_only, !CB::is_test_label(ld), loss, 1.f, ec.num_features);
+  all.sd->update(ec.test_only, !CB::is_test_label(ld), loss, 1.f, ec.get_num_features());
 
   std::stringstream ss;
   float maxprob = 0.;

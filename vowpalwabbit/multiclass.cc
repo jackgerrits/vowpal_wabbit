@@ -112,7 +112,7 @@ void print_label_pred(workspace& all, example& ec, uint32_t prediction)
   std::string_view sv_pred = all.sd->ldict->get(prediction);
   all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass,
       sv_label.empty() ? "unknown" : std::string{sv_label}, sv_pred.empty() ? "unknown" : std::string{sv_pred},
-      ec.num_features, all.progress_add, all.progress_arg);
+      ec.get_num_features(), all.progress_add, all.progress_arg);
 }
 
 void print_probability(workspace& all, example& ec, uint32_t prediction)
@@ -125,7 +125,7 @@ void print_probability(workspace& all, example& ec, uint32_t prediction)
   label_ss << ec.l.multi.label;
 
   all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_ss.str(), pred_ss.str(),
-      ec.num_features, all.progress_add, all.progress_arg);
+      ec.get_num_features(), all.progress_add, all.progress_arg);
 }
 
 void print_score(workspace& all, example& ec, uint32_t prediction)
@@ -137,13 +137,13 @@ void print_score(workspace& all, example& ec, uint32_t prediction)
   label_ss << ec.l.multi.label;
 
   all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_ss.str(), pred_ss.str(),
-      ec.num_features, all.progress_add, all.progress_arg);
+      ec.get_num_features(), all.progress_add, all.progress_arg);
 }
 
 void direct_print_update(workspace& all, example& ec, uint32_t prediction)
 {
   all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, ec.l.multi.label, prediction,
-      ec.num_features, all.progress_add, all.progress_arg);
+      ec.get_num_features(), all.progress_add, all.progress_arg);
 }
 
 template <void (*T)(workspace&, example&, uint32_t)>
@@ -169,8 +169,8 @@ void finish_example(workspace& all, example& ec, bool update_loss)
   float loss = 0;
   if (ec.l.multi.label != ec.pred.multiclass && ec.l.multi.label != static_cast<uint32_t>(-1)) loss = ec.weight;
 
-  all.sd->update(
-      ec.test_only, update_loss && (ec.l.multi.label != static_cast<uint32_t>(-1)), loss, ec.weight, ec.num_features);
+  all.sd->update(ec.test_only, update_loss && (ec.l.multi.label != static_cast<uint32_t>(-1)), loss, ec.weight,
+      ec.get_num_features());
 
   for (auto& sink : all.final_prediction_sink)
     if (!all.sd->ldict)

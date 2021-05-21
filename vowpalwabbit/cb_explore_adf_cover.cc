@@ -73,7 +73,7 @@ cb_explore_adf_cover::cb_explore_adf_cover(size_t cover_size, float psi, bool no
     , _epsilon_decay(epsilon_decay)
     , _first_only(first_only)
     , _cs_ldf_learner(cs_ldf_learner)
-    , _model_file_version(model_file_version)
+    , _model_file_version(std::move(model_file_version))
 {
   _gen_cs.cb_type = cb_type;
   _gen_cs.scorer = scorer;
@@ -301,9 +301,11 @@ vw::LEARNER::base_learner* setup(config::options_i& options, workspace& all)
     epsilon_decay = true;
   }
 
+  bool with_metrics = options.was_supplied("extra_metrics");
+
   using explore_type = cb_explore_adf_base<cb_explore_adf_cover>;
-  auto data = scoped_calloc_or_throw<explore_type>(cover_size, psi, nounif, epsilon, epsilon_decay, first_only,
-      as_multiline(all.cost_sensitive), all.scorer, cb_type_enum, all.model_file_ver);
+  auto data = scoped_calloc_or_throw<explore_type>(with_metrics, cover_size, psi, nounif, epsilon, epsilon_decay,
+      first_only, as_multiline(all.cost_sensitive), all.scorer, cb_type_enum, all.model_file_ver);
 
   vw::LEARNER::learner<explore_type, multi_ex>& l = init_learner(data, base, explore_type::learn, explore_type::predict,
       problem_multiplier, prediction_type_t::action_probs, all.get_setupfn_name(setup) + "-cover", true);

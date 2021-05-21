@@ -156,6 +156,9 @@ void set_json_reader(workspace& all, bool dsjson = false)
   }
 
   all.example_parser->decision_service_json = dsjson;
+
+  if (dsjson && all.options->was_supplied("extra_metrics"))
+  { all.example_parser->metrics = vw::make_unique<dsjson_metrics>(); }
 }
 
 void reset_source(workspace& all, size_t numbits)
@@ -176,8 +179,8 @@ void reset_source(workspace& all, size_t numbits)
 
     // Rename the cache file to the final name.
     if (0 != rename(all.example_parser->currentname.c_str(), all.example_parser->finalname.c_str()))
-      THROW("WARN: reset_source(vw& all, size_t numbits) cannot rename: " << all.example_parser->currentname << " to "
-                                                                          << all.example_parser->finalname);
+      THROW("WARN: reset_source(workspace& all, size_t numbits) cannot rename: "
+          << all.example_parser->currentname << " to " << all.example_parser->finalname);
     input->close_files();
     // Now open the written cache as the new input file.
     input->add_file(vw::io::open_file_reader(all.example_parser->finalname));
@@ -435,9 +438,10 @@ void setup_example(workspace& all, example* ae)
 
   ae->partial_prediction = 0.;
   ae->num_features = 0;
-  ae->total_sum_feat_sq = 0;
+  ae->reset_total_sum_feat_sq();
   ae->loss = 0.;
   ae->_debug_current_reduction_depth = 0;
+  ae->use_permutations = all.permutations;
 
   ae->example_counter = static_cast<size_t>(all.example_parser->end_parsed_examples.load());
   if (!all.example_parser->emptylines_separate_examples) all.example_parser->in_pass_counter++;
@@ -484,32 +488,13 @@ void setup_example(workspace& all, example* ae)
     for (features& fs : *ae)
       for (auto& j : fs.indicies) j *= multiplier;
   ae->num_features = 0;
-  ae->total_sum_feat_sq = 0;
   for (const features& fs : *ae)
   {
     ae->num_features += fs.size();
-    ae->total_sum_feat_sq += fs.sum_feat_sq;
-  }
-
-  if (all.interactions.quadratics_wildcard_expansion)
-  {
-    // lock while adding interactions since reductions might also be adding their own interactions
-    std::unique_lock<std::mutex> lock(all.interactions.mut);
-    for (auto& ns : ae->indices)
-    {
-      if (ns < constant_namespace) { all.interactions.all_seen_namespaces.insert(ns); }
-    }
-    INTERACTIONS::expand_quadratics_wildcard_interactions(all.interactions);
   }
 
   // Set the interactions for this example to the global set.
   ae->interactions = &all.interactions;
-
-  size_t new_features_cnt;
-  float new_features_sum_feat_sq;
-  INTERACTIONS::eval_count_of_generated_ft(all, *ae, new_features_cnt, new_features_sum_feat_sq);
-  ae->num_features += new_features_cnt;
-  ae->total_sum_feat_sq += new_features_sum_feat_sq;
 }
 }  // namespace vw
 
@@ -543,7 +528,6 @@ void add_constant_feature(workspace& vw, example* ec)
 {
   ec->indices.push_back(constant_namespace);
   ec->feature_space[constant_namespace].push_back(1, constant);
-  ec->total_sum_feat_sq++;
   ec->num_features++;
   if (vw.audit || vw.hash_inv)
     ec->feature_space[constant_namespace].space_names.push_back(audit_strings_ptr(new audit_strings("", "Constant")));
@@ -629,6 +613,7 @@ void empty_example(workspace& /*all*/, example& ec)
   ec.end_pass = false;
   ec.is_newline = false;
   ec._reduction_features.clear();
+  ec.num_features_from_interactions = 0;
 }
 
 void clean_example(workspace& all, example& ec, bool rewind)
@@ -716,7 +701,7 @@ size_t get_tag_length(example* ec) { return ec->tag.size(); }
 
 const char* get_tag(example* ec) { return ec->tag.begin(); }
 
-size_t get_feature_number(example* ec) { return ec->num_features; }
+size_t get_feature_number(example* ec) { return ec->get_num_features(); }
 
 float get_confidence(example* ec) { return ec->confidence; }
 }  // namespace vw
