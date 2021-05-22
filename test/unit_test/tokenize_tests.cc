@@ -13,36 +13,19 @@
 #include <cstring>
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string) {
-  std::vector<std::string_view> container;
-  std::string str = "this is   a string  ";
-  tokenize(' ', str, container);
+  std::string str = "this is   a string       ";
+  const auto container = tokenize(' ', str);
 
   auto const expected_values = {"this", "is", "a", "string"};
   BOOST_CHECK_EQUAL_COLLECTIONS(
     container.begin(), container.end(),
     expected_values.begin(), expected_values.end());
-}
 
-BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty) {
-  std::vector<std::string_view> container;
-  std::string str = "this is   a string  ";
-  tokenize(' ', str, container, true);
+  str = "this is   a string";
+  const auto container2 = tokenize(' ', str);
 
-  auto const expected_values = {"this", "is","", "", "a", "string", "", ""};
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    container.begin(), container.end(),
-    expected_values.begin(), expected_values.end());
-}
-
-BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty_no_end_space) {
-  std::vector<std::string_view> container;
-  std::string str = "this is   a string";
-  tokenize(' ', str, container, true);
-
-  auto const expected_values = {"this", "is","", "", "a", "string"};
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    container.begin(), container.end(),
-    expected_values.begin(), expected_values.end());
+  auto const expected_values2 = {"this", "is", "a", "string"};
+  BOOST_CHECK_EQUAL_COLLECTIONS(container2.begin(), container2.end(), expected_values2.begin(), expected_values2.end());
 }
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_escaped) {
@@ -55,29 +38,9 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_escaped) {
     expected_values.begin(), expected_values.end());
 }
 
-BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty_escaped) {
-  std::string str = "this is   a string  ";
-  auto const container = escaped_tokenize(' ', str, true);
-
-  auto const expected_values = {"this", "is","", "", "a", "string", "", ""};
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    container.begin(), container.end(),
-    expected_values.begin(), expected_values.end());
-}
-
-BOOST_AUTO_TEST_CASE(tokenize_basic_string_allow_empty_no_end_space_escaped) {
-  std::string str = "this is   a string";
-  auto const container = escaped_tokenize(' ', str, true);
-
-  auto const expected_values = {"this", "is","", "", "a", "string"};
-  BOOST_CHECK_EQUAL_COLLECTIONS(
-    container.begin(), container.end(),
-    expected_values.begin(), expected_values.end());
-}
-
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_slash_escaped) {
   std::string str = "this is\\ a string";
-  auto const container = escaped_tokenize(' ', str, true);
+  auto const container = escaped_tokenize(' ', str);
 
   auto const expected_values = {"this", "is a", "string"};
   BOOST_CHECK_EQUAL_COLLECTIONS(
@@ -87,7 +50,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_slash_escaped) {
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_doubleslash_escaped) {
   std::string str = "this is\\\\ a string";
-  auto const container = escaped_tokenize(' ', str, true);
+  auto const container = escaped_tokenize(' ', str);
 
   auto const expected_values = {"this", "is\\" ,"a", "string"};
   BOOST_CHECK_EQUAL_COLLECTIONS(
@@ -97,7 +60,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_doubleslash_escaped) {
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_normal_char_slash_escaped) {
   std::string str = "this \\is a string";
-  auto const container = escaped_tokenize(' ', str, true);
+  auto const container = escaped_tokenize(' ', str);
 
   auto const expected_values = {"this", "is" ,"a", "string"};
   BOOST_CHECK_EQUAL_COLLECTIONS(
@@ -107,7 +70,7 @@ BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_normal_char_slash_escaped) {
 
 BOOST_AUTO_TEST_CASE(tokenize_basic_string_with_escape_final_character) {
   std::string str = "this is a string\\";
-  auto const container = escaped_tokenize(' ', str, true);
+  auto const container = escaped_tokenize(' ', str);
 
   auto const expected_values = {"this", "is" ,"a", "string"};
   BOOST_CHECK_EQUAL_COLLECTIONS(

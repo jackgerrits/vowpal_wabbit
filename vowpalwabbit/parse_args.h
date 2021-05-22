@@ -8,16 +8,16 @@
 // Used in parse_source
 struct input_options
 {
-  size_t port;
+  size_t port = 0;
   std::string pid_file;
 
-  bool cache;
+  bool cache = false;
   std::vector<std::string> cache_files;
-  bool json;
-  bool dsjson;
-  bool kill_cache;
-  bool compressed;
-  bool chain_hash_json;
+  bool json = false;
+  bool dsjson = false;
+  bool kill_cache = false;
+  bool compressed = false;
+  bool chain_hash_json = false;
   bool flatbuffer = false;
 #ifdef BUILD_EXTERNAL_PARSER
   // pointer because it is an incomplete type

@@ -85,10 +85,10 @@ float linear_inference(workspace& all, example& ec)
 template <uint8_t policy>
 float inference(workspace& all, example& ec)
 {
-  if (policy == constant_policy)
+  if constexpr (policy == constant_policy)
     return constant_inference(all);
 
-  else if (policy == linear_policy)
+  else if constexpr (policy == linear_policy)
     return linear_inference(all, ec);
 
   else
@@ -141,10 +141,10 @@ void linear_update(cbzo& data, example& ec)
 template <uint8_t policy, bool feature_mask_off>
 void update_weights(cbzo& data, example& ec)
 {
-  if (policy == constant_policy)
+  if constexpr (policy == constant_policy)
     constant_update<feature_mask_off>(data, ec);
 
-  else if (policy == linear_policy)
+  else if constexpr (policy == linear_policy)
     linear_update<feature_mask_off>(data, ec);
 
   else

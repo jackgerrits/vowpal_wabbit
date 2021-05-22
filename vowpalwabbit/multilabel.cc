@@ -71,14 +71,14 @@ void default_label(MULTILABEL::labels& ld) { ld.label_v.clear(); }
 bool test_label(MULTILABEL::labels& ld) { return ld.label_v.size() == 0; }
 
 void parse_label(
-    parser* p, shared_data*, MULTILABEL::labels& ld, std::vector<std::string_view>& words, reduction_features&)
+    parser* p, shared_data*, MULTILABEL::labels& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   switch (words.size())
   {
     case 0:
       break;
     case 1:
-      tokenize(',', words[0], p->parse_name);
+      p->parse_name = tokenize(',', words[0]);
 
       for (const auto& parse_name : p->parse_name)
       {
@@ -96,7 +96,7 @@ label_parser multilabel = {
   // default_label
   [](polylabel* v) { default_label(v->multilabels); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->multilabels, words, red_features);
   },
   // cache_label

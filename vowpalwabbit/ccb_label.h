@@ -18,7 +18,7 @@ namespace CCB
 struct conditional_contextual_bandit_outcome
 {
   // The cost of this class
-  float cost;
+  float cost = 0.f;
 
   // Either probability for top action or for all actions in action set.
   // Top action is always in first position.
@@ -104,7 +104,8 @@ struct label
 };
 
 void default_label(CCB::label& ld);
-void parse_label(parser* p, shared_data*, CCB::label& ld, std::vector<std::string_view>& words, ::reduction_features&);
+void parse_label(
+    parser* p, shared_data*, CCB::label& ld, const std::vector<std::string_view>& words, ::reduction_features&);
 void cache_label(CCB::label& ld, io_buf& cache);
 size_t read_cached_label(shared_data*, CCB::label& ld, io_buf& cache);
 

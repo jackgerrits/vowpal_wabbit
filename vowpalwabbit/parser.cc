@@ -597,8 +597,7 @@ void releaseFeatureSpace(primitive_feature_space* features, size_t len)
 
 void parse_example_label(workspace& all, example& ec, std::string label)
 {
-  std::vector<std::string_view> words;
-  tokenize(' ', label, words);
+  const auto words = tokenize(' ', label);
   all.example_parser->lbl_parser.parse_label(
       all.example_parser, all.example_parser->_shared_data, &ec.l, words, ec._reduction_features);
 }

@@ -18,25 +18,41 @@
 
 #include "io/logger.h"
 
-// chop up the string into a v_array or any compatible container of std::string_view.
-template <typename ContainerT>
-void tokenize(char delim, std::string_view s, ContainerT& ret, bool allow_empty = false)
+inline std::vector<std::string_view> tokenize(char delim, std::string_view s)
 {
-  ret.clear();
-  size_t end_pos = 0;
-  bool last_space = false;
+  std::vector<std::string_view> tokens;
+  size_t token_start = 0;
+  size_t token_end = 0;
 
-  while (!s.empty() && ((end_pos = s.find(delim)) != std::string_view::npos))
+  for (size_t i = 0; i < s.size(); i++)
   {
-    last_space = end_pos == 0;
-    if (allow_empty || end_pos > 0) ret.emplace_back(s.substr(0, end_pos));
-    s.remove_prefix(end_pos + 1);
+    if (s[i] == delim)
+    {
+      if (token_end - token_start > 0)
+      {
+        tokens.emplace_back(s.data() + token_start, token_end - token_start);
+        token_start = token_end + 1;
+        token_end = token_start;
+      }
+      else
+      {
+        token_start++;
+        token_end++;
+      }
+    }
+    else
+    {
+      token_end++;
+    }
   }
-  if (!s.empty() || (last_space && allow_empty)) ret.emplace_back(s.substr(0));
+
+  if (token_end - token_start > 0) { tokens.emplace_back(s.data() + token_start, token_end - token_start); }
+
+  return tokens;
 }
 
 // This function returns a vector of strings (not string_views) because we need to remove the escape characters
-std::vector<std::string> escaped_tokenize(char delim, std::string_view s, bool allow_empty = false);
+std::vector<std::string> escaped_tokenize(char delim, std::string_view s);
 
 inline const char* safe_index(const char* start, char v, const char* max)
 {

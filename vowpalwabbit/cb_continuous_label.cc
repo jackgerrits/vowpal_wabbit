@@ -47,7 +47,7 @@ void parse_pdf(
   for (size_t i = words_index; i < words.size(); i++)
   {
     if (words[i] == CHOSEN_ACTION) { break; /* no more pdf to parse*/ }
-    tokenize(':', words[i], p->parse_name);
+    p->parse_name = tokenize(':', words[i]);
     if (p->parse_name.empty() || p->parse_name.size() < 3) { continue; }
     vw::continuous_actions::pdf_segment seg;
     seg.left = float_of_string(p->parse_name[0]);
@@ -64,7 +64,7 @@ void parse_chosen_action(
   auto& cats_reduction_features = red_features.template get<vw::continuous_actions::reduction_features>();
   for (size_t i = words_index; i < words.size(); i++)
   {
-    tokenize(':', words[i], p->parse_name);
+    p->parse_name = tokenize(':', words[i]);
     if (p->parse_name.empty() || p->parse_name.size() < 1) { continue; }
     cats_reduction_features.chosen_action = float_of_string(p->parse_name[0]);
     break;  // there can only be one chosen action
@@ -77,7 +77,7 @@ namespace cb_continuous
 {
 ////////////////////////////////////////////////////
 // Begin: parse a,c,p label format
-void parse_label(parser* p, shared_data*, continuous_label& ld, std::vector<std::string_view>& words,
+void parse_label(parser* p, shared_data*, continuous_label& ld, const std::vector<std::string_view>& words,
     reduction_features& red_features)
 {
   ld.costs.clear();
@@ -96,7 +96,7 @@ void parse_label(parser* p, shared_data*, continuous_label& ld, std::vector<std:
     else if (words[i - 1] == CA_LABEL)
     {
       continuous_label_elm f{0.f, FLT_MAX, 0.f};
-      tokenize(':', words[i], p->parse_name);
+      p->parse_name = tokenize(':', words[i]);
 
       if (p->parse_name.empty() || p->parse_name.size() > 4)
         THROW("malformed cost specification: "
@@ -130,7 +130,7 @@ label_parser the_label_parser = {
   // default_label
   [](polylabel* v) { CB::default_label<continuous_label>(v->cb_cont); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->cb_cont, words, red_features);
   },
   // cache_label
