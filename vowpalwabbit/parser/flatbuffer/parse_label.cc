@@ -105,23 +105,9 @@ void parser::parse_cs_label(polylabel* l, const CS_Label* label)
   }
 }
 
-void parser::parse_mc_label(shared_data* sd, polylabel* l, const MultiClass* label)
+void parser::parse_mc_label(shared_data* /*sd*/, polylabel* l, const MultiClass* label)
 {
-  std::string named_label;
-  if (flatbuffers::IsFieldPresent(label, MultiClass::VT_NAMEDLABEL))
-    named_label = std::string(label->namedlabel()->c_str());
-  if (sd->ldict)
-  {
-    if (named_label.empty()) { l->multi.label = static_cast<uint32_t>(-1); }
-    else
-    {
-      l->multi.label = static_cast<uint32_t>(sd->ldict->get(std::string_view(named_label)));
-    }
-  }
-  else
-  {
-    l->multi.label = label->label();
-  }
+  l->multi.label = label->label();
   l->multi.weight = label->weight();
 }
 

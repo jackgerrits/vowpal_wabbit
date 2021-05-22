@@ -76,7 +76,6 @@
 #include "get_pmf.h"
 #include "pmf_to_pdf.h"
 #include "sample_pdf.h"
-#include "named_labels.h"
 #include "kskip_ngram_transformer.h"
 
 #include "io/io_adapter.h"
@@ -990,7 +989,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
 void parse_example_tweaks(options_i& options, workspace& all)
 {
-  std::string named_labels;
   std::string loss_function;
   float loss_parameter = 0.0;
   size_t early_terminate_passes;
@@ -1024,11 +1022,7 @@ void parse_example_tweaks(options_i& options, workspace& all)
                .help("Parameter \\tau associated with Quantile loss. Defaults to 0.5"))
       .add(make_option("l1", all.l1_lambda).help("l_1 lambda"))
       .add(make_option("l2", all.l2_lambda).help("l_2 lambda"))
-      .add(make_option("no_bias_regularization", all.no_bias).help("no bias in regularization"))
-      .add(make_option("named_labels", named_labels)
-               .keep()
-               .help("use names for labels (multiclass, etc.) rather than integers, argument specified all possible "
-                     "labels, comma-sep, eg \"--named_labels Noun,Verb,Adj,Punc\""));
+      .add(make_option("no_bias_regularization", all.no_bias).help("no bias in regularization"));
   options.add_and_parse(example_options);
 
   if (test_only || all.eta == 0.)
@@ -1047,12 +1041,6 @@ void parse_example_tweaks(options_i& options, workspace& all)
 
   if (options.was_supplied("min_prediction") || options.was_supplied("max_prediction") || test_only)
     all.set_minmax = noop_mm;
-
-  if (options.was_supplied("named_labels"))
-  {
-    all.sd->ldict = vw::make_unique<vw::named_labels>(named_labels);
-    if (!all.logger.quiet) *(all.trace_message) << "parsed " << all.sd->ldict->getK() << " named labels" << endl;
-  }
 
   all.loss = getLossFunction(all, loss_function, loss_parameter);
 

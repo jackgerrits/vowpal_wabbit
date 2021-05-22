@@ -100,7 +100,7 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(parser* p, shared_data* sd, label& ld, std::vector<std::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data* /*sd*/, label& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -109,13 +109,9 @@ void parse_label(parser* p, shared_data* sd, label& ld, std::vector<std::string_
   {
     float fx;
     name_value(words[0], p->parse_name, fx);
-    bool eq_shared = p->parse_name[0] == "***shared***";
-    bool eq_label = p->parse_name[0] == "***label***";
-    if (!sd->ldict)
-    {
-      eq_shared |= p->parse_name[0] == "shared";
-      eq_label |= p->parse_name[0] == "label";
-    }
+    bool eq_shared = p->parse_name[0] == "***shared***" || p->parse_name[0] == "shared";
+    bool eq_label = p->parse_name[0] == "***label***" || p->parse_name[0] == "label";
+
     if (eq_shared || eq_label)
     {
       if (eq_shared)
@@ -152,9 +148,7 @@ void parse_label(parser* p, shared_data* sd, label& ld, std::vector<std::string_
 
     if (p->parse_name.size() == 1 || p->parse_name.size() == 2 || p->parse_name.size() == 3)
     {
-      f.class_index = sd->ldict
-          ? sd->ldict->get(p->parse_name[0])
-          : static_cast<uint32_t>(hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0));
+      f.class_index = static_cast<uint32_t>(hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0));
       if (p->parse_name.size() == 1 && f.x >= 0)  // test examples are specified just by un-valued class #s
         f.x = FLT_MAX;
     }
@@ -205,20 +199,12 @@ void print_update(workspace& all, bool is_test, example& ec, multi_ex* ec_seq, b
     else
       label_buf = " known";
 
-    if (action_scores || all.sd->ldict)
+    if (action_scores)
     {
       std::ostringstream pred_buf;
 
       pred_buf << std::setw(all.sd->col_current_predict) << std::right << std::setfill(' ');
-      if (all.sd->ldict)
-      {
-        if (action_scores)
-          pred_buf << all.sd->ldict->get(ec.pred.a_s[0].action);
-        else
-          pred_buf << all.sd->ldict->get(prediction);
-      }
-      else
-        pred_buf << ec.pred.a_s[0].action;
+      pred_buf << ec.pred.a_s[0].action;
       if (action_scores) pred_buf << ".....";
       all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, label_buf, pred_buf.str(),
           num_current_features, all.progress_add, all.progress_arg);
@@ -257,12 +243,7 @@ void output_example(workspace& all, example& ec, const COST_SENSITIVE::label& cs
 
   for (auto& sink : all.final_prediction_sink)
   {
-    if (!all.sd->ldict) { all.print_by_ref(sink.get(), static_cast<float>(multiclass_prediction), 0, ec.tag); }
-    else
-    {
-      std::string_view sv_pred = all.sd->ldict->get(multiclass_prediction);
-      all.print_text_by_ref(sink.get(), std::string{sv_pred}, ec.tag);
-    }
+    all.print_by_ref(sink.get(), static_cast<float>(multiclass_prediction), 0, ec.tag);
   }
 
   if (all.raw_prediction != nullptr)

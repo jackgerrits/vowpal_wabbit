@@ -193,10 +193,7 @@ void finish_example_scores(workspace& all, oaa& o, example& ec)
   for (uint32_t i = 0; i < o.k; i++)
   {
     if (i > 0) outputStringStream << ' ';
-    if (all.sd->ldict) { outputStringStream << all.sd->ldict->get(i + 1); }
-    else
-      outputStringStream << i + 1;
-    outputStringStream << ':' << ec.pred.scalars[i];
+    outputStringStream << i + 1 << ':' << ec.pred.scalars[i];
   }
   const auto ss_str = outputStringStream.str();
   for (auto& sink : all.final_prediction_sink) all.print_text_by_ref(sink.get(), ss_str, ec.tag);
@@ -231,9 +228,6 @@ vw::LEARNER::base_learner* oaa_setup(options_i& options, workspace& all)
       .add(make_option("scores", scores).help("output raw scores per class"));
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
-
-  if (all.sd->ldict && (data->k != all.sd->ldict->getK()))
-    THROW("error: you have " << all.sd->ldict->getK() << " named labels; use that as the argument to oaa")
 
   data->all = &all;
   data->pred = calloc_or_throw<polyprediction>(data->k);

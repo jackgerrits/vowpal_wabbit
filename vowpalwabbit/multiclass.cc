@@ -50,26 +50,22 @@ size_t read_cached_label(shared_data*, label_t& ld, io_buf& cache)
 float weight(label_t& ld) { return (ld.weight > 0) ? ld.weight : 0.f; }
 bool test_label(const label_t& ld) { return ld.label == static_cast<uint32_t>(-1); }
 
-void parse_label(parser*, shared_data* sd, label_t& ld, std::vector<std::string_view>& words, reduction_features&)
+void parse_label(parser*, shared_data*, label_t& ld, std::vector<std::string_view>& words, reduction_features&)
 {
   switch (words.size())
   {
     case 0:
       break;
     case 1:
-      if (sd->ldict) { ld.label = sd->ldict->get(words[0]); }
-      else
-      {
-        char* char_after_int = nullptr;
-        ld.label = int_of_string(words[0], char_after_int);
-        if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
-        { THROW("malformed example: label has trailing character(s): " << *char_after_int); }
-      }
+    {
+      char* char_after_int = nullptr;
+      ld.label = int_of_string(words[0], char_after_int);
+      if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
+      { THROW("malformed example: label has trailing character(s): " << *char_after_int); }
       ld.weight = 1.0;
       break;
+    }
     case 2:
-      if (sd->ldict) { ld.label = sd->ldict->get(words[0]); }
-      else
       {
         char* char_after_int = nullptr;
         ld.label = int_of_string(words[0], char_after_int);
@@ -82,8 +78,7 @@ void parse_label(parser*, shared_data* sd, label_t& ld, std::vector<std::string_
       THROW("malformed example, words.size() = " << words.size());
   }
   if (ld.label == 0)
-    THROW("label 0 is not allowed for multiclass.  Valid labels are {1,k}"
-        << (sd->ldict ? "\nthis likely happened because you specified an invalid label with named labels" : ""));
+    THROW("label 0 is not allowed for multiclass. Valid labels are {1,k}");
 }
 
 // clang-format off
@@ -105,15 +100,6 @@ label_parser mc_label = {
   label_type_t::multiclass
 };
 // clang-format on
-
-void print_label_pred(workspace& all, example& ec, uint32_t prediction)
-{
-  std::string_view sv_label = all.sd->ldict->get(ec.l.multi.label);
-  std::string_view sv_pred = all.sd->ldict->get(prediction);
-  all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass,
-      sv_label.empty() ? "unknown" : std::string{sv_label}, sv_pred.empty() ? "unknown" : std::string{sv_pred},
-      ec.get_num_features(), all.progress_add, all.progress_arg);
-}
 
 void print_probability(workspace& all, example& ec, uint32_t prediction)
 {
@@ -151,10 +137,7 @@ void print_update(workspace& all, example& ec, uint32_t prediction)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
-    if (!all.sd->ldict)
-      T(all, ec, prediction);
-    else
-      print_label_pred(all, ec, ec.pred.multiclass);
+    T(all, ec, prediction);
   }
 }
 
@@ -173,13 +156,7 @@ void finish_example(workspace& all, example& ec, bool update_loss)
       ec.get_num_features());
 
   for (auto& sink : all.final_prediction_sink)
-    if (!all.sd->ldict)
-      all.print_by_ref(sink.get(), static_cast<float>(ec.pred.multiclass), 0, ec.tag);
-    else
-    {
-      std::string_view sv_pred = all.sd->ldict->get(ec.pred.multiclass);
-      all.print_text_by_ref(sink.get(), std::string{sv_pred}, ec.tag);
-    }
+    all.print_by_ref(sink.get(), static_cast<float>(ec.pred.multiclass), 0, ec.tag);
 
   MULTICLASS::print_update<direct_print_update>(all, ec, ec.pred.multiclass);
   vw::finish_example(all, ec);
