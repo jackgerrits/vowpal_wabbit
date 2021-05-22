@@ -36,3 +36,4 @@
 - Remove spanning tree
 - vw renamed to workspace
 - VW namespace changed to vw
+- Remove ldict

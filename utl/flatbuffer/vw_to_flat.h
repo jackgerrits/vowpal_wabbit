@@ -10,7 +10,6 @@ VW_WARNING_DISABLE_BADLY_FORMED_XML
 #include "parser/flatbuffer/generated/example_generated.h"
 VW_WARNING_STATE_POP
 #include "simple_label.h"
-#include "named_labels.h"
 
 struct ExampleBuilder
 {
@@ -74,7 +73,7 @@ private:
   void create_cb_label(example* v, ExampleBuilder& ex_builder);
   void create_ccb_label(example* v, ExampleBuilder& ex_builder);
   void create_cb_eval_label(example* v, ExampleBuilder& ex_builder);
-  void create_mc_label(vw::named_labels* ldict, example* v, ExampleBuilder& ex_builder);
+  void create_mc_label(example* v, ExampleBuilder& ex_builder);
   void create_multi_label(example* v, ExampleBuilder& ex_builder);
   void create_slates_label(example* v, ExampleBuilder& ex_builder);
   void create_cs_label(example* v, ExampleBuilder& ex_builder);

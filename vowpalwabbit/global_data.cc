@@ -14,7 +14,6 @@
 #include "gd.h"
 #include "vw_exception.h"
 #include "future_compat.h"
-#include "named_labels.h"
 #include "shared_data.h"
 #ifdef BUILD_FLATBUFFERS
 #  include "parser/flatbuffer/parse_example_flatbuffer.h"

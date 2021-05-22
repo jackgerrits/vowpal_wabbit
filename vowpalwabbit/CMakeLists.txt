@@ -106,7 +106,6 @@ set(vw_all_headers
   multilabel_oaa.h
   multilabel.h
   numeric_casts.h
-  named_labels.h
   kskip_ngram_transformer.h
   oaa.h
   object_pool.h
@@ -225,7 +224,6 @@ set(vw_all_sources
   multiclass.cc
   multilabel_oaa.cc
   multilabel.cc
-  named_labels.cc
   kskip_ngram_transformer.cc
   oaa.cc
   offset_tree.cc
