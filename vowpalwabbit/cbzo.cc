@@ -116,8 +116,7 @@ void linear_per_feature_update(linear_update_data& upd_data, float x, uint64_t f
 
   if (feature_mask_off || fw != 0.0f)
   {
-    float update =
-        upd_data.mult * (upd_data.part_grad * x + (l1_grad(*upd_data.all, fi) + l2_grad(*upd_data.all, fi)));
+    float update = upd_data.mult * (upd_data.part_grad * x + (l1_grad(*upd_data.all, fi) + l2_grad(*upd_data.all, fi)));
     set_weight(*upd_data.all, fi, 0, fw + update);
   }
 }
