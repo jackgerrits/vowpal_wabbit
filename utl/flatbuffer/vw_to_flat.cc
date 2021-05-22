@@ -226,21 +226,21 @@ void to_flat::create_slates_label(example* v, ExampleBuilder& ex_builder)
   auto e_type = v->l.slates.type;
   ex_builder.label_type = vw::parsers::flatbuffer::Label_Slates_Label;
 
-  if (e_type == vw::slates::shared)
+  if (e_type == vw::slates::example_type::shared)
   {
     auto type = vw::parsers::flatbuffer::CCB_Slates_example_type_shared;
     ex_builder.label = vw::parsers::flatbuffer::CreateSlates_LabelDirect(
         _builder, type, weight, v->l.slates.labeled, v->l.slates.cost, 0U, nullptr)
                            .Union();
   }
-  else if (e_type == vw::slates::action)
+  else if (e_type == vw::slates::example_type::action)
   {
     auto type = vw::parsers::flatbuffer::CCB_Slates_example_type_action;
     ex_builder.label = vw::parsers::flatbuffer::CreateSlates_LabelDirect(
         _builder, type, weight, false, 0.0, v->l.slates.slot_id, nullptr)
                            .Union();
   }
-  else if (e_type == vw::slates::slot)
+  else if (e_type == vw::slates::example_type::slot)
   {
     auto type = vw::parsers::flatbuffer::CCB_Slates_example_type_slot;
     for (auto const& as : v->l.slates.probabilities)
@@ -385,7 +385,7 @@ void to_flat::convert_txt_to_flat(workspace& all)
           ((all.example_parser->lbl_parser.label_type == label_type_t::ccb &&
                ae->l.conditional_contextual_bandit.type == CCB::example_type::slot) ||
               (all.example_parser->lbl_parser.label_type == label_type_t::slates &&
-                  ae->l.slates.type == vw::slates::slot)))
+                  ae->l.slates.type == vw::slates::example_type::slot)))
       {
         ex_builder.namespaces.insert(ex_builder.namespaces.end(), namespaces.begin(), namespaces.end());
         ex_builder.is_newline = ae->is_newline;

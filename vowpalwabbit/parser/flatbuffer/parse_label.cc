@@ -123,18 +123,18 @@ void parser::parse_slates_label(polylabel* l, const Slates_Label* label)
   {
     l->slates.labeled = label->labeled();
     l->slates.cost = label->cost();
-    l->slates.type = vw::slates::shared;
+    l->slates.type = vw::slates::example_type::shared;
   }
   else if (label->example_type() == vw::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_action)
   {
     l->slates.slot_id = label->slot();
-    l->slates.type = vw::slates::action;
+    l->slates.type = vw::slates::example_type::action;
   }
   else if (label->example_type() == vw::parsers::flatbuffer::CCB_Slates_example_type::CCB_Slates_example_type_slot)
   {
     l->slates.labeled = label->labeled();
     l->slates.probabilities = v_init<ACTION_SCORE::action_score>();
-    l->slates.type = vw::slates::slot;
+    l->slates.type = vw::slates::example_type::slot;
 
     for (auto const& as : *(label->probabilities())) l->slates.probabilities.push_back({as->action(), as->score()});
   }
