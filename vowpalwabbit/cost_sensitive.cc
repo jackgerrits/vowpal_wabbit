@@ -101,7 +101,8 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(parser* p, shared_data* /*sd*/, label& ld, const std::vector<std::string_view>& words, reduction_features&)
+void parse_label(
+    parser* p, shared_data* /*sd*/, label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -109,7 +110,7 @@ void parse_label(parser* p, shared_data* /*sd*/, label& ld, const std::vector<st
   if (words.size() == 1)
   {
     float fx;
-    p->parse_name= name_value(words[0], fx);
+    p->parse_name = name_value(words[0], fx);
     bool eq_shared = p->parse_name[0] == "***shared***" || p->parse_name[0] == "shared";
     bool eq_label = p->parse_name[0] == "***label***" || p->parse_name[0] == "label";
 

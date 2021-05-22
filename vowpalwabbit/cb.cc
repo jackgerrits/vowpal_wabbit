@@ -32,7 +32,8 @@ std::pair<bool, cb_class> get_observed_cost_cb(const label& ld)
   return std::make_pair(false, CB::cb_class{});
 }
 
-void parse_label(parser* p, shared_data*, CB::label& ld, const std::vector<std::string_view>& words, reduction_features&)
+void parse_label(
+    parser* p, shared_data*, CB::label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   ld.weight = 1.0;
 

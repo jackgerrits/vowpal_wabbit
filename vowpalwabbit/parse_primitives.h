@@ -46,10 +46,7 @@ inline std::vector<std::string_view> tokenize(char delim, std::string_view s)
     }
   }
 
-  if (token_end - token_start > 0)
-  {
-    tokens.emplace_back(s.data() + token_start, token_end - token_start);
-  }
+  if (token_end - token_start > 0) { tokens.emplace_back(s.data() + token_start, token_end - token_start); }
 
   return tokens;
 }

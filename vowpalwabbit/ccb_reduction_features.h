@@ -8,7 +8,6 @@
 
 #include <cstdint>
 
-
 namespace CCB {
 enum class example_type : uint8_t
 {
@@ -34,4 +33,4 @@ inline std::ostream& operator<<(std::ostream& os, CCB::example_type enum_val)
   return os;
 }
 
-}
+}  // namespace std
