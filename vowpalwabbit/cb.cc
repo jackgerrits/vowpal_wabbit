@@ -32,7 +32,7 @@ std::pair<bool, cb_class> get_observed_cost_cb(const label& ld)
   return std::make_pair(false, CB::cb_class{});
 }
 
-void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data*, CB::label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -43,7 +43,7 @@ void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<std::string
     // for example "1:2:0.5"
     // action = 1, cost = 2, probability = 0.5
     cb_class f;
-    tokenize(':', word, p->parse_name);
+    p->parse_name = tokenize(':', word);
 
     if (p->parse_name.empty() || p->parse_name.size() > 3) { THROW("malformed cost specification: " << word); }
 
@@ -89,7 +89,7 @@ label_parser cb_label = {
   // default_label
   [](polylabel* v) { CB::default_label(v->cb); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     CB::parse_label(p, sd, v->cb, words, red_features);
   },
   // cache_label
@@ -192,18 +192,15 @@ void default_label(CB_EVAL::label& ld)
 
 bool test_label(CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
 
-void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<std::string_view>& words,
+void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, const std::vector<std::string_view>& words,
     reduction_features& red_features)
 {
   if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
 
   ld.action = (uint32_t)hashstring(words[0].data(), words[0].length(), 0);
 
-  // Removing the first element of a vector is not efficient at all, every element must be copied/moved.
-  const auto stashed_first_token = std::move(words[0]);
-  words.erase(words.begin());
-  CB::parse_label(p, sd, ld.event, words, red_features);
-  words.insert(words.begin(), std::move(stashed_first_token));
+  std::vector<std::string_view> all_except_first(words.begin() + 1, words.end());
+  CB::parse_label(p, sd, ld.event, all_except_first, red_features);
 }
 
 // clang-format off
@@ -211,7 +208,7 @@ label_parser cb_eval = {
   // default_label
   [](polylabel* v) { CB_EVAL::default_label(v->cb_eval); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     CB_EVAL::parse_label(p, sd, v->cb_eval, words, red_features);
   },
   // cache_label

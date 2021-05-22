@@ -13,10 +13,9 @@
 
 void parse_label(label_parser& lp, parser* p, shared_data* sd, std::string_view label, polylabel& l)
 {
-  tokenize(' ', label, p->words);
   lp.default_label(&l);
   reduction_features red_fts;
-  lp.parse_label(p, sd, &l, p->words, red_fts);
+  lp.parse_label(p, sd, &l, tokenize(' ', label), red_fts);
 }
 
 BOOST_AUTO_TEST_CASE(multiclass_label_parser)

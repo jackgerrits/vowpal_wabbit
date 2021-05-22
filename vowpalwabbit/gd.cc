@@ -111,7 +111,7 @@ inline void update_feature(float& update, float x, float& fw)
   bool modify = x < FLT_MAX && x > -FLT_MAX && (feature_mask_off || fw != 0.);
   if (modify)
   {
-    if VW_STD17_CONSTEXPR (spare != 0) { x *= w[spare]; }
+    if constexpr (spare != 0) { x *= w[spare]; }
     w[0] += update * x;
   }
 }
@@ -120,9 +120,9 @@ inline void update_feature(float& update, float x, float& fw)
 template <bool sqrt_rate, size_t adaptive, size_t normalized>
 float average_update(float total_weight, float normalized_sum_norm_x, float neg_norm_power)
 {
-  if VW_STD17_CONSTEXPR (normalized != 0)
+  if constexpr (normalized != 0)
   {
-    if (sqrt_rate)
+    if constexpr (sqrt_rate)
     {
       float avg_norm = (total_weight / normalized_sum_norm_x);
       if (adaptive)
@@ -131,8 +131,11 @@ float average_update(float total_weight, float normalized_sum_norm_x, float neg_
         return avg_norm;
     }
     else
+    {
       return powf((normalized_sum_norm_x / total_weight), neg_norm_power);
+    }
   }
+
   return 1.f;
 }
 

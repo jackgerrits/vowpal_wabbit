@@ -8,11 +8,12 @@
 
 #include "label_parser.h"
 #include "action_score.h"
+
 namespace vw
 {
 namespace slates
 {
-enum example_type : uint8_t
+enum class example_type : uint8_t
 {
   unset = 0,
   shared = 1,
@@ -56,10 +57,20 @@ struct label
 
 void default_label(vw::slates::label& v);
 void parse_label(
-    parser* p, shared_data* /*sd*/, vw::slates::label& ld, std::vector<std::string_view>& words, reduction_features&);
+    parser* p, shared_data* /*sd*/, vw::slates::label& ld, const std::vector<std::string_view>& words, reduction_features&);
 void cache_label(vw::slates::label& ld, io_buf& cache);
 size_t read_cached_label(shared_data* /*sd*/, vw::slates::label& ld, io_buf& cache);
 
 extern label_parser slates_label_parser;
 }  // namespace slates
 }  // namespace vw
+
+namespace std
+{
+inline std::ostream& operator<<(std::ostream& os, vw::slates::example_type enum_val)
+{
+  os << static_cast<uint8_t>(enum_val);
+  return os;
+}
+
+}

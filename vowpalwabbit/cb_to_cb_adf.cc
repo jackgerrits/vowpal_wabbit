@@ -30,17 +30,21 @@ void predict_or_learn(cb_to_cb_adf& data, multi_learner& base, example& ec)
   CB::label ld;
   bool is_test_label = CB::is_test_label(ec.l.cb);
 
-  uint32_t chosen_action;
-  if (!is_test_label) chosen_action = ec.l.cb.costs[0].action - 1;
-
-  if (!is_test_label && chosen_action < data.adf_data.num_actions)
+  uint32_t chosen_action = 0;
+  bool should_restore_chosen_action = false;
+  if (!is_test_label)
   {
-    ld = std::move(data.adf_data.ecs[chosen_action]->l.cb);
-    data.adf_data.ecs[chosen_action]->l.cb = std::move(ec.l.cb);
+    chosen_action = ec.l.cb.costs[0].action - 1;
+    if (chosen_action < data.adf_data.num_actions)
+    {
+      ld = std::move(data.adf_data.ecs[chosen_action]->l.cb);
+      data.adf_data.ecs[chosen_action]->l.cb = std::move(ec.l.cb);
+      should_restore_chosen_action = true;
+    }
   }
 
-  auto restore_guard = vw::scope_exit([&ld, &data, &ec, &chosen_action, &is_test_label] {
-    if (!is_test_label && chosen_action < data.adf_data.num_actions)
+  auto restore_guard = vw::scope_exit([&ld, &data, &ec, should_restore_chosen_action, chosen_action] {
+    if (should_restore_chosen_action)
     {
       ec.l.cb = std::move(data.adf_data.ecs[chosen_action]->l.cb);
       data.adf_data.ecs[chosen_action]->l.cb = std::move(ld);

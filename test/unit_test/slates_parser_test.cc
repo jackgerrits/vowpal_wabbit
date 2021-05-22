@@ -14,10 +14,9 @@
 
 void parse_slates_label(parser* p, std::string_view label, vw::slates::label& l)
 {
-  tokenize(' ', label, p->words);
   vw::slates::default_label(l);
   reduction_features red_fts;
-  vw::slates::parse_label(p, nullptr, l, p->words, red_fts);
+  vw::slates::parse_label(p, nullptr, l, tokenize(' ', label), red_fts);
 }
 
 BOOST_AUTO_TEST_CASE(slates_parse_label)

@@ -18,9 +18,9 @@ namespace logger = vw::io::logger;
 
 namespace COST_SENSITIVE
 {
-void name_value(std::string_view& s, std::vector<std::string_view>& name, float& v)
+std::vector<std::string_view> name_value(std::string_view s, float& v)
 {
-  tokenize(':', s, name);
+  auto name = tokenize(':', s);
 
   switch (name.size())
   {
@@ -35,6 +35,7 @@ void name_value(std::string_view& s, std::vector<std::string_view>& name, float&
     default:
       logger::errlog_error("example with a wierd name. What is '{}'?", s);
   }
+  return name;
 }
 
 char* bufread_label(label& ld, char* c, io_buf& cache)
@@ -100,7 +101,7 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(parser* p, shared_data* /*sd*/, label& ld, std::vector<std::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data* /*sd*/, label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -108,7 +109,7 @@ void parse_label(parser* p, shared_data* /*sd*/, label& ld, std::vector<std::str
   if (words.size() == 1)
   {
     float fx;
-    name_value(words[0], p->parse_name, fx);
+    p->parse_name= name_value(words[0], fx);
     bool eq_shared = p->parse_name[0] == "***shared***" || p->parse_name[0] == "shared";
     bool eq_label = p->parse_name[0] == "***label***" || p->parse_name[0] == "label";
 
@@ -142,7 +143,7 @@ void parse_label(parser* p, shared_data* /*sd*/, label& ld, std::vector<std::str
   for (unsigned int i = 0; i < words.size(); i++)
   {
     wclass f = {0., 0, 0., 0.};
-    name_value(words[i], p->parse_name, f.x);
+    p->parse_name = name_value(words[i], f.x);
 
     if (p->parse_name.size() == 0) THROW(" invalid cost: specification -- no names on: " << words[i]);
 
@@ -164,7 +165,7 @@ label_parser cs_label = {
   // default_label
   [](polylabel* v) { default_label(v->cs); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->cs, words, red_features);
   },
   // cache_label

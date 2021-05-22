@@ -11,13 +11,12 @@
 #include "hash.h"
 #include "vw_exception.h"
 
-std::vector<std::string> escaped_tokenize(char delim, std::string_view s, bool allow_empty)
+std::vector<std::string> escaped_tokenize(char delim, std::string_view s)
 {
   std::vector<std::string> tokens;
   std::string current;
   size_t end_pos = 0;
   const char delims[3] = {'\\', delim, '\0'};
-  bool last_space = false;
 
   while (!s.empty() && ((end_pos = s.find_first_of(delims)) != std::string_view::npos))
   {
@@ -35,18 +34,17 @@ std::vector<std::string> escaped_tokenize(char delim, std::string_view s, bool a
     }
     else
     {
-      last_space = end_pos == 0;
       current.append(s.data(), end_pos);
       s.remove_prefix(end_pos + 1);
-      if (!current.empty() || allow_empty) { tokens.push_back(current); }
-      current.clear();
+      if (!current.empty()) { tokens.emplace_back(std::move(current)); }
+      current = std::string{};
     }
   }
   // write whatever's left into the vector
-  if (!s.empty() || !current.empty() || (last_space && allow_empty))
+  if (!s.empty() || !current.empty())
   {
     current.append(s.data(), s.length());
-    tokens.push_back(current);
+    tokens.emplace_back(std::move(current));
   }
   return tokens;
 }

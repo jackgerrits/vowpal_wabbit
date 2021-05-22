@@ -74,7 +74,7 @@ bool test_label(label_data& ld) { return ld.label == FLT_MAX; }
 // Example: 0 1 0.5 'third_house | price:.53 sqft:.32 age:.87 1924
 // label := 0, weight := 1, initial := 0.5
 void parse_simple_label(
-    parser*, shared_data* sd, label_data& ld, std::vector<std::string_view>& words, reduction_features& red_features)
+    parser*, shared_data* sd, label_data& ld, const std::vector<std::string_view>& words, reduction_features& red_features)
 {
   auto& simple_red_features = red_features.template get<simple_label_reduction_features>();
   switch (words.size())
@@ -104,7 +104,7 @@ label_parser simple_label_parser = {
   // default_label
   [](polylabel* v) { default_simple_label(v->simple); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_simple_label(p, sd, v->simple, words, red_features);
   },
   // cache_label

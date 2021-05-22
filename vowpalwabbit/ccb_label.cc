@@ -196,15 +196,13 @@ ACTION_SCORE::action_score convert_to_score(
 }
 
 //<action>:<cost>:<probability>,<action>:<probability>,<action>:<probability>,…
-CCB::conditional_contextual_bandit_outcome* parse_outcome(std::string_view& outcome)
+CCB::conditional_contextual_bandit_outcome* parse_outcome(std::string_view outcome)
 {
   auto& ccb_outcome = *(new CCB::conditional_contextual_bandit_outcome());
 
-  std::vector<std::string_view> split_commas;
-  tokenize(',', outcome, split_commas);
+  std::vector<std::string_view> split_commas = tokenize(',', outcome);
 
-  std::vector<std::string_view> split_colons;
-  tokenize(':', split_commas[0], split_colons);
+  std::vector<std::string_view> split_colons = tokenize(':', split_commas[0]);
 
   if (split_colons.size() != 3) THROW("Malformed ccb label");
 
@@ -218,7 +216,7 @@ CCB::conditional_contextual_bandit_outcome* parse_outcome(std::string_view& outc
 
   for (size_t i = 1; i < split_commas.size(); i++)
   {
-    tokenize(':', split_commas[i], split_colons);
+    split_colons = tokenize(':', split_commas[i]);
     if (split_colons.size() != 2) THROW("Must be action probability pairs");
     ccb_outcome.probabilities.push_back(convert_to_score(split_colons[0], split_colons[1]));
   }
@@ -231,7 +229,7 @@ void parse_explicit_inclusions(CCB::label& ld, const std::vector<std::string_vie
   for (const auto& inclusion : split_inclusions) { ld.explicit_included_actions.push_back(int_of_string(inclusion)); }
 }
 
-void parse_label(parser* p, shared_data*, label& ld, std::vector<std::string_view>& words, ::reduction_features&)
+void parse_label(parser* /*p*/, shared_data*, label& ld, const std::vector<std::string_view>& words, ::reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -266,8 +264,7 @@ void parse_label(parser* p, shared_data*, label& ld, std::vector<std::string_vie
       }
       else
       {
-        tokenize(',', words[i], p->parse_name);
-        parse_explicit_inclusions(ld, p->parse_name);
+        parse_explicit_inclusions(ld, tokenize(',', words[i]));
       }
     }
 
@@ -297,7 +294,7 @@ label_parser ccb_label_parser = {
   // default_label
   [](polylabel* v) { default_label(v->conditional_contextual_bandit); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, ::reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, ::reduction_features& red_features) {
     parse_label(p, sd, v->conditional_contextual_bandit, words, red_features);
   },
   // cache_label

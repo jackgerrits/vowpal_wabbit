@@ -50,7 +50,7 @@ size_t read_cached_label(shared_data*, label_t& ld, io_buf& cache)
 float weight(label_t& ld) { return (ld.weight > 0) ? ld.weight : 0.f; }
 bool test_label(const label_t& ld) { return ld.label == static_cast<uint32_t>(-1); }
 
-void parse_label(parser*, shared_data*, label_t& ld, std::vector<std::string_view>& words, reduction_features&)
+void parse_label(parser*, shared_data*, label_t& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   switch (words.size())
   {
@@ -85,7 +85,7 @@ label_parser mc_label = {
   // default_label
   [](polylabel* v) { default_label(v->multi); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<std::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->multi, words, red_features);
   },
   // cache_label

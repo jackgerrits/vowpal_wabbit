@@ -1589,8 +1589,7 @@ char** to_argv_escaped(std::string const& s, int& argc)
 char** to_argv(std::string const& s, int& argc)
 {
   std::string_view strview(s);
-  std::vector<std::string_view> foo;
-  tokenize(' ', strview, foo);
+  const auto foo = tokenize(' ', strview);
 
   char** argv = calloc_or_throw<char*>(foo.size() + 1);
   // small optimization to avoid a string copy before tokenizing
