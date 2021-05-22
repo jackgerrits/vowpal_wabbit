@@ -107,10 +107,6 @@ Example options:
   --l1 arg                         l_1 lambda
   --l2 arg                         l_2 lambda
   --no_bias_regularization         no bias in regularization
-  --named_labels arg               use names for labels (multiclass, etc.) 
-                                   rather than integers, argument specified all
-                                   possible labels, comma-sep, eg 
-                                   "--named_labels Noun,Verb,Adj,Punc"
 Output model:
   -f [ --final_regressor ] arg          Final regressor
   --readable_model arg                  Output human-readable final regressor 
