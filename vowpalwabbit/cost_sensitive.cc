@@ -242,9 +242,7 @@ void output_example(workspace& all, example& ec, const COST_SENSITIVE::label& cs
   all.sd->update(ec.test_only, !test_label(cs_label), loss, ec.weight, ec.get_num_features());
 
   for (auto& sink : all.final_prediction_sink)
-  {
-    all.print_by_ref(sink.get(), static_cast<float>(multiclass_prediction), 0, ec.tag);
-  }
+  { all.print_by_ref(sink.get(), static_cast<float>(multiclass_prediction), 0, ec.tag); }
 
   if (all.raw_prediction != nullptr)
   {

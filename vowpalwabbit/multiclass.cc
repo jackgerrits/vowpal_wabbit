@@ -77,8 +77,7 @@ void parse_label(parser*, shared_data*, label_t& ld, std::vector<std::string_vie
     default:
       THROW("malformed example, words.size() = " << words.size());
   }
-  if (ld.label == 0)
-    THROW("label 0 is not allowed for multiclass. Valid labels are {1,k}");
+  if (ld.label == 0) THROW("label 0 is not allowed for multiclass. Valid labels are {1,k}");
 }
 
 // clang-format off
@@ -136,9 +135,7 @@ template <void (*T)(workspace&, example&, uint32_t)>
 void print_update(workspace& all, example& ec, uint32_t prediction)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
-  {
-    T(all, ec, prediction);
-  }
+  { T(all, ec, prediction); }
 }
 
 void print_update_with_probability(workspace& all, example& ec, uint32_t pred)

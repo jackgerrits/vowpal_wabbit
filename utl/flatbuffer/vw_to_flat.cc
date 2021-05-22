@@ -297,7 +297,7 @@ void to_flat::convert_txt_to_flat(workspace& all)
         to_flat::create_multi_label(ae, ex_builder);
         break;
       case label_type_t::multiclass:
-        to_flat::create_mc_label(nullptr/*unused*/, ae, ex_builder);
+        to_flat::create_mc_label(nullptr /*unused*/, ae, ex_builder);
         break;
       case label_type_t::cs:
         to_flat::create_cs_label(ae, ex_builder);
