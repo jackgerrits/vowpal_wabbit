@@ -136,9 +136,9 @@ label_parser the_label_parser = {
   [](polylabel* v, reduction_features&, io_buf& cache) { return CB::read_cached_label<continuous_label, continuous_label_elm>(v->cb_cont, cache); },
   // get_weight
   // CB::weight just returns 1.f? This seems like it could be a bug...
-  [](polylabel*, const reduction_features&) { return 1.f; },
+  [](const polylabel*, const reduction_features&) { return 1.f; },
   // test_label
-  [](polylabel* v) { return CB::is_test_label<continuous_label, continuous_label_elm>(v->cb_cont); },
+  [](const polylabel* v) { return CB::is_test_label<continuous_label, continuous_label_elm>(v->cb_cont); },
   label_type_t::continuous
 };
 

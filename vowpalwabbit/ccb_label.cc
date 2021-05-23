@@ -108,7 +108,7 @@ size_t read_cached_label(label& ld, io_buf& cache)
   return read_count;
 }
 
-float ccb_weight(CCB::label& ld) { return ld.weight; }
+float ccb_weight(const CCB::label& ld) { return ld.weight; }
 
 void cache_label(label& ld, io_buf& cache)
 {
@@ -172,7 +172,7 @@ void default_label(label& ld)
   ld.weight = 1.0;
 }
 
-bool test_label(CCB::label& ld) { return ld.outcome == nullptr; }
+bool test_label(const CCB::label& ld) { return ld.outcome == nullptr; }
 
 ACTION_SCORE::action_score convert_to_score(
     const std::string_view& action_id_str, const std::string_view& probability_str)
@@ -302,9 +302,9 @@ label_parser ccb_label_parser = {
   // read_cached_label
   [](polylabel* v, ::reduction_features&, io_buf& cache) { return read_cached_label(v->conditional_contextual_bandit, cache); },
   // get_weight
-  [](polylabel* v, const ::reduction_features&) { return ccb_weight(v->conditional_contextual_bandit); },
+  [](const polylabel* v, const ::reduction_features&) { return ccb_weight(v->conditional_contextual_bandit); },
   // test_label
-  [](polylabel* v) { return test_label(v->conditional_contextual_bandit); },
+  [](const polylabel* v) { return test_label(v->conditional_contextual_bandit); },
   label_type_t::ccb
 };
 // clang-format on

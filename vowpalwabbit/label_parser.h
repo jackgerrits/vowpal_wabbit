@@ -35,7 +35,7 @@ struct label_parser
   void (*parse_label)(polylabel*, const std::vector<std::string_view>&, reduction_features&);
   void (*cache_label)(polylabel*, reduction_features&, io_buf& cache);
   size_t (*read_cached_label)(polylabel*, reduction_features&, io_buf& cache);
-  float (*get_weight)(polylabel*, const reduction_features&);
-  bool (*test_label)(polylabel*);
+  float (*get_weight)(const polylabel*, const reduction_features&);
+  bool (*test_label)(const polylabel*);
   label_type_t label_type;
 };

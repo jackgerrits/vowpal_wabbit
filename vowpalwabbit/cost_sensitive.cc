@@ -66,8 +66,6 @@ size_t read_cached_label(label& ld, io_buf& cache)
   return total;
 }
 
-float weight(label&) { return 1.; }
-
 char* bufcache_label(label& ld, char* c)
 {
   *reinterpret_cast<size_t*>(c) = ld.costs.size();
@@ -98,8 +96,6 @@ bool test_label_internal(const label& ld)
 }
 
 bool test_label(const label& ld) { return test_label_internal(ld); }
-
-bool test_label(label& ld) { return test_label_internal(ld); }
 
 void parse_label(label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
@@ -173,9 +169,9 @@ label_parser cs_label = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(v->cs, cache); },
   // get_weight
-  [](polylabel* v, const reduction_features&) { return weight(v->cs); },
+  [](const polylabel*, const reduction_features&) { return 1.f; },
   // test_label
-  [](polylabel* v) { return test_label(v->cs); },
+  [](const polylabel* v) { return test_label(v->cs); },
   label_type_t::cs
 };
 // clang-format on

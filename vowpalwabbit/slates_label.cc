@@ -72,11 +72,11 @@ void cache_label(slates::label& ld, io_buf& cache)
   for (const auto& score : ld.probabilities) { WRITE_CACHED_VALUE(score, ACTION_SCORE::action_score); }
 }
 
-float weight(slates::label& ld) { return ld.weight; }
+float weight(const slates::label& ld) { return ld.weight; }
 
 void default_label(slates::label& ld) { ld.reset_to_default(); }
 
-bool test_label(slates::label& ld) { return ld.labeled == false; }
+bool test_label(const slates::label& ld) { return ld.labeled == false; }
 
 // Slates labels come in three types, shared, action and slot with the following structure:
 // slates shared [global_cost]
@@ -177,9 +177,9 @@ label_parser slates_label_parser = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(v->slates, cache); },
   // get_weight
-  [](polylabel* v, const reduction_features&) { return weight(v->slates); },
+  [](const polylabel* v, const reduction_features&) { return weight(v->slates); },
   // test_label
-  [](polylabel* v) { return test_label(v->slates); },
+  [](const polylabel* v) { return test_label(v->slates); },
   label_type_t::slates
 };
 // clang-format on
