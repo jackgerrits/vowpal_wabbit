@@ -6,6 +6,7 @@
 #include "vw.h"
 #include "math.h"
 #include "shared_data.h"
+#include "best_constant.h"
 
 #include "io/logger.h"
 
@@ -77,6 +78,7 @@ void output_and_account_confidence_example(workspace& all, example& ec)
   for (const auto& sink : all.final_prediction_sink)
   { confidence_print_result(sink.get(), ec.pred.scalar, ec.confidence, ec.tag); }
 
+  count_label(all.sd, ec.l.simple.label);
   print_update(all, ec);
 }
 

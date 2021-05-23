@@ -7,6 +7,7 @@
 #include "parse_args.h"
 #include "vw.h"
 #include "shared_data.h"
+#include "best_constant.h"
 #include "gd.h"
 
 using namespace vw::config;
@@ -179,6 +180,7 @@ void finish_example(workspace& all, audit_regressor_data& dd, example& ec)
     set_done(all);
   }
 
+  count_label(all.sd, ec.l.simple.label);
   vw::finish_example(all, ec);
 }
 
