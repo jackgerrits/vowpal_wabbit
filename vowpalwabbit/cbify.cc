@@ -15,6 +15,7 @@
 #include "cb_label_parser.h"
 #include "simple_label_parser.h"
 #include "shared_data.h"
+#include "best_constant.h"
 
 using namespace vw::LEARNER;
 using namespace exploration;
@@ -586,6 +587,7 @@ void output_example_regression_discrete(workspace& all, cbify& data, example& ec
 
   if (ld.label != FLT_MAX) all.sd->weighted_labels += static_cast<double>(cb_costs[0].action) * ec.weight;
 
+  count_label(all.sd, ec.l.simple.label);
   print_update(all, ec);
 }
 
@@ -604,7 +606,7 @@ void output_example_regression(workspace& all, cbify& data, example& ec)
         ec.test_only, cb_cont_costs[0].action != FLT_MAX, cb_cont_costs[0].cost, ec.weight, ec.get_num_features());
 
   if (ld.label != FLT_MAX) all.sd->weighted_labels += static_cast<double>(cb_cont_costs[0].action) * ec.weight;
-
+  count_label(all.sd, ec.l.simple.label);
   print_update(all, ec);
 }
 
