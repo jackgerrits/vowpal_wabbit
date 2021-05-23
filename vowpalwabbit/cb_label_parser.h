@@ -105,7 +105,7 @@ inline float get_probability(vw::cb_continuous::continuous_label_elm& elm)
 }
 
 template <typename LabelT = CB::label, typename LabelElmT = cb_class>
-bool is_test_label(LabelT& ld)
+bool is_test_label(const LabelT& ld)
 {
   if (ld.costs.size() == 0) return true;
   for (size_t i = 0; i < ld.costs.size(); i++)

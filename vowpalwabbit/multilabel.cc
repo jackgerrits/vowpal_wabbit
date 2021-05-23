@@ -45,8 +45,6 @@ size_t read_cached_label(MULTILABEL::labels& ld, io_buf& cache)
   return total;
 }
 
-float weight(MULTILABEL::labels&) { return 1.; }
-
 char* bufcache_label(labels& ld, char* c)
 {
   *reinterpret_cast<size_t*>(c) = ld.label_v.size();
@@ -68,7 +66,7 @@ void cache_label(MULTILABEL::labels& ld, io_buf& cache)
 
 void default_label(MULTILABEL::labels& ld) { ld.label_v.clear(); }
 
-bool test_label(MULTILABEL::labels& ld) { return ld.label_v.size() == 0; }
+bool test_label(const MULTILABEL::labels& ld) { return ld.label_v.size() == 0; }
 
 void parse_label(MULTILABEL::labels& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
@@ -101,9 +99,9 @@ label_parser multilabel = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(v->multilabels, cache); },
   // get_weight
-  [](polylabel* v, const reduction_features&) { return weight(v->multilabels); },
+  [](const polylabel* v, const reduction_features&) { return 1.f; },
   // test_label
-  [](polylabel* v) { return test_label(v->multilabels); },
+  [](const polylabel* v) { return test_label(v->multilabels); },
   label_type_t::multilabel
 };
 // clang-format on

@@ -40,7 +40,7 @@ size_t read_cached_simple_label(label_data& ld, reduction_features& red_features
   return total;
 }
 
-float get_weight(label_data&, const reduction_features& red_features)
+float get_weight(const label_data&, const reduction_features& red_features)
 {
   auto& simple_red_features = red_features.template get<simple_label_reduction_features>();
   return simple_red_features.weight;
@@ -67,7 +67,7 @@ void cache_simple_label(label_data& ld, reduction_features& red_features, io_buf
 
 void default_simple_label(label_data& ld) { ld.reset_to_default(); }
 
-bool test_label(label_data& ld) { return ld.label == FLT_MAX; }
+bool test_label(const label_data& ld) { return ld.label == FLT_MAX; }
 
 // Example: 0 1 0.5 'third_house | price:.53 sqft:.32 age:.87 1924
 // label := 0, weight := 1, initial := 0.5
@@ -108,9 +108,9 @@ label_parser simple_label_parser = {
   // read_cached_label
   [](polylabel* v, reduction_features& red_features, io_buf& cache) { return read_cached_simple_label(v->simple, red_features, cache); },
    // get_weight
-  [](polylabel* v, const reduction_features& red) { return get_weight(v->simple, red); },
+  [](const polylabel* v, const reduction_features& red) { return get_weight(v->simple, red); },
   // test_label
-  [](polylabel* v) { return test_label(v->simple); },
+  [](const polylabel* v) { return test_label(v->simple); },
   // test_label
   label_type_t::simple
 };

@@ -96,9 +96,9 @@ label_parser cb_label = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return CB::read_cached_label(v->cb, cache); },
    // get_weight
-  [](polylabel*, const reduction_features&) { return 1.f; },
+  [](const polylabel*, const reduction_features&) { return 1.f; },
   // test_label
-  [](polylabel* v) { return CB::is_test_label(v->cb); },
+  [](const polylabel* v) { return CB::is_test_label(v->cb); },
   label_type_t::cb
 };
 // clang-format on
@@ -189,7 +189,7 @@ void default_label(CB_EVAL::label& ld)
   ld.action = 0;
 }
 
-bool test_label(CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
+bool test_label(const CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
 
 void parse_label(CB_EVAL::label& ld, const std::vector<std::string_view>& words, reduction_features& red_features)
 {
@@ -214,9 +214,9 @@ label_parser cb_eval = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return CB_EVAL::read_cached_label(v->cb_eval, cache); },
   // get_weight
-  [](polylabel*, const reduction_features&) { return 1.f; },
+  [](const polylabel*, const reduction_features&) { return 1.f; },
   // test_label
-  [](polylabel* v) { return CB_EVAL::test_label(v->cb_eval); },
+  [](const polylabel* v) { return CB_EVAL::test_label(v->cb_eval); },
   label_type_t::cb_eval
 };
 // clang-format on
