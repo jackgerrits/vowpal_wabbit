@@ -48,6 +48,7 @@ void output_and_account_example(workspace& all, example& ec)
   all.print_by_ref(all.raw_prediction.get(), ec.partial_prediction, -1, ec.tag);
   for (auto& f : all.final_prediction_sink) { all.print_by_ref(f.get(), ec.pred.scalar, 0, ec.tag); }
 
+  count_label(all.sd, ec.l.simple.label);
   print_update(all, ec);
 }
 

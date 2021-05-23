@@ -9,12 +9,14 @@ Enabled reductions: gd, scorer
 average  since         example        example  current  current  current
 loss     last          counter         weight    label  predict features
 1.000000 1.000000            1            1.0   1.0000   0.0000        1
-0.683985 0.367969            2            2.0   1.0000   0.3934        2
-0.399624 0.115263            4            4.0   1.0000   0.5724        2
+0.683962 0.367924            2            2.0   1.0000   0.3934        2
+0.399609 0.115256            4            4.0   1.0000   0.5724        2
 
 finished run
 number of examples = 5
 weighted example sum = 5.000000
 weighted label sum = 5.000000
-average loss = 0.344573
+average loss = 0.344562
+best constant = 1.000000
+best constant's loss = 0.000000
 total feature number = 9

@@ -36,7 +36,7 @@ namespace CCB
 {
 void default_label(label& ld);
 
-size_t read_cached_label(shared_data*, label& ld, io_buf& cache)
+size_t read_cached_label(label& ld, io_buf& cache)
 {
   // Since read_cached_features doesn't default the label we must do it here.
   default_label(ld);
@@ -229,8 +229,7 @@ void parse_explicit_inclusions(CCB::label& ld, const std::vector<std::string_vie
   for (const auto& inclusion : split_inclusions) { ld.explicit_included_actions.push_back(int_of_string(inclusion)); }
 }
 
-void parse_label(
-    parser* /*p*/, shared_data*, label& ld, const std::vector<std::string_view>& words, ::reduction_features&)
+void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -295,13 +294,13 @@ label_parser ccb_label_parser = {
   // default_label
   [](polylabel* v) { default_label(v->conditional_contextual_bandit); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, ::reduction_features& red_features) {
-    parse_label(p, sd, v->conditional_contextual_bandit, words, red_features);
+  [](polylabel* v, const std::vector<std::string_view>& words, ::reduction_features& red_features) {
+    parse_label(v->conditional_contextual_bandit, words, red_features);
   },
   // cache_label
   [](polylabel* v, ::reduction_features&, io_buf& cache) { cache_label(v->conditional_contextual_bandit, cache); },
   // read_cached_label
-  [](shared_data* sd, polylabel* v, ::reduction_features&, io_buf& cache) { return read_cached_label(sd, v->conditional_contextual_bandit, cache); },
+  [](polylabel* v, ::reduction_features&, io_buf& cache) { return read_cached_label(v->conditional_contextual_bandit, cache); },
   // get_weight
   [](polylabel* v, const ::reduction_features&) { return ccb_weight(v->conditional_contextual_bandit); },
   // test_label

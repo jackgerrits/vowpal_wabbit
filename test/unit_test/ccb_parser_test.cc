@@ -13,42 +13,41 @@
 #include "parse_primitives.h"
 #include <memory>
 
-void parse_ccb_label(parser* p, std::string_view label, CCB::label& l)
+void parse_ccb_label(std::string_view label, CCB::label& l)
 {
   CCB::default_label(l);
   reduction_features red_fts;
-  CCB::parse_label(p, nullptr, l, tokenize(' ', label), red_fts);
+  CCB::parse_label(l, tokenize(' ', label), red_fts);
 }
 
 BOOST_AUTO_TEST_CASE(ccb_parse_label)
 {
   auto lp = CCB::ccb_label_parser;
-  parser p{8 /*ring_size*/, false /*strict parse*/};
 
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb shared", *label);
+    parse_ccb_label("ccb shared", *label);
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 0);
     BOOST_CHECK(label->outcome == nullptr);
     BOOST_CHECK_EQUAL(label->type, CCB::example_type::shared);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb action", *label.get());
+    parse_ccb_label("ccb action", *label.get());
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 0);
     BOOST_CHECK(label->outcome == nullptr);
     BOOST_CHECK_EQUAL(label->type, CCB::example_type::action);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb slot", *label.get());
+    parse_ccb_label("ccb slot", *label.get());
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 0);
     BOOST_CHECK(label->outcome == nullptr);
     BOOST_CHECK_EQUAL(label->type, CCB::example_type::slot);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb slot 1,3,4", *label.get());
+    parse_ccb_label("ccb slot 1,3,4", *label.get());
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 3);
     BOOST_CHECK_EQUAL(label->explicit_included_actions[0], 1);
     BOOST_CHECK_EQUAL(label->explicit_included_actions[1], 3);
@@ -58,7 +57,7 @@ BOOST_AUTO_TEST_CASE(ccb_parse_label)
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb slot 1:1.0:0.5 3", *label.get());
+    parse_ccb_label("ccb slot 1:1.0:0.5 3", *label.get());
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 1);
     BOOST_CHECK_EQUAL(label->explicit_included_actions[0], 3);
     BOOST_CHECK_CLOSE(label->outcome->cost, 1.0f, FLOAT_TOL);
@@ -69,7 +68,7 @@ BOOST_AUTO_TEST_CASE(ccb_parse_label)
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    parse_ccb_label(&p, "ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
+    parse_ccb_label("ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
     BOOST_CHECK_EQUAL(label->explicit_included_actions.size(), 2);
     BOOST_CHECK_EQUAL(label->explicit_included_actions[0], 3);
     BOOST_CHECK_EQUAL(label->explicit_included_actions[1], 4);
@@ -85,23 +84,23 @@ BOOST_AUTO_TEST_CASE(ccb_parse_label)
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "shared", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("shared", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other shared", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("other shared", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "other", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("other", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb unknown", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("ccb unknown", *label.get()), vw::vw_exception);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label(&p, "ccb slot 1:1.0:0.5,4:0.7", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("ccb slot 1:1.0:0.5,4:0.7", *label.get()), vw::vw_exception);
   }
 }
 
@@ -112,11 +111,9 @@ BOOST_AUTO_TEST_CASE(ccb_cache_label)
   io_writer.add_file(vw::io::create_vector_writer(backing_vector));
   // io.init();      TODO: figure out and fix leak caused by double init()
 
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   auto lp = CCB::ccb_label_parser;
   auto label = scoped_calloc_or_throw<CCB::label>();
-  parse_ccb_label(&p, "ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
+  parse_ccb_label("ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
   CCB::cache_label(*label, io_writer);
   io_writer.flush();
 
@@ -125,7 +122,7 @@ BOOST_AUTO_TEST_CASE(ccb_cache_label)
 
   auto uncached_label = scoped_calloc_or_throw<CCB::label>();
   CCB::default_label(*uncached_label);
-  CCB::read_cached_label(nullptr, *uncached_label, io_reader);
+  CCB::read_cached_label(*uncached_label, io_reader);
 
   BOOST_CHECK_EQUAL(uncached_label->explicit_included_actions.size(), 2);
   BOOST_CHECK_EQUAL(uncached_label->explicit_included_actions[0], 3);
@@ -143,11 +140,10 @@ BOOST_AUTO_TEST_CASE(ccb_cache_label)
 
 BOOST_AUTO_TEST_CASE(ccb_copy_label)
 {
-  parser p{8 /*ring_size*/, false /*strict parse*/};
   auto lp = CCB::ccb_label_parser;
 
   auto label = scoped_calloc_or_throw<CCB::label>();
-  parse_ccb_label(&p, "ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
+  parse_ccb_label("ccb slot 1:-2.0:0.5,2:0.25,3:0.25 3,4", *label.get());
 
   auto copied_to = scoped_calloc_or_throw<CCB::label>();
   CCB::default_label(*copied_to);

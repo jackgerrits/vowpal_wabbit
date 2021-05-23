@@ -508,8 +508,7 @@ void substring_to_example(workspace* all, example* ae, std::string_view example)
   }
 
   if (!all->example_parser->words.empty())
-    all->example_parser->lbl_parser.parse_label(all->example_parser, all->example_parser->_shared_data, &ae->l,
-        all->example_parser->words, ae->_reduction_features);
+    all->example_parser->lbl_parser.parse_label(&ae->l, all->example_parser->words, ae->_reduction_features);
 
   if (bar_idx != std::string_view::npos)
   {

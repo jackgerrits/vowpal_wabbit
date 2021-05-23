@@ -11,6 +11,7 @@
 #include "parse_args.h"
 #include "vw.h"
 #include "shared_data.h"
+#include "best_constant.h"
 
 #include "io/logger.h"
 
@@ -102,7 +103,7 @@ void output_example(workspace& all, example& ec)
 
   all.sd->update(ec.test_only, ld.label != FLT_MAX, ec.loss, ec.weight, ec.get_num_features());
   if (ld.label != FLT_MAX) all.sd->weighted_labels += (static_cast<double>(ld.label)) * ec.weight;
-
+  count_label(all.sd, ec.l.simple.label);
   print_update(all, ec);
 }
 
