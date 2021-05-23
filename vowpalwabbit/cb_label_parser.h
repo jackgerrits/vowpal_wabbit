@@ -39,7 +39,7 @@ char* bufread_label(LabelT& ld, char* c, io_buf& cache)
 }
 
 template <typename LabelT = CB::label, typename LabelElmT = cb_class>
-size_t read_cached_label(shared_data*, LabelT& ld, io_buf& cache)
+size_t read_cached_label(LabelT& ld, io_buf& cache)
 {
   ld.costs.clear();
   char* c;

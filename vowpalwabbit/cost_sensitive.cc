@@ -55,7 +55,7 @@ char* bufread_label(label& ld, char* c, io_buf& cache)
   return c;
 }
 
-size_t read_cached_label(shared_data*, label& ld, io_buf& cache)
+size_t read_cached_label(label& ld, io_buf& cache)
 {
   ld.costs.clear();
   char* c;
@@ -101,8 +101,7 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(
-    parser* p, shared_data* /*sd*/, label& ld, const std::vector<std::string_view>& words, reduction_features&)
+void parse_label(label& ld, const std::vector<std::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -110,15 +109,15 @@ void parse_label(
   if (words.size() == 1)
   {
     float fx;
-    p->parse_name = name_value(words[0], fx);
-    bool eq_shared = p->parse_name[0] == "***shared***" || p->parse_name[0] == "shared";
-    bool eq_label = p->parse_name[0] == "***label***" || p->parse_name[0] == "label";
+    const auto tokenized = name_value(words[0], fx);
+    bool eq_shared = tokenized[0] == "***shared***" || tokenized[0] == "shared";
+    bool eq_label = tokenized[0] == "***label***" || tokenized[0] == "label";
 
     if (eq_shared || eq_label)
     {
       if (eq_shared)
       {
-        if (p->parse_name.size() != 1)
+        if (tokenized.size() != 1)
           logger::errlog_error("shared feature vectors should not have costs on: {}", words[0]);
         else
         {
@@ -128,11 +127,11 @@ void parse_label(
       }
       if (eq_label)
       {
-        if (p->parse_name.size() != 2)
+        if (tokenized.size() != 2)
           logger::errlog_error("label feature vectors should have exactly one cost on: {}", words[0]);
         else
         {
-          wclass f = {float_of_string(p->parse_name[1]), 0, 0., 0.};
+          wclass f = {float_of_string(tokenized[1]), 0, 0., 0.};
           ld.costs.push_back(f);
         }
       }
@@ -144,18 +143,18 @@ void parse_label(
   for (unsigned int i = 0; i < words.size(); i++)
   {
     wclass f = {0., 0, 0., 0.};
-    p->parse_name = name_value(words[i], f.x);
+    const auto tokenized = name_value(words[i], f.x);
 
-    if (p->parse_name.size() == 0) THROW(" invalid cost: specification -- no names on: " << words[i]);
+    if (tokenized.size() == 0) THROW(" invalid cost: specification -- no names on: " << words[i]);
 
-    if (p->parse_name.size() == 1 || p->parse_name.size() == 2 || p->parse_name.size() == 3)
+    if (tokenized.size() == 1 || tokenized.size() == 2 || tokenized.size() == 3)
     {
-      f.class_index = static_cast<uint32_t>(hashstring(p->parse_name[0].data(), p->parse_name[0].length(), 0));
-      if (p->parse_name.size() == 1 && f.x >= 0)  // test examples are specified just by un-valued class #s
+      f.class_index = static_cast<uint32_t>(hashstring(tokenized[0].data(), tokenized[0].length(), 0));
+      if (tokenized.size() == 1 && f.x >= 0)  // test examples are specified just by un-valued class #s
         f.x = FLT_MAX;
     }
     else
-      THROW("malformed cost specification on '" << (p->parse_name[0]) << "'");
+      THROW("malformed cost specification on '" << (tokenized[0]) << "'");
 
     ld.costs.push_back(f);
   }
@@ -166,13 +165,13 @@ label_parser cs_label = {
   // default_label
   [](polylabel* v) { default_label(v->cs); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
-    parse_label(p, sd, v->cs, words, red_features);
+  [](polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
+    parse_label(v->cs, words, red_features);
   },
   // cache_label
   [](polylabel* v, reduction_features&, io_buf& cache) { cache_label(v->cs, cache); },
   // read_cached_label
-  [](shared_data* sd, polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(sd, v->cs, cache); },
+  [](polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(v->cs, cache); },
   // get_weight
   [](polylabel* v, const reduction_features&) { return weight(v->cs); },
   // test_label

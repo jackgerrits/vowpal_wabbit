@@ -53,6 +53,7 @@ void output_and_account_example(workspace& all, example& ec)
 
 void return_simple_example(workspace& all, void*, example& ec)
 {
+  count_label(all.sd, ec.l.simple.label);
   output_and_account_example(all, ec);
   vw::finish_example(all, ec);
 }

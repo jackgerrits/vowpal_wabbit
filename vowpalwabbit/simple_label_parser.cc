@@ -18,7 +18,7 @@
 
 namespace logger = vw::io::logger;
 
-char* bufread_simple_label(shared_data* sd, label_data& ld, simple_label_reduction_features& red_features, char* c)
+char* bufread_simple_label(label_data& ld, simple_label_reduction_features& red_features, char* c)
 {
   memcpy(&ld.label, c, sizeof(ld.label));
   c += sizeof(ld.label);
@@ -26,18 +26,16 @@ char* bufread_simple_label(shared_data* sd, label_data& ld, simple_label_reducti
   c += sizeof(red_features.weight);
   memcpy(&red_features.initial, c, sizeof(red_features.initial));
   c += sizeof(red_features.initial);
-
-  count_label(sd, ld.label);
   return c;
 }
 
-size_t read_cached_simple_label(shared_data* sd, label_data& ld, reduction_features& red_features, io_buf& cache)
+size_t read_cached_simple_label(label_data& ld, reduction_features& red_features, io_buf& cache)
 {
   auto& simple_red_features = red_features.template get<simple_label_reduction_features>();
   char* c;
   size_t total = sizeof(ld.label) + sizeof(simple_red_features.weight) + sizeof(simple_red_features.initial);
   if (cache.buf_read(c, total) < total) return 0;
-  bufread_simple_label(sd, ld, simple_red_features, c);
+  bufread_simple_label(ld, simple_red_features, c);
 
   return total;
 }
@@ -73,7 +71,7 @@ bool test_label(label_data& ld) { return ld.label == FLT_MAX; }
 
 // Example: 0 1 0.5 'third_house | price:.53 sqft:.32 age:.87 1924
 // label := 0, weight := 1, initial := 0.5
-void parse_simple_label(parser*, shared_data* sd, label_data& ld, const std::vector<std::string_view>& words,
+void parse_simple_label(label_data& ld, const std::vector<std::string_view>& words,
     reduction_features& red_features)
 {
   auto& simple_red_features = red_features.template get<simple_label_reduction_features>();
@@ -96,7 +94,6 @@ void parse_simple_label(parser*, shared_data* sd, label_data& ld, const std::vec
     default:
       logger::log_error("Error: {0} is too many tokens for a simple label: {1}", words.size(), fmt::join(words, " "));
   }
-  count_label(sd, ld.label);
 }
 
 // clang-format off
@@ -104,13 +101,13 @@ label_parser simple_label_parser = {
   // default_label
   [](polylabel* v) { default_simple_label(v->simple); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
-    parse_simple_label(p, sd, v->simple, words, red_features);
+  [](polylabel* v, const std::vector<std::string_view>& words, reduction_features& red_features) {
+    parse_simple_label(v->simple, words, red_features);
   },
   // cache_label
   [](polylabel* v, reduction_features& red_features, io_buf& cache) { cache_simple_label(v->simple, red_features, cache); },
   // read_cached_label
-  [](shared_data* sd, polylabel* v, reduction_features& red_features, io_buf& cache) { return read_cached_simple_label(sd, v->simple, red_features, cache); },
+  [](polylabel* v, reduction_features& red_features, io_buf& cache) { return read_cached_simple_label(v->simple, red_features, cache); },
    // get_weight
   [](polylabel* v, const reduction_features& red) { return get_weight(v->simple, red); },
   // test_label

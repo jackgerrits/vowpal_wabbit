@@ -12,20 +12,18 @@
 #include "parser.h"
 #include "parse_primitives.h"
 
-void parse_slates_label(parser* p, std::string_view label, vw::slates::label& l)
+void parse_slates_label(std::string_view label, vw::slates::label& l)
 {
   vw::slates::default_label(l);
   reduction_features red_fts;
-  vw::slates::parse_label(p, nullptr, l, tokenize(' ', label), red_fts);
+  vw::slates::parse_label(l, tokenize(' ', label), red_fts);
 }
 
 BOOST_AUTO_TEST_CASE(slates_parse_label)
 {
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates shared", label);
+    parse_slates_label("slates shared", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::shared);
     BOOST_CHECK_CLOSE(label.cost, 0.f, FLOAT_TOL);
     BOOST_CHECK_EQUAL(label.labeled, false);
@@ -33,7 +31,7 @@ BOOST_AUTO_TEST_CASE(slates_parse_label)
 
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates shared 1", label);
+    parse_slates_label("slates shared 1", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::shared);
     BOOST_CHECK_CLOSE(label.cost, 1.f, FLOAT_TOL);
     BOOST_CHECK_EQUAL(label.labeled, true);
@@ -41,21 +39,21 @@ BOOST_AUTO_TEST_CASE(slates_parse_label)
 
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates action 1", label);
+    parse_slates_label("slates action 1", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::action);
     BOOST_CHECK_EQUAL(label.slot_id, 1);
   }
 
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates slot", label);
+    parse_slates_label("slates slot", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::slot);
     BOOST_CHECK_EQUAL(label.labeled, false);
   }
 
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates slot 0:0.2", label);
+    parse_slates_label("slates slot 0:0.2", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::slot);
     BOOST_CHECK_EQUAL(label.labeled, true);
     check_collections_with_float_tolerance(
@@ -64,7 +62,7 @@ BOOST_AUTO_TEST_CASE(slates_parse_label)
 
   {
     vw::slates::label label;
-    parse_slates_label(&p, "slates slot 0:0.5,1:0.3,2:0.2", label);
+    parse_slates_label("slates slot 0:0.5,1:0.3,2:0.2", label);
     BOOST_CHECK_EQUAL(label.type, vw::slates::example_type::slot);
     BOOST_CHECK_EQUAL(label.labeled, true);
     check_collections_with_float_tolerance(
@@ -73,32 +71,32 @@ BOOST_AUTO_TEST_CASE(slates_parse_label)
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "shared", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("shared", label), vw::vw_exception);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "slates shared 0.1 too many args", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::vw_exception);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "slates shared 0.1 too many args", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::vw_exception);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "slates action", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates action", label), vw::vw_exception);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "slates action 1,1", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates action 1,1", label), vw::vw_exception);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label(&p, "slates slot 0:0,1:0.5", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates slot 0:0,1:0.5", label), vw::vw_exception);
   }
 }
 
@@ -108,10 +106,8 @@ BOOST_AUTO_TEST_CASE(slates_cache_shared_label)
   io_buf io_writer;
   io_writer.add_file(vw::io::create_vector_writer(backing_vector));
 
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   vw::slates::label label;
-  parse_slates_label(&p, "slates shared 0.5", label);
+  parse_slates_label("slates shared 0.5", label);
   vw::slates::cache_label(label, io_writer);
   io_writer.flush();
 
@@ -120,7 +116,7 @@ BOOST_AUTO_TEST_CASE(slates_cache_shared_label)
 
   vw::slates::label uncached_label;
   vw::slates::default_label(uncached_label);
-  vw::slates::read_cached_label(nullptr, uncached_label, io_reader);
+  vw::slates::read_cached_label(uncached_label, io_reader);
 
   BOOST_CHECK_EQUAL(uncached_label.type, vw::slates::example_type::shared);
   BOOST_CHECK_EQUAL(uncached_label.labeled, true);
@@ -133,10 +129,8 @@ BOOST_AUTO_TEST_CASE(slates_cache_action_label)
   io_buf io_writer;
   io_writer.add_file(vw::io::create_vector_writer(backing_vector));
 
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   vw::slates::label label;
-  parse_slates_label(&p, "slates action 5", label);
+  parse_slates_label("slates action 5", label);
   vw::slates::cache_label(label, io_writer);
   io_writer.flush();
 
@@ -145,7 +139,7 @@ BOOST_AUTO_TEST_CASE(slates_cache_action_label)
 
   vw::slates::label uncached_label;
   vw::slates::default_label(uncached_label);
-  vw::slates::read_cached_label(nullptr, uncached_label, io_reader);
+  vw::slates::read_cached_label(uncached_label, io_reader);
 
   BOOST_CHECK_EQUAL(uncached_label.type, vw::slates::example_type::action);
   BOOST_CHECK_EQUAL(uncached_label.labeled, false);
@@ -158,10 +152,8 @@ BOOST_AUTO_TEST_CASE(slates_cache_slot_label)
   io_buf io_writer;
   io_writer.add_file(vw::io::create_vector_writer(backing_vector));
 
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   vw::slates::label label;
-  parse_slates_label(&p, "slates slot 0:0.5,1:0.25,2:0.25", label);
+  parse_slates_label("slates slot 0:0.5,1:0.25,2:0.25", label);
   vw::slates::cache_label(label, io_writer);
   io_writer.flush();
 
@@ -170,7 +162,7 @@ BOOST_AUTO_TEST_CASE(slates_cache_slot_label)
 
   vw::slates::label uncached_label;
   vw::slates::default_label(uncached_label);
-  vw::slates::read_cached_label(nullptr, uncached_label, io_reader);
+  vw::slates::read_cached_label( uncached_label, io_reader);
 
   BOOST_CHECK_EQUAL(uncached_label.type, vw::slates::example_type::slot);
   BOOST_CHECK_EQUAL(uncached_label.labeled, true);
@@ -180,10 +172,8 @@ BOOST_AUTO_TEST_CASE(slates_cache_slot_label)
 
 BOOST_AUTO_TEST_CASE(slates_copy_label)
 {
-  parser p{8 /*ring_size*/, false /*strict parse*/};
-
   vw::slates::label label;
-  parse_slates_label(&p, "slates slot 0:0.5,1:0.25,2:0.25", label);
+  parse_slates_label("slates slot 0:0.5,1:0.25,2:0.25", label);
 
   vw::slates::label copied_to;
   vw::slates::default_label(copied_to);
