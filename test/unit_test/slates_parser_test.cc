@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(slates_cache_slot_label)
 
   vw::slates::label uncached_label;
   vw::slates::default_label(uncached_label);
-  vw::slates::read_cached_label( uncached_label, io_reader);
+  vw::slates::read_cached_label(uncached_label, io_reader);
 
   BOOST_CHECK_EQUAL(uncached_label.type, vw::slates::example_type::slot);
   BOOST_CHECK_EQUAL(uncached_label.labeled, true);

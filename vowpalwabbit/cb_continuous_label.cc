@@ -40,8 +40,7 @@ void default_label_additional_fields<vw::cb_continuous::continuous_label>(vw::cb
 
 }  // namespace CB
 
-void parse_pdf(
-    const std::vector<std::string_view>& words, size_t words_index, reduction_features& red_features)
+void parse_pdf(const std::vector<std::string_view>& words, size_t words_index, reduction_features& red_features)
 {
   auto& cats_reduction_features = red_features.template get<vw::continuous_actions::reduction_features>();
   for (size_t i = words_index; i < words.size(); i++)
@@ -77,8 +76,7 @@ namespace cb_continuous
 {
 ////////////////////////////////////////////////////
 // Begin: parse a,c,p label format
-void parse_label(continuous_label& ld, const std::vector<std::string_view>& words,
-    reduction_features& red_features)
+void parse_label(continuous_label& ld, const std::vector<std::string_view>& words, reduction_features& red_features)
 {
   ld.costs.clear();
 
@@ -88,7 +86,7 @@ void parse_label(continuous_label& ld, const std::vector<std::string_view>& word
 
   for (size_t i = 1; i < words.size(); i++)
   {
-    if (words[i] == PDF) { parse_pdf(words, i + 1,  red_features); }
+    if (words[i] == PDF) { parse_pdf(words, i + 1, red_features); }
     else if (words[i] == CHOSEN_ACTION)
     {
       parse_chosen_action(words, i + 1, red_features);
@@ -111,8 +109,7 @@ void parse_label(continuous_label& ld, const std::vector<std::string_view>& word
       f.pdf_value = .0;
       if (tokenized.size() > 2) f.pdf_value = float_of_string(tokenized[2]);
 
-      if (std::isnan(f.pdf_value))
-        THROW("error NaN pdf_value (" << tokenized[2] << " for action: " << tokenized[0]);
+      if (std::isnan(f.pdf_value)) THROW("error NaN pdf_value (" << tokenized[2] << " for action: " << tokenized[0]);
 
       if (f.pdf_value < 0.0)
       {

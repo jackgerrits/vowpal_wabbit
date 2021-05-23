@@ -58,8 +58,7 @@ void parse_label(CB::label& ld, const std::vector<std::string_view>& words, redu
     f.probability = .0;
     if (tokenized.size() > 2) f.probability = float_of_string(tokenized[2]);
 
-    if (std::isnan(f.probability))
-      THROW("error NaN probability (" << tokenized[2] << " for action: " << tokenized[0]);
+    if (std::isnan(f.probability)) THROW("error NaN probability (" << tokenized[2] << " for action: " << tokenized[0]);
 
     if (f.probability > 1.0)
     {
@@ -192,8 +191,7 @@ void default_label(CB_EVAL::label& ld)
 
 bool test_label(CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
 
-void parse_label(CB_EVAL::label& ld, const std::vector<std::string_view>& words,
-    reduction_features& red_features)
+void parse_label(CB_EVAL::label& ld, const std::vector<std::string_view>& words, reduction_features& red_features)
 {
   if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
 

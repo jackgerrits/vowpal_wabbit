@@ -56,8 +56,7 @@ struct label
 };
 
 void default_label(vw::slates::label& v);
-void parse_label(vw::slates::label& ld, const std::vector<std::string_view>& words,
-    reduction_features&);
+void parse_label(vw::slates::label& ld, const std::vector<std::string_view>& words, reduction_features&);
 void cache_label(vw::slates::label& ld, io_buf& cache);
 size_t read_cached_label(vw::slates::label& ld, io_buf& cache);
 
