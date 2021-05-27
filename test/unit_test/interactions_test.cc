@@ -47,7 +47,7 @@ void eval_count_of_generated_ft_naive(vw& all, example_predict& ec, size_t& new_
   new_features_value = 0.;
 
   auto interactions = INTERACTIONS::compile_interactions<generate_func, leave_duplicate_interactions>(
-      all.interactions, std::set<namespace_index>(ec.indices.begin(), ec.indices.end()));
+      all.interactions, std::set<namespace_index>(ec.get_indices().begin(), ec.get_indices().end()));
 
   v_array<float> results;
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_test)
 
   auto interactions =
       INTERACTIONS::compile_interactions<INTERACTIONS::generate_namespace_combinations_with_repetition, false>(
-          vw.interactions, std::set<namespace_index>(ex->indices.begin(), ex->indices.end()));
+          vw.interactions, std::set<namespace_index>(ec.get_indices().begin(), ec.get_indices().end()));
   ex->interactions = &interactions;
   size_t fast_features_count;
   float fast_features_value;
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_permuations_test)
 
   auto interactions =
       INTERACTIONS::compile_interactions<INTERACTIONS::generate_namespace_permutations_with_repetition, true>(
-          vw.interactions, std::set<namespace_index>(ex->indices.begin(), ex->indices.end()));
+          vw.interactions, std::set<namespace_index>(ec.get_indices().begin(), ec.get_indices().end()));
   ex->interactions = &interactions;
   size_t fast_features_count;
   float fast_features_value;

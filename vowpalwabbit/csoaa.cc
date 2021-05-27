@@ -178,8 +178,8 @@ struct ldf
 
 bool ec_is_label_definition(example& ec)  // label defs look like "0:___" or just "label:___"
 {
-  if (ec.indices.empty()) return false;
-  if (ec.indices[0] != 'l') return false;
+  if (ec.feature_space.empty()) return false;
+  if (ec.feature_space.get_indices()[0] != 'l') return false;
   const auto& costs = ec.l.cs.costs;
   for (auto const& cost : costs)
     if ((cost.class_index != 0) || (cost.x <= 0.)) return false;

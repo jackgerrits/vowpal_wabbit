@@ -85,8 +85,8 @@ BOOST_AUTO_TEST_CASE(test_flatbuffer_standalone_example)
   const auto& red_features = examples[0]->_reduction_features.template get<simple_label_reduction_features>();
   BOOST_CHECK_CLOSE(red_features.weight, 1.f, FLOAT_TOL);
 
-  BOOST_CHECK_EQUAL(examples[0]->indices[0], constant_namespace);
-  BOOST_CHECK_CLOSE(examples[0]->feature_space[examples[0]->indices[0]].values[0], 2.23f, FLOAT_TOL);
+  BOOST_CHECK(examples[0]->get_feature_group(constant_namespace) != nullptr);
+  BOOST_CHECK_CLOSE(examples[0]->feature_space[constant_namespace].values[0], 2.23f, FLOAT_TOL);
 
   VW::finish_example(*all, *examples[0]);
   VW::finish(*all);
@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE(test_flatbuffer_collection)
   const auto& red_features = examples[0]->_reduction_features.template get<simple_label_reduction_features>();
   BOOST_CHECK_CLOSE(red_features.weight, 1.f, FLOAT_TOL);
 
-  BOOST_CHECK_EQUAL(examples[0]->indices[0], constant_namespace);
-  BOOST_CHECK_CLOSE(examples[0]->feature_space[examples[0]->indices[0]].values[0], 2.23f, FLOAT_TOL);
+  BOOST_CHECK(examples[0]->get_feature_group(constant_namespace) != nullptr);
+  BOOST_CHECK_CLOSE(examples[0]->feature_space[constant_namespace].values[0], 2.23f, FLOAT_TOL);
 
   VW::finish_example(*all, *examples[0]);
   VW::finish(*all);

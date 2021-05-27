@@ -1524,9 +1524,8 @@ public:
     Namespace<audit> n;
     n.feature_group = ns[0];
     n.namespace_hash = VW::hash_space_cstr(*all, ns);
-    n.ftrs = ex->feature_space.data() + ns[0];
+    n.ftrs = &ex->feature_namespaces.get_or_create_feature_group(n.namespace_hash, ns[0]);
     n.feature_count = 0;
-
     n.name = ns;
 
     namespace_path.push_back(n);
@@ -1536,13 +1535,6 @@ public:
   BaseState<audit>* PopNamespace()
   {
     auto& ns = CurrentNamespace();
-    if (ns.feature_count > 0)
-    {
-      auto feature_group = ns.feature_group;
-      // Do not insert feature_group if it already exists.
-      if (std::find(ex->indices.begin(), ex->indices.end(), feature_group) == ex->indices.end())
-      { ex->indices.push_back(feature_group); }
-    }
 
     auto return_state = return_path.back();
     namespace_path.pop_back();

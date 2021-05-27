@@ -208,7 +208,7 @@ bool has_action(multi_ex& cb_ex) { return !cb_ex.empty(); }
 // Copy other slot namespaces to shared
 void inject_slot_features(example* shared, example* slot)
 {
-  for (auto index : slot->indices)
+  for (const auto& feat_group_it : slot->feature_space)
   {
     // constant namespace should be ignored, as it already exists and we don't want to double it up.
     if (index == constant_namespace) { continue; }

@@ -65,22 +65,21 @@ void make_marginal(data& sm, example& ec)
   sm.net_feature_weight = 0.;
   sm.average_pred = 0.;
 
-  for (example::iterator i = ec.begin(); i != ec.end(); ++i)
+  for (auto& fs : ec)
   {
-    namespace_index n = i.index();
+    namespace_index n = fs.namespace_hash;
     if (sm.id_features[n])
     {
-      std::swap(sm.temp[n], *i);
-      features& f = *i;
-      f.clear();
+      std::swap(sm.temp[n], fs);
+      fs.clear();
       for (features::iterator j = sm.temp[n].begin(); j != sm.temp[n].end(); ++j)
       {
         float first_value = j.value();
         uint64_t first_index = j.index() & mask;
         if (++j == sm.temp[n].end())
         {
-          logger::log_warn("warning: id feature namespace has {} features. Should be a multiple of 2",
-                           sm.temp[n].size());
+          logger::log_warn(
+              "warning: id feature namespace has {} features. Should be a multiple of 2", sm.temp[n].size());
           break;
         }
         float second_value = j.value();
@@ -101,8 +100,8 @@ void make_marginal(data& sm, example& ec)
           }
         }
         float marginal_pred = static_cast<float>(sm.marginals[key].first / sm.marginals[key].second);
-        f.push_back(marginal_pred, first_index);
-        if (!sm.temp[n].space_names.empty()) f.space_names.push_back(sm.temp[n].space_names[2 * (f.size() - 1)]);
+        fs.push_back(marginal_pred, first_index);
+        if (!sm.temp[n].space_names.empty()) { fs.space_names.push_back(sm.temp[n].space_names[2 * (fs.size() - 1)]); }
 
         if (sm.compete)  // compute the prediction from the marginals using the weights
         {
@@ -119,10 +118,11 @@ void make_marginal(data& sm, example& ec)
 
 void undo_marginal(data& sm, example& ec)
 {
-  for (example::iterator i = ec.begin(); i != ec.end(); ++i)
+  for (auto& fs : ec)
   {
-    namespace_index n = i.index();
-    if (sm.id_features[n]) std::swap(sm.temp[n], *i);
+    // TODO fix marginal to understand new namespaces
+    namespace_index n = fs.namespace_hash;
+    if (sm.id_features[n]) std::swap(sm.temp[n], fs);
   }
 }
 
@@ -160,9 +160,9 @@ void update_marginal(data& sm, example& ec)
   float weight = ec.weight;
   if (sm.unweighted_marginals) weight = 1.;
 
-  for (example::iterator i = ec.begin(); i != ec.end(); ++i)
+  for (auto& fs : ec)
   {
-    namespace_index n = i.index();
+    namespace_index n = fs.namespace_hash;
     if (sm.id_features[n])
       for (features::iterator j = sm.temp[n].begin(); j != sm.temp[n].end(); ++j)
       {

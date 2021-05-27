@@ -7,6 +7,8 @@
 #include "v_array.h"
 #include "future_compat.h"
 #include "generic_range.h"
+#include "vw_string_view.h"
+#include "hashstring.h"
 
 #include <utility>
 #include <memory>

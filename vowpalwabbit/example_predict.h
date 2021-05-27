@@ -3,13 +3,12 @@
 // license as described in the file LICENSE.
 #pragma once
 
-typedef unsigned char namespace_index;
-
 #include "constant.h"
 #include "future_compat.h"
 #include "reduction_features.h"
 #include "feature_group.h"
 #include "v_array.h"
+#include "namespaced_features.h"
 
 #include <vector>
 #include <set>
@@ -29,20 +28,6 @@ typedef unsigned char namespace_index;
 
 struct example_predict
 {
-  class iterator
-  {
-    features* _feature_space;
-    v_array<namespace_index>::iterator _index;
-
-  public:
-    iterator(features* feature_space, namespace_index* index);
-    features& operator*();
-    iterator& operator++();
-    namespace_index index();
-    bool operator==(const iterator& rhs);
-    bool operator!=(const iterator& rhs);
-  };
-
   example_predict() = default;
   ~example_predict() = default;
   example_predict(const example_predict&) = delete;
@@ -50,13 +35,17 @@ struct example_predict
   example_predict(example_predict&& other) = default;
   example_predict& operator=(example_predict&& other) = default;
 
+  using iterator = VW::namespaced_features::iterator;
+
   /// If indices is modified this iterator is invalidated.
   iterator begin();
   /// If indices is modified this iterator is invalidated.
   iterator end();
 
+  VW::namespaced_features feature_space;
+
   v_array<namespace_index> indices;
-  std::array<features, NUM_NAMESPACES> feature_space;  // Groups of feature values.
+  // std::array<features, NUM_NAMESPACES> feature_space;  // Groups of feature values.
   uint64_t ft_offset = 0;                              // An offset for all feature values.
 
   // Interactions are specified by this struct's interactions vector of vectors of unsigned characters, where each

@@ -86,10 +86,9 @@ void finish_setup(nn& n, vw& all)
   // TODO: output_layer audit
 
   n.output_layer.interactions = &all.interactions;
-  n.output_layer.indices.push_back(nn_output_namespace);
   uint64_t nn_index = nn_constant << all.weights.stride_shift();
 
-  features& fs = n.output_layer.feature_space[nn_output_namespace];
+  features& fs = n.output_layer.feature_space.get_or_create_feature_group(nn_output_namespace, nn_output_namespace);
   for (unsigned int i = 0; i < n.k; ++i)
   {
     fs.push_back(1., nn_index);

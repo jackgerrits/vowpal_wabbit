@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE(parse_json_slates_dom_parser)
   BOOST_CHECK_EQUAL(examples[4]->l.slates.slot_id, 1);
   BOOST_CHECK_EQUAL(examples[5]->l.slates.slot_id, 1);
 
-  check_collections_exact(examples[0]->indices, std::vector<namespace_index>{'G'});
+  check_collections_exact(examples[0]->get_indices(), std::vector<namespace_index>{'G'});
   BOOST_CHECK_EQUAL(examples[0]->feature_space['G'].indicies.size(), 4);
 
   VW::finish_example(*slates_vw, examples);
@@ -449,11 +449,11 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_cb)
   // check internals
 
   // check namespaces
-  BOOST_CHECK_EQUAL(examples[1]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[1]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[1]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[1]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[1]->feature_space['T'].space_names[0]->first, "TAction");
-  BOOST_CHECK_EQUAL(examples[2]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[2]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[2]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[2]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[2]->feature_space['T'].space_names[0]->first, "TAction");
 
   // check features
@@ -582,11 +582,11 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_ccb)
   // check internals
 
   // check namespaces
-  BOOST_CHECK_EQUAL(examples[1]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[1]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[1]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[1]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[1]->feature_space['T'].space_names[0]->first, "TAction");
-  BOOST_CHECK_EQUAL(examples[2]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[2]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[2]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[2]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[2]->feature_space['T'].space_names[0]->first, "TAction");
 
   // check features
@@ -748,11 +748,11 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_slates)
   // check internals
 
   // check namespaces
-  BOOST_CHECK_EQUAL(examples[1]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[1]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[1]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[1]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[1]->feature_space['T'].space_names[0]->first, "TAction");
-  BOOST_CHECK_EQUAL(examples[2]->indices.size(), 1);
-  BOOST_CHECK_EQUAL(examples[2]->indices[0], 'T');
+  BOOST_CHECK_EQUAL(examples[2]->get_indices().size(), 1);
+  BOOST_CHECK_EQUAL(examples[2]->get_indices()[0], 'T');
   BOOST_CHECK_EQUAL(examples[2]->feature_space['T'].space_names[0]->first, "TAction");
 
   // check features
