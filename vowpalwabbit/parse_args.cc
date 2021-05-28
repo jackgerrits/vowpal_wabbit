@@ -20,7 +20,6 @@
 #include "cbify.h"
 #include "oaa.h"
 #include "boosting.h"
-#include "multilabel_oaa.h"
 #include "rand48.h"
 #include "topk.h"
 #include "ect.h"
@@ -43,22 +42,18 @@
 #include "generate_interactions.h"
 #include "confidence.h"
 #include "scorer.h"
-#include "print.h"
 #include "learner.h"
 #include "ftrl.h"
 #include "rand48.h"
 #include "binary.h"
 #include "autolink.h"
-#include "plt.h"
 #include "parse_example.h"
 #include "best_constant.h"
 #include "vw_exception.h"
 #include "vw_validate.h"
-#include "audit_regressor.h"
 #include "marginal.h"
 #include "metrics.h"
 #include "explore_eval.h"
-#include "baseline.h"
 #include "cb_sample.h"
 #include "warm_cb.h"
 #include "shared_feature_merger.h"
@@ -1230,13 +1225,10 @@ void parse_reductions(options_i& options, workspace& all)
   // Base algorithms
   reductions.push_back(GD::setup);
   reductions.push_back(ftrl_setup);
-  reductions.push_back(print_setup);
-  // reductions.push_back(VW_CNTK::setup);
 
   reductions.push_back(generate_interactions_setup);
 
   // Score Users
-  reductions.push_back(baseline_setup);
   reductions.push_back(confidence_setup);
   reductions.push_back(marginal_setup);
   reductions.push_back(autolink_setup);
@@ -1250,8 +1242,6 @@ void parse_reductions(options_i& options, workspace& all)
   reductions.push_back(oaa_setup);
   reductions.push_back(boosting_setup);
   reductions.push_back(ect_setup);
-  reductions.push_back(multilabel_oaa_setup);
-  reductions.push_back(plt_setup);
 
   reductions.push_back(CSOAA::csoaa_setup);
   reductions.push_back(CSOAA::csldf_setup);
@@ -1286,7 +1276,6 @@ void parse_reductions(options_i& options, workspace& all)
   reductions.push_back(cbifyldf_setup);
   reductions.push_back(cb_to_cb_adf_setup);
   reductions.push_back(vw::offset_tree::setup);
-  reductions.push_back(audit_regressor_setup);
   reductions.push_back(vw::metrics::metrics_setup);
 
   register_reductions(all, reductions);
@@ -1620,7 +1609,7 @@ void free_args(int argc, char* argv[])
 void print_enabled_reductions(workspace& all)
 {
   // output list of enabled reductions
-  if (!all.logger.quiet && !all.options->was_supplied("audit_regressor") && !all.enabled_reductions.empty())
+  if (!all.logger.quiet && !all.enabled_reductions.empty())
   {
     const char* const delim = ", ";
     std::ostringstream imploded;
@@ -1683,9 +1672,7 @@ workspace* initialize(std::unique_ptr<options_i, options_deleter_type> options, 
 
     if (!all.options->get_typed_option<bool>("dry_run").value())
     {
-      if (!all.logger.quiet && !all.bfgs && !all.options->was_supplied("audit_regressor"))
-      { all.sd->print_update_header(*all.trace_message); }
-      all.l->init_driver();
+      if (!all.logger.quiet && !all.bfgs) { all.sd->print_update_header(*all.trace_message); }
     }
 
     return &all;
@@ -1789,7 +1776,7 @@ workspace* seed_vw_model(
 void finish(workspace& all, bool delete_all)
 {
   // also update VowpalWabbit::PerformanceStatistics::get() (vowpalwabbit.cpp)
-  if (!all.logger.quiet && !all.options->was_supplied("audit_regressor"))
+  if (!all.logger.quiet)
   {
     all.trace_message->precision(6);
     *(all.trace_message) << std::fixed;

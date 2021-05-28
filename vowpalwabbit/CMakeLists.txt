@@ -27,9 +27,7 @@ set(vw_all_headers
   action_score.h
   array_parameters_dense.h
   array_parameters.h
-  audit_regressor.h
   autolink.h
-  baseline.h
   best_constant.h
   binary.h
   boosting.h
@@ -103,7 +101,6 @@ set(vw_all_headers
   metrics.h
   metric_sink.h
   multiclass.h
-  multilabel_oaa.h
   multilabel.h
   numeric_casts.h
   kskip_ngram_transformer.h
@@ -123,9 +120,7 @@ set(vw_all_headers
   parse_slates_example_json.h
   parser.h
   pmf_to_pdf.h
-  plt.h
   reduction_features.h
-  print.h
   prob_dist_cont.h
   queue.h
   rand48.h
@@ -165,9 +160,7 @@ endif()
 
 set(vw_all_sources
   action_score.cc
-  audit_regressor.cc
   autolink.cc
-  baseline.cc
   best_constant.cc
   binary.cc
   boosting.cc
@@ -222,7 +215,6 @@ set(vw_all_sources
   marginal.cc
   metrics.cc
   multiclass.cc
-  multilabel_oaa.cc
   multilabel.cc
   kskip_ngram_transformer.cc
   oaa.cc
@@ -235,8 +227,6 @@ set(vw_all_sources
   parse_regressor.cc
   parser.cc
   pmf_to_pdf.cc
-  plt.cc
-  print.cc
   prob_dist_cont.cc
   rand48.cc
   sample_pdf.cc

@@ -24,7 +24,6 @@ enum class label_type_t
   multiclass,
   ccb,  // conditional contextual-bandit
   slates,
-  nolabel,
   continuous  // continuous actions
 };
 

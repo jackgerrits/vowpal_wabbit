@@ -579,7 +579,7 @@ def convert_tests_for_flatbuffers(tests, to_flatbuff, working_dir, color_enum):
         #todo: 300 understand why is it failing
         # test 189, 312, 316, 318 and 319 depend on dsjson parser behaviour
         # they can be enabled if we ignore diffing the --extra_metrics
-        if str(test_id) in ('215', '113', '225', '230', '231', '232'):
+        if str(test_id) in ('208', '110', '218', '223', '224', '225'):
             continue
 
         # test id is being used as an index here, not necessarily a contract

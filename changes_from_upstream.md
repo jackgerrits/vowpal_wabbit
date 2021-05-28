@@ -37,3 +37,4 @@
 - vw renamed to workspace
 - VW namespace changed to vw
 - Remove ldict
+- Remove baseline, mutlilabel_oaa, plt, print, audit_regressor
