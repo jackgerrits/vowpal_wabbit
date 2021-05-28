@@ -1672,8 +1672,7 @@ workspace* initialize(std::unique_ptr<options_i, options_deleter_type> options, 
 
     if (!all.options->get_typed_option<bool>("dry_run").value())
     {
-      if (!all.logger.quiet && !all.bfgs)
-      { all.sd->print_update_header(*all.trace_message); }
+      if (!all.logger.quiet && !all.bfgs) { all.sd->print_update_header(*all.trace_message); }
     }
 
     return &all;
