@@ -210,15 +210,6 @@ void to_flat::create_mc_label(example* v, ExampleBuilder& ex_builder)
   ex_builder.label_type = vw::parsers::flatbuffer::Label_MultiClass;
 }
 
-void to_flat::create_multi_label(example* v, ExampleBuilder& ex_builder)
-{
-  std::vector<uint32_t> labels;
-  for (auto const l : v->l.multilabels.label_v) { labels.push_back(l); }
-
-  ex_builder.label = vw::parsers::flatbuffer::CreateMultiLabelDirect(_builder, &labels).Union();
-  ex_builder.label_type = vw::parsers::flatbuffer::Label_MultiLabel;
-}
-
 void to_flat::create_slates_label(example* v, ExampleBuilder& ex_builder)
 {
   std::vector<flatbuffers::Offset<vw::parsers::flatbuffer::action_score>> action_scores;
@@ -292,9 +283,6 @@ void to_flat::convert_txt_to_flat(workspace& all)
         break;
       case label_type_t::ccb:
         to_flat::create_ccb_label(ae, ex_builder);
-        break;
-      case label_type_t::multilabel:
-        to_flat::create_multi_label(ae, ex_builder);
         break;
       case label_type_t::multiclass:
         to_flat::create_mc_label(ae, ex_builder);

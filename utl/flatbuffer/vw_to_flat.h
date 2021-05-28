@@ -74,7 +74,6 @@ private:
   void create_ccb_label(example* v, ExampleBuilder& ex_builder);
   void create_cb_eval_label(example* v, ExampleBuilder& ex_builder);
   void create_mc_label(example* v, ExampleBuilder& ex_builder);
-  void create_multi_label(example* v, ExampleBuilder& ex_builder);
   void create_slates_label(example* v, ExampleBuilder& ex_builder);
   void create_cs_label(example* v, ExampleBuilder& ex_builder);
   void create_continuous_action_label(example* v, ExampleBuilder& ex_builder);

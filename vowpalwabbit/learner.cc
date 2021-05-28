@@ -21,7 +21,6 @@ const char* to_string(prediction_type_t prediction_type)
     CASE(prediction_type_t::action_scores)
     CASE(prediction_type_t::action_probs)
     CASE(prediction_type_t::multiclass)
-    CASE(prediction_type_t::multilabels)
     CASE(prediction_type_t::prob)
     CASE(prediction_type_t::multiclassprobs)
     default:

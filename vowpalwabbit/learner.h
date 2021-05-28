@@ -30,7 +30,6 @@ enum class prediction_type_t
   pdf,
   action_probs,
   multiclass,
-  multilabels,
   prob,
   multiclassprobs,
   decision_probs,
