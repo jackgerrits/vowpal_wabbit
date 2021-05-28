@@ -475,16 +475,6 @@ public:
     VW_WARNING_STATE_POP
   }
 
-  // Called at the beginning by the driver.  Explicitly not recursive.
-  void init_driver() { init_fd.func(init_fd.data); }
-  void set_init_driver(void (*f)(T&))
-  {
-    VW_WARNING_STATE_PUSH
-    VW_WARNING_DISABLE_CAST_FUNC_TYPE
-    init_fd = tuple_dbf(learn_fd.data, learn_fd.base, (func_data::fn)f);
-    VW_WARNING_STATE_POP
-  }
-
   // called after learn example for each example.  Explicitly not recursive.
   inline void finish_example(workspace& all, E& ec)
   {
@@ -843,12 +833,6 @@ struct common_learner_builder
   FluentBuilderT& set_end_examples(void (*fn_ptr)(DataT&))
   {
     _learner->end_examples_fd = tuple_dbf(_learner->learn_fd.data, _learner->learn_fd.base, (func_data::fn)fn_ptr);
-    return *static_cast<FluentBuilderT*>(this);
-  }
-
-  FluentBuilderT& set_init_driver(void (*fn_ptr)(DataT&))
-  {
-    _learner->init_fd = tuple_dbf(_learner->learn_fd.data, _learner->learn_fd.base, (func_data::fn)fn_ptr);
     return *static_cast<FluentBuilderT*>(this);
   }
 

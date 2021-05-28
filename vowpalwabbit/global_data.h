@@ -18,18 +18,7 @@
 #include <memory>
 #include <atomic>
 #include <string_view>
-
-// Thread cannot be used in managed C++, tell the compiler that this is unmanaged even if included in a managed project.
-#ifdef _M_CEE
-#  pragma managed(push, off)
-#  undef _M_CEE
-#  include <thread>
-#  define _M_CEE 001
-#  pragma managed(pop)
-#else
-#  include <thread>
-#endif
-
+#include <thread>
 #include "v_array.h"
 #include "array_parameters.h"
 #include "loss_functions.h"

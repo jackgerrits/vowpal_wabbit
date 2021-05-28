@@ -149,20 +149,8 @@ Input options:
                         version, so enabling this option will migrate you to 
                         the new behavior and silence the warning.
   --flatbuffer          data file will be interpreted as a flatbuffer file
-Audit Regressor:
-  --audit_regressor arg stores feature names and their regressor values. Same 
-                        dataset must be used for both regressor training and 
-                        this mode.
 Autolink:
   --autolink arg        create link function with polynomial d
-Baseline options:
-  --baseline            Learn an additive baseline (from constant features) and
-                        a residual separately in regression.
-  --lr_multiplier arg   learning rate multiplier for baseline model
-  --global_only         use separate example with only global constant for 
-                        baseline predictions
-  --check_enabled       only use baseline when the example contains enabled 
-                        flag
 Binary loss:
   --binary              report loss as binary classification on -1,1
 Boosting:
@@ -412,8 +400,6 @@ Marginal options:
                                    marginals
   --decay arg (=0, )               decay multiplier per event (1e-3 for 
                                    example)
-Multilabel One Against All:
-  --multilabel_oaa arg  One-against-all multilabel with <k> labels
 One Against All Options:
   --oaa arg             One-against-all multiclass with <k> labels
   --oaa_subsample arg   subsample this number of negative examples when 
@@ -422,13 +408,6 @@ One Against All Options:
   --scores              output raw scores per class
 Offset tree Options:
   --ot arg              Offset tree with <k> labels
-Probabilistic Label Tree :
-  --plt arg                Probabilistic Label Tree with <k> labels
-  --kary_tree arg (=2, )   use <k>-ary tree
-  --threshold arg (=0.5, ) predict labels with conditional marginal probability
-                           greater than <thr> threshold
-  --top_k arg (=0, )       predict top-<k> labels instead of labels above 
-                           threshold
 Convert discrete PMF into continuous PDF:
   --pmf_to_pdf arg (=0, ) number of discrete actions <k> for pmf_to_pdf
   --min_value arg         Minimum continuous value
@@ -442,8 +421,6 @@ Convert discrete PMF into continuous PDF:
                           default bandwidth = unit_range / 2.0
   --first_only            Use user provided first action or user provided pdf 
                           or uniform random
-Print psuedolearner:
-  --print               print examples
 Continuous actions - sample pdf:
   --sample_pdf          Sample a pdf and pick a continuous valued action
 scorer options:

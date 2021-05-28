@@ -99,7 +99,7 @@ label_parser multilabel = {
   // read_cached_label
   [](polylabel* v, reduction_features&, io_buf& cache) { return read_cached_label(v->multilabels, cache); },
   // get_weight
-  [](const polylabel* v, const reduction_features&) { return 1.f; },
+  [](const polylabel*, const reduction_features&) { return 1.f; },
   // test_label
   [](const polylabel* v) { return test_label(v->multilabels); },
   label_type_t::multilabel

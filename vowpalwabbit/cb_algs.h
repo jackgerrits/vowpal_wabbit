@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "baseline.h"
 #include "guard.h"
 
 #include "cb.h"
@@ -37,8 +36,6 @@ float get_cost_pred(
   else
     simple_temp.label = FLT_MAX;
 
-  const bool baseline_enabled_old = BASELINE::baseline_enabled(&ec);
-  BASELINE::set_baseline_enabled(&ec);
   ec.l.simple = simple_temp;
   bool learn = is_learn && index == known_cost.action;
 
@@ -52,7 +49,6 @@ float get_cost_pred(
   else
     scorer->predict(ec, index - 1 + base);
 
-  if (!baseline_enabled_old) BASELINE::reset_baseline_disabled(&ec);
   float pred = ec.pred.scalar;
   return pred;
 }
