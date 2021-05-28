@@ -7,7 +7,6 @@
 #include "v_array.h"
 #include "simple_label.h"
 #include "multiclass.h"
-#include "multilabel.h"
 #include "cost_sensitive.h"
 #include "cb.h"
 #include "constant.h"
