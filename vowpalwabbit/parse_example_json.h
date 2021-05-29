@@ -13,13 +13,6 @@
 //#define RAPIDJSON_SIMD
 //#define RAPIDJSON_SSE42
 
-// Let MSVC know that it should not even try to compile RapidJSON as managed
-// - pragma documentation: https://docs.microsoft.com/en-us/cpp/preprocessor/managed-unmanaged?view=vs-2017
-// - /clr compilation detection: https://docs.microsoft.com/en-us/cpp/dotnet/how-to-detect-clr-compilation?view=vs-2017
-#if (_MANAGED == 1) || (_M_CEE == 1)
-#  pragma managed(push, off)
-#endif
-
 // RapidJson triggers this warning by memcpying non-trivially copyable type. Ignore it so that our warnings are not
 // polluted by it.
 // https://github.com/Tencent/rapidjson/issues/1700
@@ -28,10 +21,6 @@ VW_WARNING_DISABLE_CLASS_MEMACCESS
 #include <rapidjson/reader.h>
 #include <rapidjson/error/en.h>
 VW_WARNING_STATE_POP
-
-#if (_MANAGED == 1) || (_M_CEE == 1)
-#  pragma managed(pop)
-#endif
 
 #include "cb.h"
 #include "conditional_contextual_bandit.h"
