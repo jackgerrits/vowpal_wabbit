@@ -85,7 +85,6 @@ option(BUILD_TESTS "Build and enable tests." ON)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_ONLY_STANDALONE_BENCHMARKS "Build only the benchmarks that can run standalone (and do not use vw internals)" OFF)
 option(BUILD_DOCS "Add documentation targets." Off)
-option(BUILD_EXPERIMENTAL_BINDING "Add targets for experimental bindings" OFF)
 option(LTO "Enable Link Time optimization (Requires Release build, only works with clang and linux/mac for now)." Off)
 option(RAPIDJSON_SYS_DEP "Override using the submodule for RapidJSON dependency. Instead will use find_package" OFF)
 option(FMT_SYS_DEP "Override using the submodule for FMT dependency. Instead will use find_package" OFF)
@@ -266,11 +265,6 @@ if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(test)
 
-  set(vw_c_api_unit_test_target "")
-  if(BUILD_EXPERIMENTAL_BINDING)
-    set(vw_c_api_unit_test_target "vw_c_api_unit_test")
-  endif()
-
   # The Visual Studio expression generator
   set(cmake_test_configuration "")
   set(cmake_test_verbosity "--verbose")
@@ -282,13 +276,8 @@ if(BUILD_TESTS)
   # This target ensures all dependencies are built and also uses verbose mode allowing the test output to be seen.
   add_custom_target(test_with_output
     COMMAND ${CMAKE_CTEST_COMMAND} ${cmake_test_configuration} ${cmake_test_verbosity}
-    DEPENDS vw-unit-test.out vw-bin ${vw_c_api_unit_test_target}
+    DEPENDS vw-unit-test.out vw-bin
   )
-endif()
-
-# Must be done after the test block so that enable_testing() has been called
-if(BUILD_EXPERIMENTAL_BINDING)
-  add_subdirectory(bindings)
 endif()
 
 # Handle installation of targets, version, config and pkgconfig

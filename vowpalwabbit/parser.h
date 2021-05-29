@@ -6,20 +6,8 @@
 #include "example.h"
 #include "future_compat.h"
 
-// Mutex and CV cannot be used in managed C++, tell the compiler that this is unmanaged even if included in a managed
-// project.
-#ifdef _M_CEE
-#  pragma managed(push, off)
-#  undef _M_CEE
-#  include <mutex>
-#  include <condition_variable>
-#  define _M_CEE 001
-#  pragma managed(pop)
-#else
-#  include <mutex>
-#  include <condition_variable>
-#endif
-
+#include <mutex>
+#include <condition_variable>
 #include <atomic>
 #include <memory>
 #include <string_view>
