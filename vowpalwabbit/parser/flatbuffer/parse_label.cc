@@ -109,11 +109,6 @@ void parser::parse_mc_label(shared_data* /*sd*/, polylabel* l, const MultiClass*
   l->multi.weight = label->weight();
 }
 
-void parser::parse_multi_label(polylabel* l, const MultiLabel* label)
-{
-  for (auto const& lab : *(label->labels())) l->multilabels.label_v.push_back(lab);
-}
-
 void parser::parse_slates_label(polylabel* l, const Slates_Label* label)
 {
   l->slates.weight = label->weight();

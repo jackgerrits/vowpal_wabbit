@@ -7,7 +7,6 @@
 #include "v_array.h"
 #include "simple_label.h"
 #include "multiclass.h"
-#include "multilabel.h"
 #include "cost_sensitive.h"
 #include "cb.h"
 #include "constant.h"
@@ -44,7 +43,6 @@ struct polylabel
   CCB::label conditional_contextual_bandit;
   vw::slates::label slates;
   CB_EVAL::label cb_eval;
-  MULTILABEL::labels multilabels;
 };
 
 struct polyprediction
@@ -63,7 +61,6 @@ struct polyprediction
   ACTION_SCORE::action_scores a_s;  // a sequence of classes with scores.  Also used for probabilities.
   vw::decision_scores_t decision_scores;
   uint32_t multiclass = 0;
-  MULTILABEL::labels multilabels;
   float prob = 0.f;                                          // for --probabilities --csoaa_ldf=mc
   vw::continuous_actions::probability_density_function pdf;  // probability density defined over an action range
   vw::continuous_actions::probability_density_function_value pdf_value;  // probability density value for a given action

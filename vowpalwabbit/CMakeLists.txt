@@ -101,7 +101,6 @@ set(vw_all_headers
   metrics.h
   metric_sink.h
   multiclass.h
-  multilabel.h
   numeric_casts.h
   kskip_ngram_transformer.h
   oaa.h
@@ -215,7 +214,6 @@ set(vw_all_sources
   marginal.cc
   metrics.cc
   multiclass.cc
-  multilabel.cc
   kskip_ngram_transformer.cc
   oaa.cc
   offset_tree.cc

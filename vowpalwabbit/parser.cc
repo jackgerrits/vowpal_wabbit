@@ -675,13 +675,6 @@ float get_cost_sensitive_prediction(example* ec) { return static_cast<float>(ec-
 
 v_array<float>& get_cost_sensitive_prediction_confidence_scores(example* ec) { return ec->pred.scalars; }
 
-uint32_t* get_multilabel_predictions(example* ec, size_t& len)
-{
-  MULTILABEL::labels labels = ec->pred.multilabels;
-  len = labels.label_v.size();
-  return labels.label_v.begin();
-}
-
 float get_action_score(example* ec, size_t i)
 {
   ACTION_SCORE::action_scores scores = ec->pred.a_s;

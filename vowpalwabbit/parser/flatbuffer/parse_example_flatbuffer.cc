@@ -237,12 +237,6 @@ void parser::parse_flat_label(shared_data* sd, example* ae, const Example* eg)
       parse_mc_label(sd, &(ae->l), mc_label);
       break;
     }
-    case Label_MultiLabel:
-    {
-      auto multi_label = static_cast<const MultiLabel*>(eg->label());
-      parse_multi_label(&(ae->l), multi_label);
-      break;
-    }
     case Label_Slates_Label:
     {
       auto slates_label = static_cast<const Slates_Label*>(eg->label());
