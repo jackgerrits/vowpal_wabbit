@@ -17,7 +17,6 @@ typedef unsigned char namespace_index;
 #include <array>
 #include <mutex>
 
-
 struct example_predict
 {
   class iterator
