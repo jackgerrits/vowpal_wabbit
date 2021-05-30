@@ -579,7 +579,7 @@ def convert_tests_for_flatbuffers(tests, to_flatbuff, working_dir, color_enum):
         #todo: 300 understand why is it failing
         # test 189, 312, 316, 318 and 319 depend on dsjson parser behaviour
         # they can be enabled if we ignore diffing the --extra_metrics
-        if str(test_id) in ('208', '110', '218', '223', '224', '225'):
+        if str(test_id) in ('300', '189', '312', '316', '318', '319', '324'):
             continue
 
         # test id is being used as an index here, not necessarily a contract
@@ -688,6 +688,14 @@ def main():
     if args.for_flatbuffers:
         to_flatbuff = find_to_flatbuf_binary(test_base_ref_dir, args.to_flatbuff_path)
         tests = convert_tests_for_flatbuffers(tests, to_flatbuff, args.working_dir, color_enum)
+
+    # Skip "true" tests
+    for test in tests:
+        test_id = test['id']
+        if "bash_command" in test and 'true' == test['bash_command']:
+            print("{}Skipping test {} removed from overhaul{}".format(color_enum.LIGHT_CYAN, test_id, color_enum.ENDC))
+            test['skip'] = True
+            continue
 
     # Because bash_command based tests don't specify all inputs and outputs they must operate in the test directory directly.
     # This means that if they run in parallel they can break each other by touching the same files.

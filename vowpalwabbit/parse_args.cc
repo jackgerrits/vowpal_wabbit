@@ -18,11 +18,7 @@
 
 #include "gd.h"
 #include "cbify.h"
-#include "oaa.h"
-#include "boosting.h"
 #include "rand48.h"
-#include "topk.h"
-#include "ect.h"
 #include "csoaa.h"
 #include "cb_algs.h"
 #include "cb_adf.h"
@@ -40,13 +36,11 @@
 #include "cb_explore_adf_softmax.h"
 #include "slates.h"
 #include "generate_interactions.h"
-#include "confidence.h"
 #include "scorer.h"
 #include "learner.h"
 #include "ftrl.h"
 #include "rand48.h"
 #include "binary.h"
-#include "autolink.h"
 #include "parse_example.h"
 #include "best_constant.h"
 #include "vw_exception.h"
@@ -57,7 +51,6 @@
 #include "cb_sample.h"
 #include "warm_cb.h"
 #include "shared_feature_merger.h"
-#include "cbzo.h"
 // #include "cntk.h"
 
 #include "cats.h"
@@ -1229,20 +1222,10 @@ void parse_reductions(options_i& options, workspace& all)
   reductions.push_back(generate_interactions_setup);
 
   // Score Users
-  reductions.push_back(confidence_setup);
-  reductions.push_back(marginal_setup);
-  reductions.push_back(autolink_setup);
   reductions.push_back(scorer_setup);
-  reductions.push_back(vw::cbzo::setup);
 
   // Reductions
   reductions.push_back(vw::binary::binary_setup);
-
-  reductions.push_back(topk_setup);
-  reductions.push_back(oaa_setup);
-  reductions.push_back(boosting_setup);
-  reductions.push_back(ect_setup);
-
   reductions.push_back(CSOAA::csoaa_setup);
   reductions.push_back(CSOAA::csldf_setup);
   reductions.push_back(cb_algs_setup);

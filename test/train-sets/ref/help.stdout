@@ -149,15 +149,8 @@ Input options:
                         version, so enabling this option will migrate you to 
                         the new behavior and silence the warning.
   --flatbuffer          data file will be interpreted as a flatbuffer file
-Autolink:
-  --autolink arg        create link function with polynomial d
 Binary loss:
   --binary              report loss as binary classification on -1,1
-Boosting:
-  --boosting arg        Online boosting with <N> weak learners
-  --gamma arg (=0.1, )  weak learner's edge (=0.1), used only by online BBM
-  --alg arg (=BBM, )    specify the boosting algorithm: BBM (default), logistic
-                        (AdaBoost.OL.W), adaptive (AdaBoost.OL)
 Continuous actions tree with smoothing:
   --cats arg            number of discrete actions <k> for cats
   --min_value arg       Minimum continuous value
@@ -327,11 +320,6 @@ Make csoaa_ldf into Contextual Bandit:
   --cbify_ldf           Convert csoaa_ldf into a contextual bandit problem
   --loss0 arg (=0, )    loss for correct label
   --loss1 arg (=1, )    loss for incorrect label
-Continuous Action Contextual Bandit using Zeroth-Order Optimization:
-  --cbzo                   Solve 1-slot Continuous Action Contextual Bandit 
-                           using Zeroth-Order Optimization
-  --policy arg (=linear, ) Policy/Model to Learn
-  --radius arg (=0.1, )    Exploration Radius
 EXPERIMENTAL: Conditional Contextual Bandit Exploration with ADF:
   --ccb_explore_adf               EXPERIMENTAL: Do Conditional Contextual 
                                   Bandit learning with multiline action 
@@ -341,9 +329,6 @@ EXPERIMENTAL: Conditional Contextual Bandit Exploration with ADF:
                                   combinations of namespaces. For ex. this is a
                                   duplicate: '-q ab -q ba' and a lot more in 
                                   '-q ::'.
-Confidence:
-  --confidence                 Get confidence for binary predictions
-  --confidence_after_training  Confidence after training
 Cost Sensitive One Against All:
   --csoaa arg           One-against-all multiclass with <k> costs
 Cost Sensitive One Against All with Label Dependent Features:
@@ -356,11 +341,6 @@ Cost Sensitive One Against All with Label Dependent Features:
 Cost Sensitive weighted all-pairs with Label Dependent Features:
   --wap_ldf arg         Use weighted all-pairs multiclass learning with label 
                         dependent features.  Specify singleline or multiline.
-Error Correcting Tournament Options:
-  --ect arg                Error correcting tournament with <k> labels
-  --error arg (=0, )       errors allowed by ECT
-  --link arg (=identity, ) Specify the link function: identity, logistic, glf1 
-                           or poisson
 Explore evaluation:
   --explore_eval        Evaluate explore_eval adf policies
   --multiplier arg      Multiplier used to make all rejection sample 
@@ -390,22 +370,6 @@ Generate interactions:
                                   '-q ::'.
 Continuous actions - convert to pmf:
   --get_pmf             Convert a single multiclass prediction to a pmf
-Marginal options:
-  --marginal arg                   substitute marginal label estimates for ids
-  --initial_denominator arg (=1, ) initial denominator
-  --initial_numerator arg (=0.5, ) initial numerator
-  --compete                        enable competition with marginal features
-  --update_before_learn            update marginal values before learning
-  --unweighted_marginals           ignore importance weights when computing 
-                                   marginals
-  --decay arg (=0, )               decay multiplier per event (1e-3 for 
-                                   example)
-One Against All Options:
-  --oaa arg             One-against-all multiclass with <k> labels
-  --oaa_subsample arg   subsample this number of negative examples when 
-                        learning
-  --probabilities       predict probabilites of all classes
-  --scores              output raw scores per class
 Offset tree Options:
   --ot arg              Offset tree with <k> labels
 Convert discrete PMF into continuous PDF:
@@ -428,8 +392,6 @@ scorer options:
                            or poisson
 Slates:
   --slates              EXPERIMENTAL
-Top K:
-  --top arg             top k recommendation
 Make Multiclass into Warm-starting Contextual Bandit:
   --warm_cb arg                        Convert multiclass on <k> classes into a
                                        contextual bandit problem
