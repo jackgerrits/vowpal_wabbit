@@ -120,7 +120,7 @@ if __name__ == '__main__':
     VW = options.vw
     filename = options.filename
     repeat_args = not options.no_repeat_args
-    verbose = options.verbose
+    verbose = options.verbose 
     verbose_on_fail = options.verbose_on_fail
     errors = 0
 
@@ -137,7 +137,6 @@ if __name__ == '__main__':
         errors += do_test(filename, '--max_prediction 0.1')
         errors += do_test(filename, '--hash_seed 10')
         errors += do_test(filename, '--loss_function logistic')
-        errors += do_test(filename, '--boosting 10')
         errors += do_test(filename, '--l1 1e-04')
         errors += do_test(filename, '--l2 1e-04')
         errors += do_test(filename, '--learning_rate 0.1')
@@ -158,9 +157,7 @@ if __name__ == '__main__':
         # this one also fails but pollutes output
         #errors += do_test(filename, '--ksvm', known_failure=True)
 
-        errors += do_test('train-sets/multiclass', '--oaa 10')
         errors += do_test('train-sets/multiclass', '--csoaa 10')
-        errors += do_test('train-sets/multiclass', '--ect 10')
 
     if errors:
         sys.exit('%s failed' % errors)
