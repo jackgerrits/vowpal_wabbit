@@ -38,3 +38,4 @@
 - VW namespace changed to vw
 - Remove ldict
 - Remove baseline, mutlilabel_oaa, plt, print, audit_regressor
+- Remove autolink, boosting, cbzo, confidence, ect, oaa, topk

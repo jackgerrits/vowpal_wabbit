@@ -27,10 +27,8 @@ set(vw_all_headers
   action_score.h
   array_parameters_dense.h
   array_parameters.h
-  autolink.h
   best_constant.h
   binary.h
-  boosting.h
   cache.h
   cats_pdf.h
   cats_tree.h
@@ -59,10 +57,8 @@ set(vw_all_headers
   ccb_reduction_features.h
   continuous_actions_reduction_features.h
   conditional_contextual_bandit.h
-  confidence.h
   config.h.in
   constant.h
-  cbzo.h
   correctedMath.h
   cost_sensitive.h
   crossplat_compat.h
@@ -70,7 +66,6 @@ set(vw_all_headers
   debug_print.h
   decision_scores.h
   distributionally_robust.h
-  ect.h
   error_constants.h
   error_data.h
   error_reporting.h
@@ -103,7 +98,6 @@ set(vw_all_headers
   multiclass.h
   numeric_casts.h
   kskip_ngram_transformer.h
-  oaa.h
   object_pool.h
   offset_tree.h
   options_boost_po.h
@@ -136,7 +130,6 @@ set(vw_all_headers
   slates.h
   stable_unique.h
   tag_utils.h
-  topk.h
   unique_sort.h
   v_array.h
   version.h
@@ -159,10 +152,8 @@ endif()
 
 set(vw_all_sources
   action_score.cc
-  autolink.cc
   best_constant.cc
   binary.cc
-  boosting.cc
   cache.cc
   cats_pdf.cc
   cats_tree.cc
@@ -188,13 +179,10 @@ set(vw_all_sources
   cb_to_cb_adf.cc
   ccb_label.cc
   conditional_contextual_bandit.cc
-  confidence.cc
-  cbzo.cc
   cost_sensitive.cc
   csoaa.cc
   decision_scores.cc
   distributionally_robust.cc
-  ect.cc
   example_predict.cc
   example.cc
   explore_eval.cc
@@ -215,7 +203,6 @@ set(vw_all_sources
   metrics.cc
   multiclass.cc
   kskip_ngram_transformer.cc
-  oaa.cc
   offset_tree.cc
   options_boost_po.cc
   options_serializer_boost_po.cc
@@ -236,7 +223,6 @@ set(vw_all_sources
   slates_label.cc
   slates.cc
   tag_utils.cc
-  topk.cc
   unique_sort.cc
   version.cc
   vw_exception.cc
