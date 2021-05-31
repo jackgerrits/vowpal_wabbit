@@ -372,7 +372,7 @@ uint32_t predict_bandit_adf(warm_cb& data, multi_learner& base, example& ec)
   uint32_t chosen_action;
   if (sample_after_normalizing(data.app_seed + data.example_counter++, begin_scores(out_ec.pred.a_s),
           end_scores(out_ec.pred.a_s), chosen_action))
-    throw vw::error(vw::error_code::unknown, "Failed to sample from pdf");
+    throw vw::error("Failed to sample from pdf");
 
   auto& a_s = data.a_s_adf;
   a_s = out_ec.pred.a_s;
@@ -415,7 +415,7 @@ void predict_or_learn_bandit_adf(warm_cb& data, multi_learner& base, example& ec
   cl.action = a_s[chosen_action].action + 1;
   cl.probability = a_s[chosen_action].score;
 
-  if (!cl.action) throw vw::error(vw::error_code::unknown, "No action with non-zero probability found!");
+  if (!cl.action) throw vw::error("No action with non-zero probability found!");
 
   if (use_cs)
     cl.cost = loss_cs(data, ec.l.cs.costs, cl.action);
@@ -572,7 +572,7 @@ base_learner* warm_cb_setup(options_i& options, workspace& all)
   if (!options.add_parse_and_check_necessary(new_options)) { return nullptr; }
 
   if (use_cs && (options.was_supplied("corrupt_type_warm_start") || options.was_supplied("corrupt_prob_warm_start")))
-  { throw vw::error(vw::error_code::unknown, "label corruption on cost-sensitive examples not currently supported"); }
+  { throw vw::error("label corruption on cost-sensitive examples not currently supported"); }
 
   data->app_seed = uniform_hash("vw", 2, 0);
   data->a_s = v_init<action_score>();

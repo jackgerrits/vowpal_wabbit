@@ -21,5 +21,5 @@ void options_serializer_boost_po::serialize<bool>(typed_option<bool>& typed_opti
 template <>
 void options_serializer_boost_po::add_impl<typelist<>>(base_option&)
 {
-  THROW("That is an unsupported option type.");
+  throw vw::error("That is an unsupported option type.");
 }

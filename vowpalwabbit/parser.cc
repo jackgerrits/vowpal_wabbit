@@ -94,9 +94,9 @@ uint32_t cache_numbits(io_buf* buf, vw::io::reader* filepointer)
 {
   size_t v_length;
   buf->read_file(filepointer, reinterpret_cast<char*>(&v_length), sizeof(v_length));
-  if (v_length > 61) throw vw::error(vw::error_code::unknown, "cache version too long, cache file is probably invalid");
+  if (v_length > 61) throw vw::error("cache version too long, cache file is probably invalid");
 
-  if (v_length == 0) throw vw::error(vw::error_code::unknown, "cache version too short, cache file is probably invalid");
+  if (v_length == 0) throw vw::error("cache version too short, cache file is probably invalid");
 
   std::vector<char> t(v_length);
   buf->read_file(filepointer, t.data(), v_length);
@@ -104,9 +104,9 @@ uint32_t cache_numbits(io_buf* buf, vw::io::reader* filepointer)
   if (v_tmp != vw::version) { return 0; }
 
   char temp;
-  if (buf->read_file(filepointer, &temp, 1) < 1) throw vw::error(vw::error_code::unknown, "failed to read");
+  if (buf->read_file(filepointer, &temp, 1) < 1) throw vw::error("failed to read");
 
-  if (temp != 'c') throw vw::error(vw::error_code::unknown, "data file is not a cache file");
+  if (temp != 'c') throw vw::error("data file is not a cache file");
 
   uint32_t cache_numbits;
   if (buf->read_file(filepointer, &cache_numbits, sizeof(cache_numbits)) < static_cast<int>(sizeof(cache_numbits)))
@@ -179,8 +179,9 @@ void reset_source(workspace& all, size_t numbits)
 
     // Rename the cache file to the final name.
     if (0 != rename(all.example_parser->currentname.c_str(), all.example_parser->finalname.c_str()))
-      THROW("WARN: reset_source(workspace& all, size_t numbits) cannot rename: "
-          << all.example_parser->currentname << " to " << all.example_parser->finalname);
+    {
+      throw vw::error(fmt::format("WARN: reset_source(workspace& all, size_t numbits) cannot rename: {} to {}", all.example_parser->currentname, all.example_parser->finalname));
+    }
     input->close_files();
     // Now open the written cache as the new input file.
     input->add_file(vw::io::open_file_reader(all.example_parser->finalname));
@@ -192,7 +193,7 @@ void reset_source(workspace& all, size_t numbits)
     for (auto& file : input->get_input_files())
     {
       input->reset_file(file.get());
-      if (cache_numbits(input, file.get()) < numbits) throw vw::error(vw::error_code::unknown, "argh, a bug in caching of some sort!");
+      if (cache_numbits(input, file.get()) < numbits) throw vw::error("argh, a bug in caching of some sort!");
     }
   }
 }
@@ -371,7 +372,7 @@ void enable_sources(workspace& all, bool quiet, size_t passes, input_options& in
     }
 
   if (passes > 1 && !all.example_parser->resettable)
-    throw vw::error(vw::error_code::unknown, "need a cache file for multiple passes : try using --cache_file");
+    throw vw::error("need a cache file for multiple passes : try using --cache_file");
 
   if (!quiet) *(all.trace_message) << "num sources = " << all.example_parser->input->num_files() << endl;
 }
@@ -669,7 +670,6 @@ float get_initial(example* ec)
   return simple_red_features.initial;
 }
 
-float get_prediction(example* ec) { return ec->pred.scalar; }
 
 float get_cost_sensitive_prediction(example* ec) { return static_cast<float>(ec->pred.multiclass); }
 

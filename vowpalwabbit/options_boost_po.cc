@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <utility>
+#include <fmt/format.h>
 
 #include <boost/exception/exception.hpp>
 #include <boost/throw_exception.hpp>
@@ -38,7 +39,7 @@ po::typed_value<std::vector<bool>>* options_boost_po::convert_to_boost_value(std
   auto value = get_base_boost_value(opt);
 
   if (opt->default_value_supplied())
-  { THROW("Using a bool option type acts as a switch, no explicit default value is allowed.") }
+  { throw vw::error("Using a bool option type acts as a switch, no explicit default value is allowed."); }
 
   value->default_value({false});
   value->zero_tokens();
@@ -134,11 +135,11 @@ void options_boost_po::add_and_parse(const option_group_definition& group)
   catch (boost::exception_detail::clone_impl<
       boost::exception_detail::error_info_injector<boost::program_options::ambiguous_option>>& ex)
   {
-    throw vw::error(vw::error_code::unknown, ex.what());
+    throw vw::error(ex.what());
   }
   catch (boost::program_options::ambiguous_option& ex)
   {
-    throw vw::error(vw::error_code::unknown, ex.what());
+    throw vw::error(ex.what());
   }
 }
 
@@ -233,13 +234,14 @@ void options_boost_po::check_unregistered()
   for (auto const& supplied : m_supplied_options)
   {
     if (m_defined_options.count(supplied) == 0 && m_ignore_supplied.count(supplied) == 0)
-    { 
-      throw std::error(vw::error_code::unrecognized_option, std::format("unrecognised option '--{}'", supplied));
+    {
+      throw vw::error(vw::error_code::unrecognized_option, fmt::format("unrecognised option '--{}'", supplied));
+    }
   }
 }
 
 template <>
 void options_boost_po::add_to_description_impl<typelist<>>(std::shared_ptr<base_option>, po::options_description&)
 {
-  THROW("That is an unsupported option type.");
+  throw vw::error("That is an unsupported option type.");
 }

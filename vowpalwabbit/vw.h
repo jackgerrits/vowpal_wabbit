@@ -110,7 +110,6 @@ float get_topic_prediction(example* ec, size_t i);  // i=0 to max topic -1
 float get_label(example* ec);
 float get_importance(example* ec);
 float get_initial(example* ec);
-float get_prediction(example* ec);
 float get_cost_sensitive_prediction(example* ec);
 v_array<float>& get_cost_sensitive_prediction_confidence_scores(example* ec);
 float get_action_score(example* ec, size_t i);

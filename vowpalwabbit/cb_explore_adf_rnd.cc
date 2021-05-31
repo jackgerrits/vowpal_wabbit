@@ -281,11 +281,11 @@ base_learner* setup(vw::config::options_i& options, workspace& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (alpha <= 0) { throw vw::error(vw::error_code::unknown, "The value of rnd_alpha must be positive.") }
+  if (alpha <= 0) { throw vw::error("The value of rnd_alpha must be positive."); }
 
-  if (invlambda <= 0) { throw vw::error(vw::error_code::unknown, "The value of rnd_invlambda must be positive.") }
+  if (invlambda <= 0) { throw vw::error("The value of rnd_invlambda must be positive."); }
 
-  if (numrnd < 1) { throw vw::error(vw::error_code::unknown, "The value of numrnd must be at least 1.") }
+  if (numrnd < 1) { throw vw::error("The value of numrnd must be at least 1."); }
 
   // Ensure serialization of cb_adf in all cases.
   if (!options.was_supplied("cb_adf")) { options.insert("cb_adf", ""); }
@@ -301,7 +301,7 @@ base_learner* setup(vw::config::options_i& options, workspace& all)
   auto data = vw::make_unique<explore_type>(
       with_metrics, epsilon, alpha, invlambda, numrnd, base->increment * problem_multiplier, &all);
 
-  if (epsilon < 0.0 || epsilon > 1.0) { throw vw::error(vw::error_code::unknown, "The value of epsilon must be in [0,1]"); }
+  if (epsilon < 0.0 || epsilon > 1.0) { throw vw::error("The value of epsilon must be in [0,1]"); }
   auto* l = make_reduction_learner(
       std::move(data), base, explore_type::learn, explore_type::predict, all.get_setupfn_name(setup) + "-rnd")
                 .set_params_per_weight(problem_multiplier)

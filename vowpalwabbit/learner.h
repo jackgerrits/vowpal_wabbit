@@ -509,7 +509,7 @@ public:
     debug_log_message(ec, "print_example");
 
     if (finish_example_fd.print_example_f == nullptr)
-      THROW("fatal: learner did not register print example fn: " + name);
+      throw vw::error("fatal: learner did not register print example fn: " + name);
 
     finish_example_fd.print_example_f(all, finish_example_fd.data, (void*)&ec);
   }
@@ -587,7 +587,7 @@ public:
       if (learn_fd.base != nullptr)
         return learn_fd.base->get_learner_by_name_prefix(reduction_name);
       else
-        THROW("fatal: could not find in learner chain: " << reduction_name);
+        throw vw::error(fmt::format("fatal: could not find in learner chain: {}", reduction_name));
     }
   }
 };
@@ -713,7 +713,7 @@ multi_learner* as_multiline(learner<T, E>* l)
 {
   if (l->is_multiline)  // Tried to use a singleline reduction as a multiline reduction
     return (multi_learner*)(l);
-  throw vw::error(vw::error_code::unknown, "Tried to use a singleline reduction as a multiline reduction");
+  throw vw::error("Tried to use a singleline reduction as a multiline reduction");
 }
 
 template <class T, class E>
@@ -721,7 +721,7 @@ single_learner* as_singleline(learner<T, E>* l)
 {
   if (!l->is_multiline)  // Tried to use a multiline reduction as a singleline reduction
     return (single_learner*)(l);
-  throw vw::error(vw::error_code::unknown, "Tried to use a multiline reduction as a singleline reduction");
+  throw vw::error("Tried to use a multiline reduction as a singleline reduction");
 }
 
 template <bool is_learn>

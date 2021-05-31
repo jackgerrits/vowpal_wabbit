@@ -89,7 +89,7 @@ vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
   using explore_type = cb_explore_adf_base<cb_explore_adf_softmax>;
   auto data = vw::make_unique<explore_type>(with_metrics, epsilon, lambda);
 
-  if (epsilon < 0.0 || epsilon > 1.0) { throw vw::error(vw::error_code::unknown, "The value of epsilon must be in [0,1]"); }
+  if (epsilon < 0.0 || epsilon > 1.0) { throw vw::error("The value of epsilon must be in [0,1]"); }
   auto* l = make_reduction_learner(
       std::move(data), base, explore_type::learn, explore_type::predict, all.get_setupfn_name(setup) + "-softmax")
                 .set_params_per_weight(problem_multiplier)

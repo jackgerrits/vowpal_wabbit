@@ -6,6 +6,7 @@
 #include "vw_exception.h"
 
 #include <string>
+#include <fmt/format.h>
 
 hash_func_t getHasher(const std::string& s)
 {
@@ -14,5 +15,5 @@ hash_func_t getHasher(const std::string& s)
   else if (s == "all")
     return hashall;
   else
-    THROW("Unknown hash function: " << s);
+    throw vw::error(fmt::format("Unknown hash function: {}", s));
 }

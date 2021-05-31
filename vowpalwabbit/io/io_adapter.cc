@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+#include <fmt/format.h>
 #include <cstdio>
 #include <cassert>
 #include <cstring>
@@ -237,7 +238,9 @@ file_adapter::file_adapter(const char* filename, file_mode mode)
   }
 #endif
 
-  if (_file_descriptor == -1 && *filename != '\0') { THROWERRNO("can't open: " << filename); }
+  if (_file_descriptor == -1 && *filename != '\0') {
+    throw vw::error(fmt::format("errno: {}, err_msg: {}, can't open: {}", errno, vw::errno_to_string(errno), filename));
+  }
 }
 
 file_adapter::file_adapter(int file_descriptor, file_mode mode, bool should_close)

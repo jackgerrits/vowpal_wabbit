@@ -37,7 +37,7 @@ struct sfm_data
 template <bool is_learn>
 void predict_or_learn(sfm_data&, vw::LEARNER::multi_learner& base, multi_ex& ec_seq)
 {
-  if (ec_seq.size() == 0) THROW("cb_adf: At least one action must be provided for an example to be valid.");
+  if (ec_seq.size() == 0) throw vw::error("cb_adf: At least one action must be provided for an example to be valid.");
 
   multi_ex::value_type shared_example = nullptr;
 

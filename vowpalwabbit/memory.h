@@ -25,7 +25,7 @@ T* calloc_or_throw(size_t nmemb)
     const char* msg = "internal error: memory allocation failed!\n";
     // use low-level function since we're already out of memory.
     fputs(msg, stderr);
-    throw vw::error(vw::error_code::unknown, msg);
+    throw vw::error(msg);
   }
   return (T*)data;
 }
@@ -90,13 +90,13 @@ T* calloc_mergable_or_throw(size_t nmemb)
   {
     const char* msg = "internal error: memory allocation failed!\n";
     fputs(msg, stderr);
-    throw vw::error(vw::error_code::unknown, msg);
+    throw vw::error(msg);
   }
   if (data == nullptr)
   {
     const char* msg = "internal error: memory allocation failed!\n";
     fputs(msg, stderr);
-    throw vw::error(vw::error_code::unknown, msg);
+    throw vw::error(msg);
   }
   memset(data, 0, length);
   // mark weight vector as KSM sharable

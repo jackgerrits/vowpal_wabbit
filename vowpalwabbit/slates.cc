@@ -55,7 +55,7 @@ void slates_data::learn_or_predict(vw::LEARNER::multi_learner& base, multi_ex& e
     }
     else if (slates_label.type == slates::example_type::action)
     {
-      if (slates_label.slot_id >= num_slots) { throw vw::error(vw::error_code::unknown, "slot_id cannot be larger than or equal to the number of slots"); }
+      if (slates_label.slot_id >= num_slots) { throw vw::error("slot_id cannot be larger than or equal to the number of slots"); }
       ccb_label.type = CCB::example_type::action;
       slot_action_pools[slates_label.slot_id].push_back(action_index);
       action_index++;
@@ -183,7 +183,7 @@ void output_example(workspace& all, slates_data& /*c*/, multi_ex& ec_seq)
       if (is_labelled)
       {
         const auto& this_example_label_probs = ec->l.slates.probabilities;
-        if (this_example_label_probs.empty()) { throw vw::error(vw::error_code::unknown, "Probabilities missing for labeled example"); }
+        if (this_example_label_probs.empty()) { throw vw::error("Probabilities missing for labeled example"); }
         // Only care about top action for each slot.
         label_probs.push_back(this_example_label_probs[0]);
       }

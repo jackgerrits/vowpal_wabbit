@@ -160,7 +160,7 @@ vw::LEARNER::base_learner* cb_to_cb_adf_setup(options_i& options, workspace& all
 
   learner<cb_to_cb_adf, example>* l;
 
-  if (num_actions <= 0) throw vw::error(vw::error_code::unknown, "cb num actions must be positive");
+  if (num_actions <= 0) throw vw::error("cb num actions must be positive");
 
   data->adf_data.init_adf_data(num_actions, base->increment, all.interactions);
 

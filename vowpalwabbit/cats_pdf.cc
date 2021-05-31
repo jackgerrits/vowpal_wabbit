@@ -9,7 +9,6 @@
 
 #include "cats_pdf.h"
 #include "parse_args.h"
-#include "error_constants.h"
 #include "cb_continuous_label.h"
 #include "debug_log.h"
 #include "shared_data.h"

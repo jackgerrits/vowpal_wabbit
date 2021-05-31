@@ -30,7 +30,7 @@ std::vector<std::string_view> name_value(std::string_view s, float& v)
       break;
     case 2:
       v = float_of_string(name[1]);
-      if (std::isnan(v)) THROW("error NaN value for: " << name[0]);
+      if (std::isnan(v)) throw vw::error(fmt::format("error NaN value for: {}", name[0]));
       break;
     default:
       logger::errlog_error("example with a wierd name. What is '{}'?", s);
@@ -44,7 +44,7 @@ char* bufread_label(label& ld, char* c, io_buf& cache)
   ld.costs.clear();
   c += sizeof(size_t);
   size_t total = sizeof(wclass) * num;
-  if (cache.buf_read(c, static_cast<int>(total)) < total) { THROW("error in demarshal of cost data"); }
+  if (cache.buf_read(c, static_cast<int>(total)) < total) { throw vw::error("error in demarshal of cost data"); }
   for (size_t i = 0; i < num; i++)
   {
     wclass temp = *reinterpret_cast<wclass*>(c);
@@ -141,7 +141,7 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, reductio
     wclass f = {0., 0, 0., 0.};
     const auto tokenized = name_value(words[i], f.x);
 
-    if (tokenized.size() == 0) THROW(" invalid cost: specification -- no names on: " << words[i]);
+    if (tokenized.size() == 0) throw vw::error(fmt::format(" invalid cost: specification -- no names on: {}",  words[i]));
 
     if (tokenized.size() == 1 || tokenized.size() == 2 || tokenized.size() == 3)
     {
@@ -150,7 +150,7 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, reductio
         f.x = FLT_MAX;
     }
     else
-      THROW("malformed cost specification on '" << (tokenized[0]) << "'");
+      throw vw::error(fmt::format("malformed cost specification on '{}'", tokenized[0]));
 
     ld.costs.push_back(f);
   }

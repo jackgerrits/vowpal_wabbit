@@ -213,13 +213,13 @@ void predict_or_learn_regression_discrete(cbify& data, single_learner& base, exa
   uint32_t chosen_action;
   if (sample_after_normalizing(
           data.app_seed + data.example_counter++, begin_scores(ec.pred.a_s), end_scores(ec.pred.a_s), chosen_action))
-    throw vw::error(vw::error_code::unknown, "Failed to sample from pdf");
+    throw vw::error("Failed to sample from pdf");
 
   CB::cb_class cb;
   cb.action = chosen_action + 1;
   cb.probability = ec.pred.a_s[chosen_action].score;
 
-  if (!cb.action) throw vw::error(vw::error_code::unknown, "No action with non-zero probability found!");
+  if (!cb.action) throw vw::error("No action with non-zero probability found!");
   float continuous_range = data.regression_data.max_value - data.regression_data.min_value;
   float converted_action =
       data.regression_data.min_value + chosen_action * continuous_range / data.regression_data.num_actions;
@@ -355,7 +355,7 @@ void predict_or_learn(cbify& data, single_learner& base, example& ec)
   uint32_t chosen_action;
   if (sample_after_normalizing(
           data.app_seed + data.example_counter++, begin_scores(ec.pred.a_s), end_scores(ec.pred.a_s), chosen_action))
-    throw vw::error(vw::error_code::unknown, "Failed to sample from pdf");
+    throw vw::error("Failed to sample from pdf");
 
   // Create a new cb label
   const auto action = chosen_action + 1;
@@ -389,7 +389,7 @@ void predict_adf(cbify& data, multi_learner& base, example& ec)
 
   if (sample_after_normalizing(data.app_seed + data.example_counter++, begin_scores(out_ec.pred.a_s),
           end_scores(out_ec.pred.a_s), data.chosen_action))
-    throw vw::error(vw::error_code::unknown, "Failed to sample from pdf");
+    throw vw::error("Failed to sample from pdf");
 
   ec.pred.multiclass = out_ec.pred.a_s[data.chosen_action].action + 1;
   ec.l = save_label;
@@ -411,7 +411,7 @@ void learn_adf(cbify& data, multi_learner& base, example& ec)
   cl.action = out_ec.pred.a_s[data.chosen_action].action + 1;
   cl.probability = out_ec.pred.a_s[data.chosen_action].score;
 
-  if (!cl.action) throw vw::error(vw::error_code::unknown, "No action with non-zero probability found!");
+  if (!cl.action) throw vw::error("No action with non-zero probability found!");
 
   if (use_cs)
     cl.cost = loss_cs(data, csl.costs, cl.action);
@@ -448,7 +448,7 @@ void do_actual_predict_ldf(cbify& data, multi_learner& base, multi_ex& ec_seq)
 
   if (sample_after_normalizing(data.app_seed + data.example_counter++, begin_scores(out_ec.pred.a_s),
           end_scores(out_ec.pred.a_s), data.chosen_action))
-    throw vw::error(vw::error_code::unknown, "Failed to sample from pdf");
+    throw vw::error("Failed to sample from pdf");
 
   // Get the predicted action (adjusting for 1 based start)
   const auto predicted_action = out_ec.pred.a_s[data.chosen_action].action + 1;
@@ -472,7 +472,7 @@ void do_actual_learning_ldf(cbify& data, multi_learner& base, multi_ex& ec_seq)
   cl.action = data.cb_as[0][data.chosen_action].action + 1;
   cl.probability = data.cb_as[0][data.chosen_action].score;
 
-  if (!cl.action) throw vw::error(vw::error_code::unknown, "No action with non-zero probability found!");
+  if (!cl.action) throw vw::error("No action with non-zero probability found!");
 
   cl.cost = loss_csldf(data, data.cs_costs, cl.action);
 
@@ -706,12 +706,12 @@ base_learner* cbify_setup(options_i& options, workspace& all)
   if (use_reg)
   {
     // Check invalid parameter combinations
-    if (data->use_adf) { throw vw::error(vw::error_code::unknown, "error: incompatible options: cb_explore_adf and cbify_reg"); }
-    if (use_cs) { throw vw::error(vw::error_code::unknown, "error: incompatible options: cbify_cs and cbify_reg"); }
+    if (data->use_adf) { throw vw::error("error: incompatible options: cb_explore_adf and cbify_reg"); }
+    if (use_cs) { throw vw::error("error: incompatible options: cbify_cs and cbify_reg"); }
     if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
-    { throw vw::error(vw::error_code::unknown, "error: min and max values must be supplied with cbify_reg"); }
+    { throw vw::error("error: min and max values must be supplied with cbify_reg"); }
 
-    if (use_discrete && options.was_supplied("cats")) { throw vw::error(vw::error_code::unknown, "error: incompatible options: cb_discrete and cats"); }
+    if (use_discrete && options.was_supplied("cats")) { throw vw::error("error: incompatible options: cb_discrete and cats"); }
     else if (use_discrete)
     {
       std::stringstream ss;
@@ -721,7 +721,7 @@ base_learner* cbify_setup(options_i& options, workspace& all)
     else if (options.was_supplied("cats"))
     {
       if (cb_continuous_num_actions != num_actions)
-        throw vw::error(vw::error_code::unknown, "error: different number of actions specified for cbify and cb_continuous");
+        throw vw::error("error: different number of actions specified for cbify and cb_continuous");
     }
     else
     {

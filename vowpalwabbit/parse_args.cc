@@ -153,7 +153,8 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
   }
 
   std::string fname = find_in_path(all.dictionary_path, std::string(s));
-  if (fname == "") THROW("error: cannot find dictionary '" << s << "' in path; try adding --dictionary_path");
+  if (fname == "")
+  { throw vw::error(fmt::format("error: cannot find dictionary '{}' in path; try adding --dictionary_path", s)); }
 
   bool is_gzip = ends_with(fname, ".gz");
   std::unique_ptr<vw::io::reader> file_adapter;
@@ -163,8 +164,7 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
   }
   catch (...)
   {
-    throw vw::error(vw::error_code::unknown, "error: cannot read dictionary from file '" << fname << "'"
-                                                      << ", opening failed");
+    throw vw::error(fmt::format("error: cannot read dictionary from file '{}', opening failed", fname));
   }
 
   uint64_t fd_hash = hash_file_contents(file_adapter.get());
@@ -190,7 +190,7 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
   }
   catch (...)
   {
-    throw vw::error(vw::error_code::unknown, "error: cannot re-read dictionary from file '" << fname << "', opening failed");
+    throw vw::error(fmt::format("error: cannot re-read dictionary from file '{}', opening failed", fname));
   }
   auto map = std::make_shared<feature_dict>();
   // mimicing old v_hashmap behavior for load factor.
@@ -218,7 +218,7 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
         {
           free(buffer);
           vw::dealloc_examples(ec, 1);
-          THROW("error: memory allocation failed in reading dictionary");
+          throw vw::error("error: memory allocation failed in reading dictionary");
         }
         else
           buffer = new_buffer;
@@ -283,7 +283,7 @@ void parse_affix_argument(workspace& all, std::string str)
         prefix = 0;
         q++;
       }
-      if ((q[0] < '1') || (q[0] > '7')) THROW("malformed affix argument (length must be 1..7): " << p);
+      if ((q[0] < '1') || (q[0] > '7')) throw vw::error(fmt::format("malformed affix argument (length must be 1..7): {}", p));
 
       uint16_t len = static_cast<uint16_t>(q[0] - '0');
       uint16_t ns = static_cast<uint16_t>(' ');  // default namespace
@@ -292,9 +292,9 @@ void parse_affix_argument(workspace& all, std::string str)
         if (valid_ns(q[1]))
           ns = static_cast<uint16_t>(q[1]);
         else
-          THROW("malformed affix argument (invalid namespace): " << p);
+          throw vw::error(fmt::format("malformed affix argument (invalid namespace): {}", p));
 
-        if (q[2] != 0) THROW("malformed affix argument (too long): " << p);
+        if (q[2] != 0) throw vw::error(fmt::format("malformed affix argument (too long): {}", p));
       }
 
       uint16_t afx = (len << 1) | (prefix & 0x1);
@@ -334,7 +334,7 @@ void parse_diagnostics(options_i& options, workspace& all)
 
   options.add_and_parse(diagnostic_group);
 
-  if(all.logger.quiet) logger::log_set_level(logger::log_level::off);
+  if (all.logger.quiet) logger::log_set_level(logger::log_level::off);
 
   // Upon direct query for version -- spit it out directly to stdout
   if (version_arg)
@@ -429,7 +429,7 @@ input_options parse_source(workspace& all, options_i& options)
   if (parsed_options.cache) { parsed_options.cache_files.push_back(all.data_filename + ".cache"); }
 
   if ((parsed_options.cache || options.was_supplied("cache_file")) && options.was_supplied("invert_hash"))
-    THROW("invert_hash is incompatible with a cache file.  Use it in single pass mode only.");
+    throw vw::error("invert_hash is incompatible with a cache file.  Use it in single pass mode only.");
 
   if (!all.holdout_set_off &&
       (options.was_supplied("output_feature_regularizer_binary") ||
@@ -655,12 +655,12 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   // Process ngram and skips arguments
   if (options.was_supplied("skips"))
   {
-    if (!options.was_supplied("ngram")) { THROW("You can not skip unless ngram is > 1"); }
+    if (!options.was_supplied("ngram")) { throw vw::error("You can not skip unless ngram is > 1"); }
   }
 
   if (options.was_supplied("ngram"))
   {
-    if (options.was_supplied("sort_features")) { THROW("ngram is incompatible with sort_features."); }
+    if (options.was_supplied("sort_features")) { throw vw::error("ngram is incompatible with sort_features."); }
 
     std::vector<std::string> hex_decoded_ngram_strings;
     hex_decoded_ngram_strings.reserve(ngram_strings.size());
@@ -681,8 +681,9 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   if (options.was_supplied("bit_precision"))
   {
     if (all.default_bits == false && new_bits != all.num_bits)
-      THROW("Number of bits is set to " << new_bits << " and " << all.num_bits
-                                        << " by argument and model.  That does not work.");
+    {
+      throw vw::error(fmt::format("Number of bits is set to {} and {} by argument and model.  That does not work.", new_bits, all.num_bits));
+    }
 
     all.default_bits = false;
     all.num_bits = new_bits;
@@ -713,7 +714,7 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
     for (auto& i : quadratics)
     {
-      if (i.size() != 2) { throw vw::error(vw::error_code::unknown, "error, quadratic features must involve two sets.)") }
+      if (i.size() != 2) { throw vw::error("error, quadratic features must involve two sets.)"); }
       auto encoded = spoof_hex_encoded_namespaces(i);
       decoded_interactions.emplace_back(encoded.begin(), encoded.end());
       if (!all.logger.quiet) *(all.trace_message) << i << " ";
@@ -733,7 +734,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
       }
     }
 
-
     if (!all.logger.quiet) *(all.trace_message) << endl;
   }
 
@@ -742,7 +742,7 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
     if (!all.logger.quiet) *(all.trace_message) << "creating cubic features for triples: ";
     for (const auto& i : cubics)
     {
-      if (i.size() != 3) { THROW("error, cubic features must involve three sets.") }
+      if (i.size() != 3) { throw vw::error("error, cubic features must involve three sets."); }
       auto encoded = spoof_hex_encoded_namespaces(i);
       decoded_interactions.emplace_back(encoded.begin(), encoded.end());
       if (!all.logger.quiet) *(all.trace_message) << i << " ";
@@ -766,7 +766,7 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
     for (const auto& i : interactions)
     {
-      if (i.size() < 2) { THROW("error, feature interactions must involve at least two namespaces") }
+      if (i.size() < 2) { throw vw::error("error, feature interactions must involve at least two namespaces"); }
       auto encoded = spoof_hex_encoded_namespaces(i);
       decoded_interactions.emplace_back(encoded.begin(), encoded.end());
       if (!all.logger.quiet) *(all.trace_message) << i << " ";
@@ -906,7 +906,7 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
           operator_found = true;
       }
 
-      if (!operator_found) THROW("argument of --redefine is malformed. Valid format is N:=S, :=S or N:=");
+      if (!operator_found) throw vw::error("argument of --redefine is malformed. Valid format is N:=S, :=S or N:=");
 
       if (++operator_pos > 3)  // seek operator end
         *(all.trace_message)
@@ -1203,7 +1203,7 @@ void register_reductions(workspace& all, std::vector<reduction_setup_fn>& reduct
       if (base == nullptr)
         all.reduction_stack.push_back(std::make_tuple(name_extractor.generated_name, setup_fn));
       else
-        THROW("fatal: under register_reduction() all setup functions must return nullptr");
+        throw vw::error("fatal: under register_reduction() all setup functions must return nullptr");
     }
   }
 
@@ -1297,7 +1297,7 @@ workspace& parse_args(
         .add(make_option("strict_parse", strict_parse).help("throw on malformed examples"));
     all.options->add_and_parse(vw_args);
 
-    if (ring_size_tmp <= 0) { THROW("ring_size should be positive"); }
+    if (ring_size_tmp <= 0) { throw vw::error("ring_size should be positive"); }
     size_t ring_size = static_cast<size_t>(ring_size_tmp);
 
     all.example_parser = new parser{ring_size, strict_parse};
@@ -1812,13 +1812,13 @@ void finish(workspace& all, bool delete_all)
   // implement finally.
   // finalize_regressor can throw if it can't write the file.
   // we still want to free up all the memory.
-  vw_exception finalize_regressor_exception(__FILE__, __LINE__, "empty");
+  vw::error finalize_regressor_exception("empty");
   bool finalize_regressor_exception_thrown = false;
   try
   {
     finalize_regressor(all, all.final_regressor_name);
   }
-  catch (vw_exception& e)
+  catch (vw::error& e)
   {
     finalize_regressor_exception = e;
     finalize_regressor_exception_thrown = true;

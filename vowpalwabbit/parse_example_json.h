@@ -381,7 +381,7 @@ public:
       {
         auto outcome = new CCB::conditional_contextual_bandit_outcome();
         outcome->cost = cb_label.cost;
-        if (actions.size() != probs.size()) { throw vw::error(vw::error_code::unknown, "Actions and probabilities must be the same length."); }
+        if (actions.size() != probs.size()) { throw vw::error("Actions and probabilities must be the same length."); }
 
         for (size_t i = 0; i < this->actions.size(); i++) { outcome->probabilities.push_back({actions[i], probs[i]}); }
         actions.clear();
@@ -396,7 +396,7 @@ public:
       auto& ld = ctx.ex->l.slates;
       if ((actions.size() != 0) && (probs.size() != 0))
       {
-        if (actions.size() != probs.size()) { throw vw::error(vw::error_code::unknown, "Actions and probabilities must be the same length."); }
+        if (actions.size() != probs.size()) { throw vw::error("Actions and probabilities must be the same length."); }
         ld.labeled = true;
 
         for (size_t i = 0; i < this->actions.size(); i++) { ld.probabilities.push_back({actions[i], probs[i]}); }
@@ -600,7 +600,7 @@ struct MultiState : BaseState<audit>
       ld.type = vw::slates::example_type::shared;
     }
     else
-      throw vw::error(, vw::error_code::unknown, "label type is not CB, CCB or slates")
+      throw vw::error("label type is not CB, CCB or slates");
 
     return this;
   }
@@ -911,7 +911,7 @@ public:
       else if (length == 8 && !strncmp(str, "_slot_id", 8))
       {
         if (ctx.all->example_parser->lbl_parser.label_type != label_type_t::slates)
-        { throw vw::error(vw::error_code::unknown, "Can only use _slot_id with slates examples"); }
+        { throw vw::error("Can only use _slot_id with slates examples"); }
         ctx.uint_state.output_uint = &ctx.ex->l.slates.slot_id;
         ctx.array_float_state.return_state = this;
         return &ctx.array_float_state;
@@ -1184,7 +1184,8 @@ public:
   {
     auto* new_ex = ctx.examples->back();
 
-    if (ctx.dedup_examples->find(i) == ctx.dedup_examples->end()) { THROW("dedup id not found: " << i); }
+    if (ctx.dedup_examples->find(i) == ctx.dedup_examples->end())
+    { throw vw::error(fmt::format("dedup id not found: {}", i)); }
 
     auto* stored_ex = (*ctx.dedup_examples)[i];
 
@@ -1259,7 +1260,7 @@ public:
     old_root = ctx.root_state;
     ctx.root_state = this;
 
-    if (slot_object_index == 0) { THROW("Badly formed ccb example. Shared example is required.") }
+    if (slot_object_index == 0) { throw vw::error("Badly formed ccb example. Shared example is required."); }
 
     return this;
   }
@@ -1631,12 +1632,7 @@ void read_line_json_s(workspace& all, v_array<example*>& examples, char* line, s
 
   BaseState<audit>* current_state = handler.current_state();
 
-  THROW("JSON parser error at " << result.Offset() << ": " << GetParseError_En(result.Code())
-                                << ". "
-                                   "Handler: "
-                                << handler.error().str()
-                                << "State: " << (current_state ? current_state->name : "null"));  // <<
-  // "Line: '"<< line_copy << "'");
+  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(), GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
 }
 
 template <bool audit>
@@ -1697,11 +1693,7 @@ void read_line_decision_service_json(workspace& all, v_array<example*>& examples
 
   BaseState<audit>* current_state = handler.current_state();
 
-  THROW("JSON parser error at " << result.Offset() << ": " << GetParseError_En(result.Code())
-                                << ". "
-                                   "Handler: "
-                                << handler.error().str()
-                                << "State: " << (current_state ? current_state->name : "null"));
+  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(), GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
 }  // namespace vw
 }  // namespace vw
 

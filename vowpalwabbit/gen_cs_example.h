@@ -175,7 +175,7 @@ void gen_cs_example(cb_to_cs& c, example& ec, CB::label& ld, COST_SENSITIVE::lab
       gen_cs_example_dr<is_learn>(c, ec, ld, cs_ld);
       break;
     default:
-      THROW("Unknown cb_type specified for contextual bandit learning: " << c.cb_type);
+      throw vw::error(fmt::format("Unknown cb_type specified for contextual bandit learning: {}", c.cb_type));
   }
 }
 
@@ -241,7 +241,7 @@ void gen_cs_example(cb_to_cs_adf& c, multi_ex& ec_seq, COST_SENSITIVE::label& cs
       gen_cs_example_mtr(c, ec_seq, cs_labels);
       break;
     default:
-      THROW("Unknown cb_type specified for contextual bandit learning: " << c.cb_type);
+      throw vw::error(fmt::format("Unknown cb_type specified for contextual bandit learning: {}", c.cb_type));
   }
 }
 

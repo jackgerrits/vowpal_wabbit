@@ -179,7 +179,7 @@ ACTION_SCORE::action_score convert_to_score(
 {
   auto action_id = static_cast<uint32_t>(int_of_string(action_id_str));
   auto probability = float_of_string(probability_str);
-  if (std::isnan(probability)) THROW("error NaN probability: " << probability_str);
+  if (std::isnan(probability)) throw vw::error(fmt::format("error NaN probability: {}", probability_str));
 
   if (probability > 1.0)
   {
@@ -204,20 +204,20 @@ CCB::conditional_contextual_bandit_outcome* parse_outcome(std::string_view outco
 
   std::vector<std::string_view> split_colons = tokenize(':', split_commas[0]);
 
-  if (split_colons.size() != 3) throw vw::error(vw::error_code::unknown, "Malformed ccb label");
+  if (split_colons.size() != 3) throw vw::error("Malformed ccb label");
 
   ccb_outcome.probabilities = v_init<ACTION_SCORE::action_score>();
   ccb_outcome.probabilities.push_back(convert_to_score(split_colons[0], split_colons[2]));
 
   ccb_outcome.cost = float_of_string(split_colons[1]);
-  if (std::isnan(ccb_outcome.cost)) THROW("error NaN cost: " << split_colons[1]);
+  if (std::isnan(ccb_outcome.cost)) throw vw::error(fmt::format("error NaN cost: ", split_colons[1]));
 
   split_colons.clear();
 
   for (size_t i = 1; i < split_commas.size(); i++)
   {
     split_colons = tokenize(':', split_commas[i]);
-    if (split_colons.size() != 2) THROW("Must be action probability pairs");
+    if (split_colons.size() != 2) throw vw::error("Must be action probability pairs");
     ccb_outcome.probabilities.push_back(convert_to_score(split_colons[0], split_colons[1]));
   }
 
@@ -233,23 +233,23 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
 {
   ld.weight = 1.0;
 
-  if (words.size() < 2) THROW("ccb labels may not be empty");
-  if (!(words[0] == CCB_LABEL)) { throw vw::error(vw::error_code::unknown, "ccb labels require the first word to be ccb"); }
+  if (words.size() < 2) throw vw::error("ccb labels may not be empty");
+  if (!(words[0] == CCB_LABEL)) { throw vw::error("ccb labels require the first word to be ccb"); }
 
   auto type = words[1];
   if (type == SHARED_TYPE)
   {
-    if (words.size() > 2) throw vw::error(vw::error_code::unknown, "shared labels may not have a cost");
+    if (words.size() > 2) throw vw::error("shared labels may not have a cost");
     ld.type = CCB::example_type::shared;
   }
   else if (type == ACTION_TYPE)
   {
-    if (words.size() > 2) throw vw::error(vw::error_code::unknown, "action labels may not have a cost");
+    if (words.size() > 2) throw vw::error("action labels may not have a cost");
     ld.type = CCB::example_type::action;
   }
   else if (type == SLOT_TYPE)
   {
-    if (words.size() > 4) throw vw::error(vw::error_code::unknown, "ccb slot label can only have a type cost and exclude list");
+    if (words.size() > 4) throw vw::error("ccb slot label can only have a type cost and exclude list");
     ld.type = CCB::example_type::slot;
 
     // Skip the first two words "ccb <type>"
@@ -258,7 +258,7 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
       auto is_outcome = words[i].find(':');
       if (is_outcome != std::string_view::npos)
       {
-        if (ld.outcome != nullptr) { throw vw::error(vw::error_code::unknown, "There may be only 1 outcome associated with a slot.") }
+        if (ld.outcome != nullptr) { throw vw::error("There may be only 1 outcome associated with a slot."); }
 
         ld.outcome = parse_outcome(words[i]);
       }
@@ -279,13 +279,13 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
       // TODO do a proper comparison here.
       if (!vw::math::are_same(total_pred, 1.f))
       {
-        THROW("When providing all prediction probabilities they must add up to 1.f, instead summed to " << total_pred);
+        throw vw::error(fmt::format("When providing all prediction probabilities they must add up to 1.f, instead summed to {}", total_pred));
       }
     }
   }
   else
   {
-    THROW("unknown label type: " << type);
+    throw vw::error(fmt::format("unknown label type: {}", type));
   }
 }
 
