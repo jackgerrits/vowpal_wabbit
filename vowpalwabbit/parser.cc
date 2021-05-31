@@ -671,7 +671,6 @@ float get_initial(example* ec)
   return simple_red_features.initial;
 }
 
-
 float get_cost_sensitive_prediction(example* ec) { return static_cast<float>(ec->pred.multiclass); }
 
 v_array<float>& get_cost_sensitive_prediction_confidence_scores(example* ec) { return ec->pred.scalars; }
