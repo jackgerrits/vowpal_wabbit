@@ -5,6 +5,7 @@
 #include "vw_exception.h"
 
 #include <string.h>
+#include <array>
 
 #ifdef _WIN32
 #  define NOMINMAX

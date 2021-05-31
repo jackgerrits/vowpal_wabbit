@@ -56,14 +56,14 @@ inline void parse_dispatch(workspace& all, dispatch_fptr dispatch)
   }
   catch (const vw::error& e)
   {
-    vw::io::logger::errlog_error("vw example #{0}: {}", example_number, e.what());
+    vw::io::logger::errlog_error("vw example #{}: {}", example_number, e.what());
 
     // Stash the exception so it can be thrown on the main thread.
     all.example_parser->exc_ptr = std::current_exception();
   }
   catch (std::exception& e)
   {
-    vw::io::logger::errlog_error("vw: example #{0}{1}", example_number, e.what());
+    vw::io::logger::errlog_error("vw: example #{}: {}", example_number, e.what());
 
     // Stash the exception so it can be thrown on the main thread.
     all.example_parser->exc_ptr = std::current_exception();

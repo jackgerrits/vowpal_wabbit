@@ -8,6 +8,7 @@
 
 #include <cfloat>
 #include <climits>
+#include <sstream>
 
 shared_data::shared_data()
     : is_more_than_two_labels_observed(false), first_observed_label(FLT_MAX), second_observed_label(FLT_MAX)
