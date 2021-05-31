@@ -70,7 +70,7 @@ void parse_label(label_t& ld, const std::vector<std::string_view>& words, reduct
         char* char_after_int = nullptr;
         ld.label = int_of_string(words[0], char_after_int);
         if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
-      { throw vw::error(fmt::format("malformed example: label has trailing character(s): {}", *char_after_int)); }
+        { throw vw::error(fmt::format("malformed example: label has trailing character(s): {}", *char_after_int)); }
       }
       ld.weight = float_of_string(words[1]);
       break;

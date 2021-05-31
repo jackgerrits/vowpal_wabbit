@@ -1632,7 +1632,8 @@ void read_line_json_s(workspace& all, v_array<example*>& examples, char* line, s
 
   BaseState<audit>* current_state = handler.current_state();
 
-  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(), GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
+  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(),
+      GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
 }
 
 template <bool audit>
@@ -1693,7 +1694,8 @@ void read_line_decision_service_json(workspace& all, v_array<example*>& examples
 
   BaseState<audit>* current_state = handler.current_state();
 
-  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(), GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
+  throw vw::error(fmt::format("JSON parser error at {}: {} Handler: {} State: {}", result.Offset(),
+      GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
 }  // namespace vw
 }  // namespace vw
 

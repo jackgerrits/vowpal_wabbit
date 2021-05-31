@@ -119,7 +119,8 @@ struct typed_option : base_option
   T default_value() const
   {
     if (m_default_value) { return *m_default_value; }
-    throw vw::error("typed_option does not contain default value. use default_value_supplied to check if default value exists.");
+    throw vw::error(
+        "typed_option does not contain default value. use default_value_supplied to check if default value exists.");
   }
 
   bool value_supplied() const { return m_value.get() != nullptr; }
@@ -312,7 +313,8 @@ struct options_name_extractor : options_i
 
   bool add_parse_and_check_necessary(const option_group_definition& group) override
   {
-    if (group.m_necessary_flags.empty()) { throw vw::error("reductions must specify at least one .necessary() option"); }
+    if (group.m_necessary_flags.empty())
+    { throw vw::error("reductions must specify at least one .necessary() option"); }
 
     if (m_added_help_group_names.count(group.m_name) == 0) { m_added_help_group_names.insert(group.m_name); }
     else

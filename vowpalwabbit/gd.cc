@@ -765,7 +765,9 @@ void save_load_regressor(workspace& all, io_buf& model_file, bool read, bool tex
       {
         if (i >= length)
         {
-          throw vw::error(fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}", i , length));
+          throw vw::error(
+              fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}",
+                  i, length));
         }
         weight* v = &weights.strided_index(i);
         brw += model_file.bin_read_fixed(reinterpret_cast<char*>(&(*v)), sizeof(*v), "");
@@ -816,7 +818,9 @@ void save_load_online_state(workspace& all, io_buf& model_file, bool read, bool 
       {
         if (i >= length)
         {
-          throw vw::error(fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}", i , length));
+          throw vw::error(
+              fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}",
+                  i, length));
         }
         weight buff[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         if (ftrl_size > 0)

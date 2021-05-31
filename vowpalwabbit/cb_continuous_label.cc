@@ -97,20 +97,20 @@ void parse_label(continuous_label& ld, const std::vector<std::string_view>& word
       const auto tokenized = tokenize(':', words[i]);
 
       if (tokenized.empty() || tokenized.size() > 4)
-      {
-        throw vw::error(fmt::format("malformed cost specification: {}", tokenized));
-      }
+      { throw vw::error(fmt::format("malformed cost specification: {}", tokenized)); }
 
       f.action = float_of_string(tokenized[0]);
 
       if (tokenized.size() > 1) f.cost = float_of_string(tokenized[1]);
 
-      if (std::isnan(f.cost)) throw vw::error(fmt::format("error NaN cost ({}) for action: {} ", tokenized[1], tokenized[0]));
+      if (std::isnan(f.cost))
+        throw vw::error(fmt::format("error NaN cost ({}) for action: {} ", tokenized[1], tokenized[0]));
 
       f.pdf_value = .0;
       if (tokenized.size() > 2) f.pdf_value = float_of_string(tokenized[2]);
 
-      if (std::isnan(f.pdf_value)) throw vw::error(fmt::format("error NaN pdf_value ({}), for action: {}", tokenized[2], tokenized[0]));
+      if (std::isnan(f.pdf_value))
+        throw vw::error(fmt::format("error NaN pdf_value ({}), for action: {}", tokenized[2], tokenized[0]));
 
       if (f.pdf_value < 0.0)
       {

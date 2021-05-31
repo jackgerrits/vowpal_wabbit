@@ -711,7 +711,8 @@ base_learner* cbify_setup(options_i& options, workspace& all)
     if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
     { throw vw::error("error: min and max values must be supplied with cbify_reg"); }
 
-    if (use_discrete && options.was_supplied("cats")) { throw vw::error("error: incompatible options: cb_discrete and cats"); }
+    if (use_discrete && options.was_supplied("cats"))
+    { throw vw::error("error: incompatible options: cb_discrete and cats"); }
     else if (use_discrete)
     {
       std::stringstream ss;

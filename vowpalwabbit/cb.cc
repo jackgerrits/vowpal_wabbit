@@ -55,9 +55,7 @@ void parse_label(CB::label& ld, const std::vector<std::string_view>& words, redu
     if (tokenized.size() > 1) f.cost = float_of_string(tokenized[1]);
 
     if (std::isnan(f.cost))
-    {
-      throw vw::error(fmt::format("error NaN cost ({}) for action: {}", tokenized[1], tokenized[0]));
-    }
+    { throw vw::error(fmt::format("error NaN cost ({}) for action: {}", tokenized[1], tokenized[0])); }
 
     f.probability = .0;
     if (tokenized.size() > 2) f.probability = float_of_string(tokenized[2]);

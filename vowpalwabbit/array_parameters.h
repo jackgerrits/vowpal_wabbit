@@ -183,7 +183,10 @@ public:
   void stride_shift(uint32_t stride_shift) { _stride_shift = stride_shift; }
 
 #ifndef _WIN32
-  void share(size_t /* length */) { throw vw::error(vw::error_code::unsupported, "Operation not supported on Windows"); }
+  void share(size_t /* length */)
+  {
+    throw vw::error(vw::error_code::unsupported, "Operation not supported on Windows");
+  }
 #endif
 
   ~sparse_parameters()

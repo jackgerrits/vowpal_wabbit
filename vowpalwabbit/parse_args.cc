@@ -283,7 +283,8 @@ void parse_affix_argument(workspace& all, std::string str)
         prefix = 0;
         q++;
       }
-      if ((q[0] < '1') || (q[0] > '7')) throw vw::error(fmt::format("malformed affix argument (length must be 1..7): {}", p));
+      if ((q[0] < '1') || (q[0] > '7'))
+        throw vw::error(fmt::format("malformed affix argument (length must be 1..7): {}", p));
 
       uint16_t len = static_cast<uint16_t>(q[0] - '0');
       uint16_t ns = static_cast<uint16_t>(' ');  // default namespace
@@ -682,7 +683,8 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   {
     if (all.default_bits == false && new_bits != all.num_bits)
     {
-      throw vw::error(fmt::format("Number of bits is set to {} and {} by argument and model.  That does not work.", new_bits, all.num_bits));
+      throw vw::error(fmt::format(
+          "Number of bits is set to {} and {} by argument and model.  That does not work.", new_bits, all.num_bits));
     }
 
     all.default_bits = false;

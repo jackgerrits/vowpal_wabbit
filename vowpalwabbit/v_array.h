@@ -59,9 +59,7 @@ private:
 
     T* temp = reinterpret_cast<T*>(std::realloc(_begin, sizeof(T) * length));
     if (temp == nullptr)
-    {
-      throw vw::error(fmt::format("realloc of {} failed in reserve_nocheck().  out of memory?", length));
-    }
+    { throw vw::error(fmt::format("realloc of {} failed in reserve_nocheck().  out of memory?", length)); }
     else
     {
       _begin = temp;

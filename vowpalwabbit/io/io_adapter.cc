@@ -238,7 +238,8 @@ file_adapter::file_adapter(const char* filename, file_mode mode)
   }
 #endif
 
-  if (_file_descriptor == -1 && *filename != '\0') {
+  if (_file_descriptor == -1 && *filename != '\0')
+  {
     throw vw::error(fmt::format("errno: {}, err_msg: {}, can't open: {}", errno, vw::errno_to_string(errno), filename));
   }
 }

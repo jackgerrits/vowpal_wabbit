@@ -279,7 +279,8 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
       // TODO do a proper comparison here.
       if (!vw::math::are_same(total_pred, 1.f))
       {
-        throw vw::error(fmt::format("When providing all prediction probabilities they must add up to 1.f, instead summed to {}", total_pred));
+        throw vw::error(fmt::format(
+            "When providing all prediction probabilities they must add up to 1.f, instead summed to {}", total_pred));
       }
     }
   }

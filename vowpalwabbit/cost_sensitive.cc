@@ -141,7 +141,8 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, reductio
     wclass f = {0., 0, 0., 0.};
     const auto tokenized = name_value(words[i], f.x);
 
-    if (tokenized.size() == 0) throw vw::error(fmt::format(" invalid cost: specification -- no names on: {}",  words[i]));
+    if (tokenized.size() == 0)
+      throw vw::error(fmt::format(" invalid cost: specification -- no names on: {}", words[i]));
 
     if (tokenized.size() == 1 || tokenized.size() == 2 || tokenized.size() == 3)
     {

@@ -181,7 +181,8 @@ void parse_context(const Value& context, workspace& all, v_array<example*>& exam
       {
         auto dedup_id = obj["__aid"].GetUint64();
 
-        if (dedup_examples->find(dedup_id) == dedup_examples->end()) { throw vw::error(fmt::format("dedup id not found: {}", dedup_id)); }
+        if (dedup_examples->find(dedup_id) == dedup_examples->end())
+        { throw vw::error(fmt::format("dedup id not found: {}", dedup_id)); }
 
         auto* stored_ex = (*dedup_examples)[dedup_id];
         ex->indices = stored_ex->indices;

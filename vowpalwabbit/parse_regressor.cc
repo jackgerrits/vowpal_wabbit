@@ -485,7 +485,9 @@ void dump_regressor(workspace& all, std::string reg_name, bool as_text)
 
   if (0 != rename(start_name.c_str(), reg_name.c_str()))
   {
-    throw vw::error(fmt::format("WARN: dump_regressor(workspace& all, std::string reg_name, bool as_text): cannot rename: {} to {}", start_name.c_str(), reg_name.c_str()));
+    throw vw::error(
+        fmt::format("WARN: dump_regressor(workspace& all, std::string reg_name, bool as_text): cannot rename: {} to {}",
+            start_name.c_str(), reg_name.c_str()));
   }
 }
 

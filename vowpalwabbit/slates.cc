@@ -55,7 +55,8 @@ void slates_data::learn_or_predict(vw::LEARNER::multi_learner& base, multi_ex& e
     }
     else if (slates_label.type == slates::example_type::action)
     {
-      if (slates_label.slot_id >= num_slots) { throw vw::error("slot_id cannot be larger than or equal to the number of slots"); }
+      if (slates_label.slot_id >= num_slots)
+      { throw vw::error("slot_id cannot be larger than or equal to the number of slots"); }
       ccb_label.type = CCB::example_type::action;
       slot_action_pools[slates_label.slot_id].push_back(action_index);
       action_index++;

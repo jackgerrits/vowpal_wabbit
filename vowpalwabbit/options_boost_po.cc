@@ -234,9 +234,7 @@ void options_boost_po::check_unregistered()
   for (auto const& supplied : m_supplied_options)
   {
     if (m_defined_options.count(supplied) == 0 && m_ignore_supplied.count(supplied) == 0)
-    {
-      throw vw::error(vw::error_code::unrecognized_option, fmt::format("unrecognised option '--{}'", supplied));
-    }
+    { throw vw::error(vw::error_code::unrecognized_option, fmt::format("unrecognised option '--{}'", supplied)); }
   }
 }
 
