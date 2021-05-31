@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(multiple_locations_one_option)
   arg_group.add(make_option("str_opt", str_opt_1));
   arg_group.add(make_option("str_opt", str_opt_2));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(duplicate_option_clash)
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(duplicate_option_clash)
   arg_group.add(make_option("the_opt", int_opt));
   arg_group.add(make_option("the_opt", char_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(mismatched_values_duplicate_command_line)
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(mismatched_values_duplicate_command_line)
   option_group_definition arg_group("group");
   arg_group.add(make_option("int_opt", int_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_argument_disagreement_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(get_positional_tokens)
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(unregistered_options)
   BOOST_CHECK_NO_THROW(options->add_and_parse(arg_group));
   BOOST_CHECK_EQUAL(int_opt, 3);
 
-  BOOST_CHECK_THROW(options->check_unregistered(), vw::vw_exception);
+  BOOST_CHECK_THROW(options->check_unregistered(), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(check_necessary)

@@ -24,15 +24,15 @@ BOOST_AUTO_TEST_CASE(multiclass_label_parser)
 
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, "1,2,3", *plabel), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, "1,2,3", *plabel), vw::error);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, "1a", *plabel), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, "1a", *plabel), vw::error);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, "1 2 3", *plabel), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, "1 2 3", *plabel), vw::error);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();

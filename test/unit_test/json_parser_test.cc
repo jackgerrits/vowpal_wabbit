@@ -506,7 +506,7 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_cb_missing_dedup_id)
   BOOST_REQUIRE_THROW(
       vw::read_line_json_s<true>(*vw, examples, (char*)json_deduped_text.c_str(), json_deduped_text.length(),
           (vw::example_factory_t)&vw::get_unused_example, (void*)vw, &dedup_examples),
-      vw::vw_exception);
+      vw::error);
 
   for (auto* example : examples) { vw::finish_example(*vw, *example); }
   for (auto& dedup : dedup_examples) { vw::finish_example(*vw, *dedup.second); }
@@ -693,7 +693,7 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_ccb_dedup_id_missing)
   BOOST_REQUIRE_THROW(
       vw::read_line_json_s<true>(*vw, examples, (char*)json_deduped_text.c_str(), json_deduped_text.length(),
           (vw::example_factory_t)&vw::get_unused_example, (void*)vw, &dedup_examples),
-      vw::vw_exception);
+      vw::error);
 
   for (auto* example : examples) { vw::finish_example(*vw, *example); }
   for (auto& dedup : dedup_examples) { vw::finish_example(*vw, *dedup.second); }
@@ -818,7 +818,7 @@ BOOST_AUTO_TEST_CASE(parse_json_dedup_slates_dedup_id_missing)
   BOOST_REQUIRE_THROW(
       vw::read_line_json_s<true>(*vw, examples, (char*)json_deduped_text.c_str(), json_deduped_text.length(),
           (vw::example_factory_t)&vw::get_unused_example, (void*)vw, &dedup_examples),
-      vw::vw_exception);
+      vw::error);
 
   for (auto* example : examples) { vw::finish_example(*vw, *example); }
   for (auto& dedup : dedup_examples) { vw::finish_example(*vw, *dedup.second); }

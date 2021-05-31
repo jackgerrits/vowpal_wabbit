@@ -17,12 +17,12 @@ BOOST_AUTO_TEST_CASE(numeric_cast_tests)
   // Correct positive
   BOOST_CHECK_EQUAL(vw::cast_to_smaller_type<int8_t>(static_cast<int32_t>(4)), 4);
   // Too small
-  BOOST_CHECK_THROW(vw::cast_to_smaller_type<int8_t>(static_cast<int32_t>(-500)), vw::vw_exception);
+  BOOST_CHECK_THROW(vw::cast_to_smaller_type<int8_t>(static_cast<int32_t>(-500)), vw::error);
   // Too large
-  BOOST_CHECK_THROW(vw::cast_to_smaller_type<int8_t>(static_cast<int32_t>(50000)), vw::vw_exception);
+  BOOST_CHECK_THROW(vw::cast_to_smaller_type<int8_t>(static_cast<int32_t>(50000)), vw::error);
 
   // Negative
-  BOOST_CHECK_THROW(vw::cast_signed_to_unsigned<uint32_t>(static_cast<int32_t>(-5)), vw::vw_exception);
+  BOOST_CHECK_THROW(vw::cast_signed_to_unsigned<uint32_t>(static_cast<int32_t>(-5)), vw::error);
   // Correct
   BOOST_CHECK_EQUAL(vw::cast_signed_to_unsigned<uint32_t>(static_cast<int32_t>(10)), 10);
   // Larger unsigned to smaller signed

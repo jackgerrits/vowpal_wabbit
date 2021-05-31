@@ -71,32 +71,32 @@ BOOST_AUTO_TEST_CASE(slates_parse_label)
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("shared", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("shared", label), vw::error);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::error);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates shared 0.1 too many args", label), vw::error);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("slates action", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates action", label), vw::error);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("slates action 1,1", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates action 1,1", label), vw::error);
   }
 
   {
     vw::slates::label label;
-    BOOST_REQUIRE_THROW(parse_slates_label("slates slot 0:0,1:0.5", label), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_slates_label("slates slot 0:0,1:0.5", label), vw::error);
   }
 }
 

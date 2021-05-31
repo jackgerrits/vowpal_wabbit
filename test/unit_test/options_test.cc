@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(name_extraction_from_option_group)
   BOOST_CHECK_EQUAL(name_extractor.was_supplied("random"), false);
 
   // should throw since we validate that reductions should use add_parse_and_check_necessary
-  BOOST_REQUIRE_THROW(name_extractor.add_and_parse(ag), vw::vw_exception);
+  BOOST_REQUIRE_THROW(name_extractor.add_and_parse(ag), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(name_extraction_multi_necessary)
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(name_extraction_multi_necessary)
   BOOST_CHECK_EQUAL(name_extractor.was_supplied("random"), false);
 
   // should throw since we validate that reductions should use add_parse_and_check_necessary
-  BOOST_REQUIRE_THROW(name_extractor.add_and_parse(ag), vw::vw_exception);
+  BOOST_REQUIRE_THROW(name_extractor.add_and_parse(ag), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(name_extraction_should_throw)
@@ -162,19 +162,19 @@ BOOST_AUTO_TEST_CASE(name_extraction_should_throw)
   auto name_extractor = options_name_extractor();
 
   // should throw since no .necessary() is defined
-  BOOST_REQUIRE_THROW(name_extractor.add_parse_and_check_necessary(ag), vw::vw_exception);
+  BOOST_REQUIRE_THROW(name_extractor.add_parse_and_check_necessary(ag), vw::error);
 
   // should throw since these methods will never be implemented by options_name_extractor
-  BOOST_REQUIRE_THROW(name_extractor.help({}), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.check_unregistered(), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.get_all_options(), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.get_option("opt2"), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.insert("opt2", "blah"), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.replace("opt2", "blah"), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.get_positional_tokens(), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.tint("nonsense"), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.reset_tint(), vw::vw_exception);
-  BOOST_REQUIRE_THROW(name_extractor.get_collection_of_options(), vw::vw_exception);
+  BOOST_REQUIRE_THROW(name_extractor.help({}), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.check_unregistered(), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.get_all_options(), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.get_option("opt2"), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.insert("opt2", "blah"), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.replace("opt2", "blah"), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.get_positional_tokens(), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.tint("nonsense"), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.reset_tint(), vw::error);
+  BOOST_REQUIRE_THROW(name_extractor.get_collection_of_options(), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(name_extraction_recycle)
