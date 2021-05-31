@@ -713,7 +713,7 @@ multi_learner* as_multiline(learner<T, E>* l)
 {
   if (l->is_multiline)  // Tried to use a singleline reduction as a multiline reduction
     return (multi_learner*)(l);
-  THROW("Tried to use a singleline reduction as a multiline reduction");
+  throw vw::error(vw::error_code::unknown, "Tried to use a singleline reduction as a multiline reduction");
 }
 
 template <class T, class E>
@@ -721,7 +721,7 @@ single_learner* as_singleline(learner<T, E>* l)
 {
   if (!l->is_multiline)  // Tried to use a multiline reduction as a singleline reduction
     return (single_learner*)(l);
-  THROW("Tried to use a multiline reduction as a singleline reduction");
+  throw vw::error(vw::error_code::unknown, "Tried to use a multiline reduction as a singleline reduction");
 }
 
 template <bool is_learn>

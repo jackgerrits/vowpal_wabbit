@@ -303,7 +303,7 @@ void to_flat::convert_txt_to_flat(workspace& all)
         to_flat::create_continuous_action_label(ae, ex_builder);
         break;
       default:
-        THROW("label_type has not been set or is unknown");
+        throw vw::error(vw::error_code::unknown, "label_type has not been set or is unknown");
         break;
     }
 

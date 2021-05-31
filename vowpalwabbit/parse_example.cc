@@ -94,7 +94,7 @@ public:
     {
       // maintain newline behavior
       ss << std::endl;
-      THROW_EX(vw::strict_parse_exception, ss.str());
+      throw vw::error(vw::error_code::string_parse, ss.str());
     }
     else
     {

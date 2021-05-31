@@ -338,7 +338,7 @@ public:
 
   float getRevertingWeight(shared_data* /* sd */, float /* prediction */, float /* eta_t */)
   {
-    THROW("Active learning not supported by poisson loss");
+    throw vw::error(vw::error_code::unknown, "Active learning not supported by poisson loss");
   }
 
   float getSquareGrad(float prediction, float label)
@@ -394,5 +394,5 @@ std::unique_ptr<loss_function> getLossFunction(workspace& all, const std::string
     return vw::make_unique<poisson_loss>();
   }
   else
-    THROW("Invalid loss function name: \'" << funcName << "\' Bailing!");
+    throw vw::error(vw::error_code::unknown, "Invalid loss function name: \'" << funcName << "\' Bailing!");
 }

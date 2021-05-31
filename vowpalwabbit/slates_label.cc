@@ -89,10 +89,10 @@ void parse_label(slates::label& ld, const std::vector<std::string_view>& words, 
 {
   ld.weight = 1;
 
-  if (words.empty()) { THROW("Slates labels may not be empty"); }
-  if (!(words[0] == SLATES_LABEL)) { THROW("Slates labels require the first word to be slates"); }
+  if (words.empty()) { throw vw::error(vw::error_code::unknown, "Slates labels may not be empty"); }
+  if (!(words[0] == SLATES_LABEL)) { throw vw::error(vw::error_code::unknown, "Slates labels require the first word to be slates"); }
 
-  if (words.size() == 1) { THROW("Slates labels require a type. It must be one of: [shared, action, slot]"); }
+  if (words.size() == 1) { throw vw::error(vw::error_code::unknown, "Slates labels require a type. It must be one of: [shared, action, slot]"); }
 
   const auto& type = words[1];
   if (type == SHARED_TYPE)
@@ -105,18 +105,18 @@ void parse_label(slates::label& ld, const std::vector<std::string_view>& words, 
     }
     else if (words.size() != 2)
     {
-      THROW("Slates shared labels must be of the form: slates shared [global_cost]");
+      throw vw::error(vw::error_code::unknown, "Slates shared labels must be of the form: slates shared [global_cost]");
     }
     ld.type = example_type::shared;
   }
   else if (type == ACTION_TYPE)
   {
-    if (words.size() != 3) { THROW("Slates action labels must be of the form: slates action <slot_id>"); }
+    if (words.size() != 3) { throw vw::error(vw::error_code::unknown, "Slates action labels must be of the form: slates action <slot_id>"); }
 
     char* char_after_int = nullptr;
     ld.slot_id = int_of_string(words[2], char_after_int);
     if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
-    { THROW("Slot id seems to be malformed"); }
+    { throw vw::error(vw::error_code::unknown, "Slot id seems to be malformed"); }
 
     ld.type = example_type::action;
   }
@@ -128,7 +128,7 @@ void parse_label(slates::label& ld, const std::vector<std::string_view>& words, 
       for (auto& token : tokenize(',', words[2]))
       {
         const auto split_colons = tokenize(':', token);
-        if (split_colons.size() != 2) { THROW("Malformed action score token"); }
+        if (split_colons.size() != 2) { throw vw::error(vw::error_code::unknown, "Malformed action score token"); }
 
         // Element 0 is the action, element 1 is the probability
         ld.probabilities.push_back(
@@ -145,14 +145,14 @@ void parse_label(slates::label& ld, const std::vector<std::string_view>& words, 
 
         if (!vw::math::are_same(total_pred, 1.f))
         {
-          THROW(
+          throw vw::error(vw::error_code::unknown, 
               "When providing all prediction probabilities they must add up to 1.0, instead summed to " << total_pred);
         }
       }
     }
     else if (words.size() > 3)
     {
-      THROW(
+      throw vw::error(vw::error_code::unknown, 
           "Slates shared labels must be of the form: slates slot "
           "[chosen_action_id:probability[,action_id:probability...]]");
     }

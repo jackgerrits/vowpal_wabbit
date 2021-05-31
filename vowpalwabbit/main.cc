@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
       if (alls.size() == 1)
         vw::LEARNER::generic_driver_onethread(all);
       else
-        THROW("--onethread doesn't make sense with multiple learners");
+        throw vw::error(vw::error_code::unknown, "--onethread doesn't make sense with multiple learners");
     }
     else
     {

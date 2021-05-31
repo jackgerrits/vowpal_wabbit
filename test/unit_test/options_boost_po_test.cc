@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(incorrect_option_type)
   option_group_definition arg_group("group");
   arg_group.add(make_option("int_opt", int_opt));
 
-  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::vw_argument_invalid_value_exception);
+  BOOST_CHECK_THROW(options->add_and_parse(arg_group), vw::error);
 }
 
 BOOST_AUTO_TEST_CASE(multiple_locations_one_option)

@@ -163,7 +163,7 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
   }
   catch (...)
   {
-    THROW("error: cannot read dictionary from file '" << fname << "'"
+    throw vw::error(vw::error_code::unknown, "error: cannot read dictionary from file '" << fname << "'"
                                                       << ", opening failed");
   }
 
@@ -190,7 +190,7 @@ void parse_dictionary_argument(workspace& all, const std::string& str)
   }
   catch (...)
   {
-    THROW("error: cannot re-read dictionary from file '" << fname << "', opening failed");
+    throw vw::error(vw::error_code::unknown, "error: cannot re-read dictionary from file '" << fname << "', opening failed");
   }
   auto map = std::make_shared<feature_dict>();
   // mimicing old v_hashmap behavior for load factor.
@@ -713,7 +713,7 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
     for (auto& i : quadratics)
     {
-      if (i.size() != 2) { THROW("error, quadratic features must involve two sets.)") }
+      if (i.size() != 2) { throw vw::error(vw::error_code::unknown, "error, quadratic features must involve two sets.)") }
       auto encoded = spoof_hex_encoded_namespaces(i);
       decoded_interactions.emplace_back(encoded.begin(), encoded.end());
       if (!all.logger.quiet) *(all.trace_message) << i << " ";

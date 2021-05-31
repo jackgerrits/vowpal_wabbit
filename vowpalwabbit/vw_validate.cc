@@ -22,7 +22,7 @@ void validate_version(workspace& all)
 
 void validate_min_max_label(workspace& all)
 {
-  if (all.sd->max_label < all.sd->min_label) THROW("Max label cannot be less than min label.");
+  if (all.sd->max_label < all.sd->min_label) throw vw::error(vw::error_code::unknown, "Max label cannot be less than min label.");
 }
 
 void validate_default_bits(workspace& all, uint32_t local_num_bits)

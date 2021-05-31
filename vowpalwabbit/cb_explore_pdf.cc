@@ -111,7 +111,7 @@ LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, workspac
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
   if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
-    THROW("error: min and max values must be supplied with cb_explore_pdf");
+    throw vw::error(vw::error_code::unknown, "error: min and max values must be supplied with cb_explore_pdf");
 
   LEARNER::base_learner* p_base = setup_base(options, all);
   auto p_reduction = scoped_calloc_or_throw<cb_explore_pdf>();

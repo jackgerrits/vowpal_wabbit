@@ -390,7 +390,7 @@ base_learner* cb_explore_setup(options_i& options, workspace& all)
     options.insert("cb", ss.str());
   }
 
-  if (data->epsilon < 0.0 || data->epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
+  if (data->epsilon < 0.0 || data->epsilon > 1.0) { throw vw::error(vw::error_code::unknown, "The value of epsilon must be in [0,1]"); }
 
   data->cbcs.cb_type = CB_TYPE_DR;
 

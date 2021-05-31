@@ -265,7 +265,7 @@ base_learner* setup(options_i& options, workspace& all)
 
   if (data->num_actions == 0) return nullptr;
   if (!options.was_supplied("min_value") || !options.was_supplied("max_value"))
-  { THROW("error: min and max values must be supplied with cb_continuous"); }
+  { throw vw::error(vw::error_code::unknown, "error: min and max values must be supplied with cb_continuous"); }
 
   float leaf_width = (data->max_value - data->min_value) / (data->num_actions);  // aka unit range
   float half_leaf_width = leaf_width / 2.f;
@@ -277,7 +277,7 @@ base_learner* setup(options_i& options, workspace& all)
                          << data->bandwidth << std::endl;
   }
 
-  if (!(data->bandwidth >= 0.0f)) { THROW("error: Bandwidth must be positive"); }
+  if (!(data->bandwidth >= 0.0f)) { throw vw::error(vw::error_code::unknown, "error: Bandwidth must be positive"); }
 
   if (data->bandwidth >= (data->max_value - data->min_value))
   {

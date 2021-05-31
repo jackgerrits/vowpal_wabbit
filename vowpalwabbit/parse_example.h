@@ -7,13 +7,6 @@
 #include "vw.h"
 #include <string_view>
 
-// example processing
-typedef enum
-{
-  StringFeatures,
-  JsonFeatures
-} FeatureInputType;
-
 void substring_to_example(workspace* all, example* ae, std::string_view example);
 
 namespace vw

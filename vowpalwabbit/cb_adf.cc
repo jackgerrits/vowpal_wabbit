@@ -263,21 +263,21 @@ void cb_adf::learn_MTR(multi_learner& base, multi_ex& examples)
 // Validates a multiline example collection as a valid sequence for action dependent features format.
 example* test_adf_sequence(multi_ex& ec_seq)
 {
-  if (ec_seq.empty()) THROW("cb_adf: At least one action must be provided for an example to be valid.");
+  if (ec_seq.empty()) throw vw::error(vw::error_code::unknown, "cb_adf: At least one action must be provided for an example to be valid.");
 
   uint32_t count = 0;
   example* ret = nullptr;
   for (auto* ec : ec_seq)
   {
     // Check if there is more than one cost for this example.
-    if (ec->l.cb.costs.size() > 1) THROW("cb_adf: badly formatted example, only one cost can be known.");
+    if (ec->l.cb.costs.size() > 1) throw vw::error(vw::error_code::unknown, "cb_adf: badly formatted example, only one cost can be known.");
 
     // Check whether the cost was initialized to a value.
     if (ec->l.cb.costs.size() == 1 && ec->l.cb.costs[0].cost != FLT_MAX)
     {
       ret = ec;
       count += 1;
-      if (count > 1) THROW("cb_adf: badly formatted example, only one line can have a cost");
+      if (count > 1) throw vw::error(vw::error_code::unknown, "cb_adf: badly formatted example, only one line can have a cost");
     }
   }
 
@@ -311,7 +311,7 @@ void cb_adf::learn(multi_learner& base, multi_ex& ec_seq)
         learn_SM(base, ec_seq);
         break;
       default:
-        THROW("Unknown cb_type specified for contextual bandit learning: " << _gen_cs.cb_type);
+        throw vw::error(vw::error_code::unknown, "Unknown cb_type specified for contextual bandit learning: " << _gen_cs.cb_type);
     }
   }
   else if (learn_returns_prediction())

@@ -119,7 +119,7 @@ vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
   using explore_type = cb_explore_adf_base<cb_explore_adf_greedy>;
   auto data = scoped_calloc_or_throw<explore_type>(with_metrics, epsilon, first_only);
 
-  if (epsilon < 0.0 || epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
+  if (epsilon < 0.0 || epsilon > 1.0) { throw vw::error(vw::error_code::unknown, "The value of epsilon must be in [0,1]"); }
 
   vw::LEARNER::learner<explore_type, multi_ex>& l =
       vw::LEARNER::init_learner(data, base, explore_type::learn, explore_type::predict, problem_multiplier,

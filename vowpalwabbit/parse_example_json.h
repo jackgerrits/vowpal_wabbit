@@ -381,7 +381,7 @@ public:
       {
         auto outcome = new CCB::conditional_contextual_bandit_outcome();
         outcome->cost = cb_label.cost;
-        if (actions.size() != probs.size()) { THROW("Actions and probabilities must be the same length."); }
+        if (actions.size() != probs.size()) { throw vw::error(vw::error_code::unknown, "Actions and probabilities must be the same length."); }
 
         for (size_t i = 0; i < this->actions.size(); i++) { outcome->probabilities.push_back({actions[i], probs[i]}); }
         actions.clear();
@@ -396,7 +396,7 @@ public:
       auto& ld = ctx.ex->l.slates;
       if ((actions.size() != 0) && (probs.size() != 0))
       {
-        if (actions.size() != probs.size()) { THROW("Actions and probabilities must be the same length."); }
+        if (actions.size() != probs.size()) { throw vw::error(vw::error_code::unknown, "Actions and probabilities must be the same length."); }
         ld.labeled = true;
 
         for (size_t i = 0; i < this->actions.size(); i++) { ld.probabilities.push_back({actions[i], probs[i]}); }
@@ -600,7 +600,7 @@ struct MultiState : BaseState<audit>
       ld.type = vw::slates::example_type::shared;
     }
     else
-      THROW("label type is not CB, CCB or slates")
+      throw vw::error(, vw::error_code::unknown, "label type is not CB, CCB or slates")
 
     return this;
   }
@@ -911,7 +911,8 @@ public:
       else if (length == 8 && !strncmp(str, "_slot_id", 8))
       {
         if (ctx.all->example_parser->lbl_parser.label_type != label_type_t::slates)
-        { THROW("Can only use _slot_id with slates examples"); } ctx.uint_state.output_uint = &ctx.ex->l.slates.slot_id;
+        { throw vw::error(vw::error_code::unknown, "Can only use _slot_id with slates examples"); }
+        ctx.uint_state.output_uint = &ctx.ex->l.slates.slot_id;
         ctx.array_float_state.return_state = this;
         return &ctx.array_float_state;
       }

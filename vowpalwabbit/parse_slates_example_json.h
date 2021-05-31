@@ -49,7 +49,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
   {
     case rapidjson::kNullType:
       // Do nothing?
-      THROW("Null fields not supported")
+      throw vw::error(vw::error_code::unknown, "Null fields not supported")
       break;
     case rapidjson::kFalseType:
       // No nothing for false!
@@ -98,7 +98,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
           }
           break;
           default:
-            THROW("NOT HANDLED")
+            throw vw::error(vw::error_code::unknown, "NOT HANDLED")
         }
       }
       pop_ns(current_example, namespaces);

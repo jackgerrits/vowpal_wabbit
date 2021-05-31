@@ -204,7 +204,7 @@ CCB::conditional_contextual_bandit_outcome* parse_outcome(std::string_view outco
 
   std::vector<std::string_view> split_colons = tokenize(':', split_commas[0]);
 
-  if (split_colons.size() != 3) THROW("Malformed ccb label");
+  if (split_colons.size() != 3) throw vw::error(vw::error_code::unknown, "Malformed ccb label");
 
   ccb_outcome.probabilities = v_init<ACTION_SCORE::action_score>();
   ccb_outcome.probabilities.push_back(convert_to_score(split_colons[0], split_colons[2]));
@@ -234,22 +234,22 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
   ld.weight = 1.0;
 
   if (words.size() < 2) THROW("ccb labels may not be empty");
-  if (!(words[0] == CCB_LABEL)) { THROW("ccb labels require the first word to be ccb"); }
+  if (!(words[0] == CCB_LABEL)) { throw vw::error(vw::error_code::unknown, "ccb labels require the first word to be ccb"); }
 
   auto type = words[1];
   if (type == SHARED_TYPE)
   {
-    if (words.size() > 2) THROW("shared labels may not have a cost");
+    if (words.size() > 2) throw vw::error(vw::error_code::unknown, "shared labels may not have a cost");
     ld.type = CCB::example_type::shared;
   }
   else if (type == ACTION_TYPE)
   {
-    if (words.size() > 2) THROW("action labels may not have a cost");
+    if (words.size() > 2) throw vw::error(vw::error_code::unknown, "action labels may not have a cost");
     ld.type = CCB::example_type::action;
   }
   else if (type == SLOT_TYPE)
   {
-    if (words.size() > 4) THROW("ccb slot label can only have a type cost and exclude list");
+    if (words.size() > 4) throw vw::error(vw::error_code::unknown, "ccb slot label can only have a type cost and exclude list");
     ld.type = CCB::example_type::slot;
 
     // Skip the first two words "ccb <type>"
@@ -258,7 +258,7 @@ void parse_label(label& ld, const std::vector<std::string_view>& words, ::reduct
       auto is_outcome = words[i].find(':');
       if (is_outcome != std::string_view::npos)
       {
-        if (ld.outcome != nullptr) { THROW("There may be only 1 outcome associated with a slot.") }
+        if (ld.outcome != nullptr) { throw vw::error(vw::error_code::unknown, "There may be only 1 outcome associated with a slot.") }
 
         ld.outcome = parse_outcome(words[i]);
       }

@@ -422,7 +422,7 @@ void learn_or_predict(ccb& data, multi_learner& base, multi_ex& examples)
     {
       if (slot->l.conditional_contextual_bandit.outcome != nullptr &&
           slot->l.conditional_contextual_bandit.outcome->probabilities.empty())
-      { THROW("ccb_adf_explore: badly formatted example - missing label probability"); }
+      { throw vw::error(vw::error_code::unknown, "ccb_adf_explore: badly formatted example - missing label probability"); }
     }
   }
 

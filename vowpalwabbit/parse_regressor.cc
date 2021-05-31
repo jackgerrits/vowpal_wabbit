@@ -215,7 +215,7 @@ void save_load_header(
 
       if (all.model_file_ver < VERSION_FILE_WITH_INTERACTIONS_IN_FO)
       {
-        if (!read) THROW("cannot write legacy format");
+        if (!read) throw vw::error(vw::error_code::unknown, "cannot write legacy format");
 
         // -q, --cubic and --interactions are not saved in vw::file_options
         uint32_t pair_len = 0;
@@ -263,7 +263,7 @@ void save_load_header(
         if (all.model_file_ver >=
             VERSION_FILE_WITH_INTERACTIONS)  // && < VERSION_FILE_WITH_INTERACTIONS_IN_FO (previous if)
         {
-          if (!read) THROW("cannot write legacy format");
+          if (!read) throw vw::error(vw::error_code::unknown, "cannot write legacy format");
 
           // the only version that saves interacions among pairs and triples
           uint32_t len = 0;
@@ -281,7 +281,7 @@ void save_load_header(
 
             auto size = bin_text_read_write_fixed_validated(model_file, buff2, inter_len, "", read, msg, text);
             bytes_read_write += size;
-            if (size != inter_len) { THROW("Failed to read interaction from model file."); }
+            if (size != inter_len) { throw vw::error(vw::error_code::unknown, "Failed to read interaction from model file."); }
 
             std::vector<namespace_index> temp(buff2, buff2 + size);
             if (count(all.interactions.begin(), all.interactions.end(), temp) == 0)
@@ -384,7 +384,7 @@ void save_load_header(
       {
         uint32_t len;
         size_t ret = model_file.bin_read_fixed(reinterpret_cast<char*>(&len), sizeof(len), "");
-        if (len > 104857600 /*sanity check: 100 Mb*/ || ret < sizeof(uint32_t)) THROW("bad model format!");
+        if (len > 104857600 /*sanity check: 100 Mb*/ || ret < sizeof(uint32_t)) throw vw::error(vw::error_code::unknown, "bad model format!");
         resize_buf_if_needed(buff2, buf2_size, len);
         bytes_read_write += model_file.bin_read_fixed(buff2, len, "") + ret;
 
@@ -440,7 +440,7 @@ void save_load_header(
         msg << "Checksum: " << check_sum << "\n";
         bin_text_read_write(model_file, reinterpret_cast<char*>(&check_sum), sizeof(check_sum), "", read, msg, text);
 
-        if (check_sum_saved != check_sum) THROW("Checksum is inconsistent, file is possibly corrupted.");
+        if (check_sum_saved != check_sum) throw vw::error(vw::error_code::unknown, "Checksum is inconsistent, file is possibly corrupted.");
       }
 
       if (all.model_file_ver >= VERSION_FILE_WITH_HEADER_CHAINED_HASH) { model_file.verify_hash(false); }
@@ -457,7 +457,7 @@ void save_load_header(
 
 void dump_regressor(workspace& all, io_buf& buf, bool as_text)
 {
-  if (buf.num_output_files() == 0) { THROW("Cannot dump regressor with an io buffer that has no output files."); }
+  if (buf.num_output_files() == 0) { throw vw::error(vw::error_code::unknown, "Cannot dump regressor with an io buffer that has no output files."); }
   std::string unused;
   save_load_header(all, buf, false, as_text, unused, *all.options);
   if (all.l != nullptr) all.l->save_load(buf, false, as_text);

@@ -8,7 +8,7 @@
 #  include <sstream>
 #  include <array>
 #  include <string>
-
+		
 #  include <cstring>
 #  include <string.h>
 
@@ -24,93 +24,57 @@
 
 namespace vw
 {
-class vw_exception : public std::exception
+enum class error_code : uint8_t 
+{
+  sample_pdf_failed = 1,
+  num_actions_gt_zero,
+  options_disagree,
+  not_implemented,
+  strict_parse,
+  invalid_value,
+  unrecognized_option,
+  unknown,
+  unsupported
+};
+
+inline const char* to_string(error_code code)
+{
+  switch(code)
+  {
+    case error_code::sample_pdf_failed:
+      return "Failed to sample from pdf";
+    case error_code::num_actions_gt_zero:
+      return "Number of leaf nodes must be greater than zero";
+    case error_code::options_disagree:
+      return "Different values specified for two options that are constrained to be the same.";
+    case error_code::not_implemented:
+      return "Not implemented.";
+    default:
+      return "Unknown error";
+  }
+}
+
+class error : public std::exception
 {
 private:
-  // Source file exception was thrown in.
-  const char* _file;
-
+  vw::error_code _code;
   std::string _message;
 
-  // Line number exception was thrown in.
-  int _line_number;
-
 public:
-  vw_exception(const char* file, int lineNumber, std::string const& message)
+  error( std::string message)
       : _file(file), _message(message), _line_number(lineNumber)
   {
   }
-  vw_exception(const vw_exception& ex) = default;
-  vw_exception& operator=(const vw_exception& other) = default;
-  vw_exception(vw_exception&& ex) = default;
-  vw_exception& operator=(vw_exception&& other) = default;
-  ~vw_exception() noexcept = default;
+  error(const error& ex) = default;
+  error& operator=(const error& other) = default;
+  error(error&& ex) = default;
+  error& operator=(error&& other) = default;
+  ~error() noexcept = default;
 
   const char* what() const noexcept override { return _message.c_str(); }
-  const char* Filename() const { return _file; }
-  int LineNumber() const { return _line_number; }
 };
 
-class vw_argument_disagreement_exception : public vw_exception
-{
-public:
-  vw_argument_disagreement_exception(const char* file, int lineNumber, const std::string& message)
-      : vw_exception(file, lineNumber, message)
-  {
-  }
-
-  vw_argument_disagreement_exception(const vw_argument_disagreement_exception& ex) = default;
-  vw_argument_disagreement_exception& operator=(const vw_argument_disagreement_exception& other) = default;
-  vw_argument_disagreement_exception(vw_argument_disagreement_exception&& ex) = default;
-  vw_argument_disagreement_exception& operator=(vw_argument_disagreement_exception&& other) = default;
-  ~vw_argument_disagreement_exception() noexcept override = default;
-};
-
-class vw_argument_invalid_value_exception : public vw_exception
-{
-public:
-  vw_argument_invalid_value_exception(const char* file, int lineNumber, const std::string& message)
-      : vw_exception(file, lineNumber, message)
-  {
-  }
-
-  vw_argument_invalid_value_exception(const vw_argument_invalid_value_exception& ex) = default;
-  vw_argument_invalid_value_exception& operator=(const vw_argument_invalid_value_exception& other) = default;
-  vw_argument_invalid_value_exception(vw_argument_invalid_value_exception&& ex) = default;
-  vw_argument_invalid_value_exception& operator=(vw_argument_invalid_value_exception&& other) = default;
-  ~vw_argument_invalid_value_exception() noexcept override = default;
-};
-
-class vw_unrecognised_option_exception : public vw_exception
-{
-public:
-  vw_unrecognised_option_exception(const char* file, int lineNumber, const std::string& message)
-      : vw_exception(file, lineNumber, message)
-  {
-  }
-
-  vw_unrecognised_option_exception(const vw_unrecognised_option_exception& ex) = default;
-  vw_unrecognised_option_exception& operator=(const vw_unrecognised_option_exception& other) = default;
-  vw_unrecognised_option_exception(vw_unrecognised_option_exception&& ex) = default;
-  vw_unrecognised_option_exception& operator=(vw_unrecognised_option_exception&& other) = default;
-  ~vw_unrecognised_option_exception() noexcept override = default;
-};
-
-class strict_parse_exception : public vw_exception
-{
-public:
-  strict_parse_exception(const char* file, int lineNumber, const std::string& message)
-      : vw_exception(file, lineNumber, message)
-  {
-  }
-
-  strict_parse_exception(const strict_parse_exception& ex) = default;
-  strict_parse_exception& operator=(const strict_parse_exception& other) = default;
-  strict_parse_exception(strict_parse_exception&& ex) noexcept = default;
-  strict_parse_exception& operator=(strict_parse_exception&& other) noexcept = default;
-  ~strict_parse_exception() noexcept override = default;
-};
-
+// errno -> std::string
 inline std::string strerror_to_string(int error_number)
 {
 #  ifdef _WIN32
@@ -208,6 +172,7 @@ bool launchDebugger();
     if (!(condition)) { THROW(args); }
 
 #endif
+
 
 #define EXPAND(x) x
 #define GET_MACRO(_1, _2, NAME, ...) NAME
