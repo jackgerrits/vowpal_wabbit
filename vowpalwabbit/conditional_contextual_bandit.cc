@@ -208,10 +208,10 @@ bool has_action(multi_ex& cb_ex) { return !cb_ex.empty(); }
 // Copy other slot namespaces to shared
 void inject_slot_features(example* shared, example* slot)
 {
-  for (const auto& feat_group_it : slot->feature_space)
+  for (auto it = slot->feature_space.begin(); it != slot->feature_space.end(); ++it)
   {
     // constant namespace should be ignored, as it already exists and we don't want to double it up.
-    if (index == constant_namespace) { continue; }
+    if (it.index() == constant_namespace) { continue; }
 
     if (index == default_namespace)  // slot default namespace has a special namespace in shared
     { LabelDict::add_example_namespace(*shared, ccb_slot_namespace, slot->feature_space[default_namespace]); }

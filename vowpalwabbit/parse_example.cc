@@ -209,7 +209,7 @@ public:
       }
 
       if (_v == 0) return;  // dont add 0 valued features to list of features
-      features& fs = _ae->feature_namespaces.get_or_create_feature_group(_channel_hash, _index);
+      features& fs = _ae->feature_space.get_or_create_feature_group(_channel_hash, _index);
       if (audit)
       {
         if (!string_feature_value.empty())
@@ -226,7 +226,7 @@ public:
 
       if (((*_affix_features)[_index] > 0) && (!feature_name.empty()))
       {
-        features& affix_fs = _ae->feature_namespaces.get_or_create_reserved_feature_group(affix_namespace);
+        features& affix_fs = _ae->feature_space.get_or_create_feature_group(affix_namespace, affix_namespace);
         uint64_t affix = (*_affix_features)[_index];
 
         while (affix > 0)
@@ -261,7 +261,7 @@ public:
       }
       if ((*_spelling_features)[_index])
       {
-        features& spell_fs = _ae->feature_namespaces.get_or_create_feature_group(spelling_namespace);
+        features& spell_fs = _ae->feature_space.get_or_create_feature_group(spelling_namespace);
         // v_array<char> spelling;
         _spelling.clear();
         for (char c : feature_name)
@@ -308,7 +308,7 @@ public:
           if ((feats_it != map->end()) && (feats_it->second->values.size() > 0))
           {
             const auto& feats = feats_it->second;
-            features& dict_fs = _ae->feature_namespaces.get_or_create_reserved_feature_group(dictionary_namespace);
+            features& dict_fs = _ae->feature_space.get_or_create_feature_group(dictionary_namespace, dictionary_namespace);
             if (dict_fs.size() == 0) _ae->indices.push_back(dictionary_namespace);
             dict_fs.values.insert(dict_fs.values.end(), feats->values.begin(), feats->values.end());
             dict_fs.indicies.insert(dict_fs.indicies.end(), feats->indicies.begin(), feats->indicies.end());

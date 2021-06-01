@@ -78,14 +78,13 @@ void audit_regressor_lda(audit_regressor_data& rd, VW::LEARNER::single_learner& 
   parameters& weights = rd.all->weights;
   for (const auto& feat_group : ec)
   {
-    const auto& fs =*feat_group;
-    for (size_t j = 0; j < fs.size(); ++j)
+    for (size_t j = 0; j < feat_group.size(); ++j)
     {
-      tempstream << '\t' << fs.space_names[j].get()->first << '^' << fs.space_names[j].get()->second << ':'
-                 << ((fs.indicies[j] >> weights.stride_shift()) & all.parse_mask);
+      tempstream << '\t' << feat_group.space_names[j].get()->first << '^' << feat_group.space_names[j].get()->second
+                 << ':' << ((feat_group.indicies[j] >> weights.stride_shift()) & all.parse_mask);
       for (size_t k = 0; k < all.lda; k++)
       {
-        weight& w = weights[(fs.indicies[j] + k)];
+        weight& w = weights[(feat_group.indicies[j] + k)];
         tempstream << ':' << w;
         w = 0.;
       }
@@ -114,17 +113,25 @@ void audit_regressor(audit_regressor_data& rd, VW::LEARNER::single_learner& base
     {
       for (const auto& feat_group : ec)
       {
-        const auto& fs =*feat_group;
-        if (fs.space_names.size() > 0)
-          for (size_t j = 0; j < fs.size(); ++j)
+        if (feat_group.space_names.size() > 0)
+        {
+          for (size_t j = 0; j < feat_group.size(); ++j)
           {
-            audit_regressor_interaction(rd, fs.space_names[j].get());
-            audit_regressor_feature(rd, fs.values[j], static_cast<uint32_t>(fs.indicies[j]) + ec.ft_offset);
+            audit_regressor_interaction(rd, feat_group.space_names[j].get());
+            audit_regressor_feature(
+                rd, feat_group.values[j], static_cast<uint32_t>(feat_group.indicies[j]) + ec.ft_offset);
             audit_regressor_interaction(rd, nullptr);
           }
+        }
+
         else
-          for (size_t j = 0; j < fs.size(); ++j)
-            audit_regressor_feature(rd, fs.values[j], static_cast<uint32_t>(fs.indicies[j]) + ec.ft_offset);
+        {
+          for (size_t j = 0; j < feat_group.size(); ++j)
+          {
+            audit_regressor_feature(
+                rd, feat_group.values[j], static_cast<uint32_t>(feat_group.indicies[j]) + ec.ft_offset);
+          }
+        }
       }
 
       size_t num_interacted_features = 0;

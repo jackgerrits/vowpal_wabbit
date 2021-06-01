@@ -128,11 +128,11 @@ inline void generate_interactions(const std::vector<std::vector<namespace_index>
 
     if (len == 2)  // special case of pairs
     {
-      for (const auto& first : ec.feature_namespaces.namespace_index_range(ns[0]))
+      for (const auto& first : ec.feature_space.namespace_index_range(ns[0]))
       {
         if (first.nonempty())
         {
-          for (const auto& second : ec.feature_namespaces.namespace_index_range(ns[1]))
+          for (const auto& second : ec.feature_space.namespace_index_range(ns[1]))
           {
             if (second.nonempty())
             {
@@ -161,15 +161,15 @@ inline void generate_interactions(const std::vector<std::vector<namespace_index>
     }
     else if (len == 3)  // special case for triples
     {
-      for (const auto& first : ec.feature_namespaces.namespace_index_range(ns[0]))
+      for (const auto& first : ec.feature_space.namespace_index_range(ns[0]))
       {
         if (first.nonempty())
         {
-          for (const auto& second : ec.feature_namespaces.namespace_index_range(ns[1]))
+          for (const auto& second : ec.feature_space.namespace_index_range(ns[1]))
           {
             if (second.nonempty())
             {
-              for (const auto& third : ec.feature_namespaces.namespace_index_range(ns[2]))
+              for (const auto& third : ec.feature_space.namespace_index_range(ns[2]))
               {
                 if (third.nonempty())
                 {  // don't compare 1 and 3 as interaction is sorted
@@ -225,7 +225,7 @@ inline void generate_interactions(const std::vector<std::vector<namespace_index>
       feature_gen_data* fgd2;  // for further use
       for (auto n : ns)
       {
-        for (auto& ft : ec.feature_namespaces.namespace_index_range(static_cast<int32_t>(n)))
+        for (auto& ft : ec.feature_space.namespace_index_range(static_cast<int32_t>(n)))
         {
           const size_t ft_cnt = ft.indicies.size();
 

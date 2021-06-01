@@ -64,7 +64,7 @@ void push_ns(example* ex, const char* ns, std::vector<Namespace<audit>>& namespa
   Namespace<audit> n;
   n.feature_group = ns[0];
   n.namespace_hash = VW::hash_space_cstr(all, ns);
-  n.ftrs = &ex->feature_namespaces.get_or_create_feature_group(n.namespace_hash, ns[0]);
+  n.ftrs = &ex->feature_space.get_or_create_feature_group(n.namespace_hash, ns[0]);
   n.feature_count = 0;
   n.name = ns;
   namespaces.push_back(std::move(n));
