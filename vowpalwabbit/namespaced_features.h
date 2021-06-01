@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_map>
+#include <cassert>
 
 #include "feature_group.h"
 #include "generic_range.h"
@@ -15,6 +16,8 @@ typedef unsigned char namespace_index;
 
 namespace VW
 {
+
+/// Insertion or removal will result in this value in invalidated.
 template <typename FeaturesT, typename IndexT, typename HashT>
 class iterator_t
 {
@@ -45,6 +48,7 @@ public:
   bool operator!=(const iterator_t& rhs) { return _index != rhs._index; }
 };
 
+/// Insertion or removal will result in this value in invalidated.
 template <typename IndicesT, typename FeaturesT, typename IndexT, typename HashT>
 class indexed_iterator_t
 {
@@ -54,6 +58,8 @@ class indexed_iterator_t
   HashT* _namespace_hashes;
 
 public:
+  using difference_type = std::ptrdiff_t;
+
   indexed_iterator_t(IndicesT* indices, FeaturesT* feature_groups, IndexT* namespace_indices, HashT* namespace_hashes)
       : _indices(indices)
       , _feature_groups(feature_groups)
@@ -63,7 +69,9 @@ public:
   }
   FeaturesT& operator*()
   {
+#ifndef VW_NOEXCEPT
     if (_indices == nullptr) { THROW("Invalid iterator"); }
+#endif
     return _feature_groups[*_indices];
   }
   indexed_iterator_t& operator++()
@@ -74,13 +82,23 @@ public:
 
   IndexT index()
   {
+#ifndef VW_NOEXCEPT
     if (_indices == nullptr) { THROW("Invalid iterator"); }
+#endif
     return _namespace_indices[*_indices];
   }
   HashT hash()
   {
+#ifndef VW_NOEXCEPT
     if (_indices == nullptr) { THROW("Invalid iterator"); }
+#endif
     return _namespace_hashes[*_indices];
+  }
+
+  friend difference_type operator-(const indexed_iterator_t& lhs, const indexed_iterator_t& rhs)
+  {
+    assert(lhs._indices >= rhs._indices);
+    return lhs._indices - rhs._indices;
   }
 
   bool operator==(const indexed_iterator_t& rhs) { return _indices == rhs._indices; }
@@ -105,7 +123,8 @@ struct namespaced_features
   // Returns nullptr if not found.
   const features* get_feature_group(uint64_t hash) const;
 
-  const std::vector<namespace_index>& get_indices() const;
+  // TODO - don't generate this per call.
+  std::vector<namespace_index> get_indices() const;
 
   // Returns empty range if not found
   std::pair<indexed_iterator, indexed_iterator> get_namespace_index_groups(namespace_index index);
@@ -169,7 +188,7 @@ features& namespaced_features::merge_feature_group(FeaturesT&& ftrs, uint64_t ha
   }
   else
   {
-    existing_group->push_back(std::forward<FeaturesT>(ftrs));
+    existing_group->concat(std::forward<FeaturesT>(ftrs));
     auto existing_index = _hash_to_index_mapping[hash];
     // Should we ensure that this doesnt already exist under a DIFFERENT namespace_index?
     // However, his shouldn't be possible as ns_index depends on hash.

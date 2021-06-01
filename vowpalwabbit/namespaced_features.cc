@@ -23,7 +23,14 @@ const features* namespaced_features::get_feature_group(uint64_t hash) const
   return &_feature_groups[it->second];
 }
 
-const std::vector<namespace_index>& namespaced_features::get_indices() const { return _namespace_indices; }
+std::vector<namespace_index> namespaced_features::get_indices() const
+{
+  auto indices_copy = _namespace_indices;
+  std::sort(indices_copy.begin(), indices_copy.end());
+  auto last = std::unique(indices_copy.begin(), indices_copy.end());
+  indices_copy.erase(last, indices_copy.end());
+  return indices_copy;
+}
 
 std::pair<namespaced_features::indexed_iterator, namespaced_features::indexed_iterator>
 namespaced_features::get_namespace_index_groups(namespace_index ns_index)
@@ -57,18 +64,23 @@ features& namespaced_features::get_or_create_feature_group(uint64_t hash, namesp
 const features& namespaced_features::operator[](uint64_t hash) const
 {
   auto* existing_group = get_feature_group(hash);
+#ifndef VW_NOEXCEPT
   if (existing_group == nullptr) { THROW("No group found for hash: " << hash); }
+#endif
   return *existing_group;
 }
 features& namespaced_features::operator[](uint64_t hash)
 {
   auto* existing_group = get_feature_group(hash);
+#ifndef VW_NOEXCEPT
   if (existing_group == nullptr) { THROW("No group found for hash: " << hash); }
+#endif
   return *existing_group;
 }
 
 void namespaced_features::remove_feature_group(uint64_t hash)
 {
+  if (_hash_to_index_mapping.count(hash) == 0) { return; }
   auto existing_index = _hash_to_index_mapping[hash];
 
   // Remove item from each vector at this index.
@@ -79,7 +91,7 @@ void namespaced_features::remove_feature_group(uint64_t hash)
 
   for (auto& kv : _legacy_indices_to_index_mapping)
   {
-    auto index_vec = kv.second;
+    auto& index_vec = kv.second;
     // Remove this index from ns_index mappings if it exists
     auto it = std::find(index_vec.begin(), index_vec.end(), existing_index);
     if (it != index_vec.end()) { index_vec.erase(it); }
@@ -89,6 +101,21 @@ void namespaced_features::remove_feature_group(uint64_t hash)
     {
       if (idx > existing_index) { idx -= 1; }
     }
+  }
+
+  // If any groups are left empty, remove them.
+  for (auto it = _legacy_indices_to_index_mapping.begin(); it != _legacy_indices_to_index_mapping.end();)
+  {
+    if (it->second.empty()) { it = _legacy_indices_to_index_mapping.erase(it); }
+    else
+    {
+      ++it;
+    }
+  }
+
+  for (auto& kv : _hash_to_index_mapping)
+  {
+    if (kv.second > existing_index) { kv.second -= 1; }
   }
 }
 
