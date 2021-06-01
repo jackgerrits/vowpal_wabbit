@@ -71,7 +71,7 @@ void print_decision_scores(vw::io::writer* f, const vw::decision_scores_t& decis
     const auto str = ss.str();
     ssize_t len = str.size();
     ssize_t t = f->write(str.c_str(), static_cast<unsigned int>(len));
-    if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
+    if (t != len) { logger::errlog_error("write error: {}", vw::errno_to_string(errno)); }
   }
 }
 

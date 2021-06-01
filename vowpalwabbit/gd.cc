@@ -764,8 +764,11 @@ void save_load_regressor(workspace& all, io_buf& model_file, bool read, bool tex
       if (brw > 0)
       {
         if (i >= length)
-          THROW("Model content is corrupted, weight vector index " << i << " must be less than total vector length "
-                                                                   << length);
+        {
+          throw vw::error(
+              fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}",
+                  i, length));
+        }
         weight* v = &weights.strided_index(i);
         brw += model_file.bin_read_fixed(reinterpret_cast<char*>(&(*v)), sizeof(*v), "");
       }
@@ -814,8 +817,11 @@ void save_load_online_state(workspace& all, io_buf& model_file, bool read, bool 
       if (brw > 0)
       {
         if (i >= length)
-          THROW("Model content is corrupted, weight vector index " << i << " must be less than total vector length "
-                                                                   << length);
+        {
+          throw vw::error(
+              fmt::format("Model content is corrupted, weight vector index {} must be less than total vector length {}",
+                  i, length));
+        }
         weight buff[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         if (ftrl_size > 0)
           brw += model_file.bin_read_fixed(reinterpret_cast<char*>(buff), sizeof(buff[0]) * ftrl_size, "");
@@ -1233,7 +1239,7 @@ base_learner* setup(options_i& options, workspace& all)
 
   if (adax) g->adax = all.training && adax;
 
-  if (g->adax && !all.weights.adaptive) THROW("Cannot use adax without adaptive");
+  if (g->adax && !all.weights.adaptive) throw vw::error("Cannot use adax without adaptive");
 
   if (pow(static_cast<double>(all.eta_decay_rate), static_cast<double>(all.numpasses)) < 0.0001)
     *(all.trace_message) << "Warning: the learning rate for the last pass is multiplied by: "

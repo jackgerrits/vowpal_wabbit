@@ -190,8 +190,8 @@ BOOST_AUTO_TEST_CASE(ccb_invalid_example_checks)
   for (auto* example : examples) { vw::setup_example(vw, example); }
 
   // Check that number of actions is greater than slots
-  BOOST_REQUIRE_THROW(vw.predict(examples), vw::vw_exception);
-  BOOST_REQUIRE_THROW(vw.learn(examples), vw::vw_exception);
+  BOOST_REQUIRE_THROW(vw.predict(examples), vw::error);
+  BOOST_REQUIRE_THROW(vw.learn(examples), vw::error);
 
   vw.finish_example(examples);
   vw::finish(vw);

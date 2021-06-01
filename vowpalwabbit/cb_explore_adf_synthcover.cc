@@ -189,9 +189,9 @@ vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
   // Ensure serialization of cb_adf in all cases.
   if (!options.was_supplied("cb_adf")) { options.insert("cb_adf", ""); }
 
-  if (synthcoversize <= 0) { THROW("synthcoversize must be >= 1"); }
-  if (epsilon < 0) { THROW("epsilon must be non-negative"); }
-  if (psi <= 0) { THROW("synthcoverpsi must be positive"); }
+  if (synthcoversize <= 0) { throw vw::error("synthcoversize must be >= 1"); }
+  if (epsilon < 0) { throw vw::error("epsilon must be non-negative"); }
+  if (psi <= 0) { throw vw::error("synthcoverpsi must be positive"); }
 
   if (!all.logger.quiet)
   {

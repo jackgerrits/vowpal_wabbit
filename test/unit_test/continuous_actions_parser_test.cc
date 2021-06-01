@@ -217,6 +217,6 @@ BOOST_AUTO_TEST_CASE(continus_actions_check_label_for_prefix)
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
     reduction_features red_features;
-    BOOST_REQUIRE_THROW(parse_label(lp, "185.121:0.657567:6.20426e-05", *plabel, red_features), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, "185.121:0.657567:6.20426e-05", *plabel, red_features), vw::error);
   }
 }

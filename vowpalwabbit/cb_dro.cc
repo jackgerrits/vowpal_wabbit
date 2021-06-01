@@ -118,16 +118,16 @@ base_learner* cb_dro_setup(options_i& options, workspace& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (options.was_supplied("no_predict")) { THROW("cb_dro cannot be used with no_predict"); }
+  if (options.was_supplied("no_predict")) { throw vw::error("cb_dro cannot be used with no_predict"); }
 
   if (!options.was_supplied("cb_adf") && !options.was_supplied("cb_explore_adf"))
-  { THROW("cb_dro requires cb_adf or cb_explore_adf"); }
+  { throw vw::error("cb_dro requires cb_adf or cb_explore_adf"); }
 
-  if (alpha <= 0 || alpha >= 1) { THROW("cb_dro_alpha must be in (0, 1)"); }
+  if (alpha <= 0 || alpha >= 1) { throw vw::error("cb_dro_alpha must be in (0, 1)"); }
 
-  if (tau <= 0 || tau > 1) { THROW("cb_dro_tau must be in (0, 1]"); }
+  if (tau <= 0 || tau > 1) { throw vw::error("cb_dro_tau must be in (0, 1]"); }
 
-  if (wmax <= 1) { THROW("cb_dro_wmax must exceed 1"); }
+  if (wmax <= 1) { throw vw::error("cb_dro_wmax must exceed 1"); }
 
   if (!all.logger.quiet)
   {
@@ -139,7 +139,7 @@ base_learner* cb_dro_setup(options_i& options, workspace& all)
 
   auto data = scoped_calloc_or_throw<cb_dro_data>(alpha, tau, wmax);
 
-  if (!data->isValid()) { THROW("invalid cb_dro parameter values supplied"); }
+  if (!data->isValid()) { throw vw::error("invalid cb_dro parameter values supplied"); }
 
   if (options.was_supplied("cb_explore_adf"))
   {

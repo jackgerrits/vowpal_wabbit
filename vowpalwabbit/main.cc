@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     if (argc == 3 && !std::strcmp(argv[1], "--args"))
     {
       std::fstream arg_file(argv[2]);
-      if (!arg_file) { THROW("Could not open file: " << argv[2]); }
+      if (!arg_file) { throw vw::error(fmt::format("Could not open file: {}", argv[2])); }
 
       int line_count = 1;
       std::string line;
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
       if (alls.size() == 1)
         vw::LEARNER::generic_driver_onethread(all);
       else
-        THROW("--onethread doesn't make sense with multiple learners");
+        throw vw::error("--onethread doesn't make sense with multiple learners");
     }
     else
     {
@@ -115,10 +115,10 @@ int main(int argc, char* argv[])
       vw::finish(*v);
     }
   }
-  catch (vw::vw_exception& e)
+  catch (const vw::error& e)
   {
     // TODO: If loggers are instantiated within struct vw, this line lives outside of that. Log as critical for now
-    std::cerr << "[critical] vw (" << e.Filename() << ":" << e.LineNumber() << "): " << e.what() << std::endl;
+    std::cerr << "[critical] " << e.what() << std::endl;
     exit(1);
   }
   catch (std::exception& e)

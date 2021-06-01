@@ -45,7 +45,8 @@ void parse_label(CB::label& ld, const std::vector<std::string_view>& words, redu
     cb_class f;
     const auto tokenized = tokenize(':', word);
 
-    if (tokenized.empty() || tokenized.size() > 3) { THROW("malformed cost specification: " << word); }
+    if (tokenized.empty() || tokenized.size() > 3)
+    { throw vw::error(fmt::format("malformed cost specification: {}", word)); }
 
     f.partial_prediction = 0.;
     f.action = static_cast<uint32_t>(hashstring(tokenized[0].data(), tokenized[0].length(), 0));
@@ -53,12 +54,14 @@ void parse_label(CB::label& ld, const std::vector<std::string_view>& words, redu
 
     if (tokenized.size() > 1) f.cost = float_of_string(tokenized[1]);
 
-    if (std::isnan(f.cost)) THROW("error NaN cost (" << tokenized[1] << " for action: " << tokenized[0]);
+    if (std::isnan(f.cost))
+    { throw vw::error(fmt::format("error NaN cost ({}) for action: {}", tokenized[1], tokenized[0])); }
 
     f.probability = .0;
     if (tokenized.size() > 2) f.probability = float_of_string(tokenized[2]);
 
-    if (std::isnan(f.probability)) THROW("error NaN probability (" << tokenized[2] << " for action: " << tokenized[0]);
+    if (std::isnan(f.probability))
+      throw vw::error(fmt::format("error NaN probability ({}) for action: {}", tokenized[2], tokenized[0]));
 
     if (f.probability > 1.0)
     {
@@ -193,7 +196,7 @@ bool test_label(const CB_EVAL::label& ld) { return CB::is_test_label(ld.event); 
 
 void parse_label(CB_EVAL::label& ld, const std::vector<std::string_view>& words, reduction_features& red_features)
 {
-  if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
+  if (words.size() < 2) throw vw::error("Evaluation can not happen without an action and an exploration");
 
   ld.action = (uint32_t)hashstring(words[0].data(), words[0].length(), 0);
 

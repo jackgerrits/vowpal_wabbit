@@ -58,8 +58,9 @@ void min_depth_binary_tree::build_tree(uint32_t num_nodes, uint32_t bandwidth)
   {
     if (num_nodes != _num_leaf_nodes)
     {
-      THROW("Tree already initialized.  New leaf node count (" << num_nodes << ") does not equal current value. ("
-                                                               << _num_leaf_nodes << ")");
+      throw vw::error(
+          fmt::format("Tree already initialized.  New leaf node count ({}) does not equal current value. ({})",
+              num_nodes, _num_leaf_nodes));
     }
     return;
   }
@@ -113,7 +114,8 @@ void min_depth_binary_tree::build_tree(uint32_t num_nodes, uint32_t bandwidth)
   }
   catch (std::bad_alloc& e)
   {
-    THROW("Unable to allocate memory for cats_tree.  Label count:" << _num_leaf_nodes << " bad_alloc:" << e.what());
+    throw vw::error(fmt::format(
+        "Unable to allocate memory for cats_tree.  Label count: {} bad_alloc: {}", _num_leaf_nodes, e.what()));
   }
 }
 

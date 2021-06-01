@@ -3,7 +3,6 @@
 // license as described in the file LICENSE.
 
 #include "sample_pdf.h"
-#include "error_constants.h"
 #include "debug_log.h"
 #include "parse_args.h"
 #include "explore.h"
@@ -64,7 +63,7 @@ void sample_pdf::predict(example& ec)
   const int ret_code = exploration::sample_pdf(_p_random_state, std::begin(_pred_pdf), std::end(_pred_pdf),
       ec.pred.pdf_value.action, ec.pred.pdf_value.pdf_value);
 
-  if (ret_code != S_EXPLORATION_OK) THROW("error_code::sample_pdf_failed");
+  if (ret_code != S_EXPLORATION_OK) throw vw::error("error_code::sample_pdf_failed");
 }
 
 void sample_pdf::init(single_learner* p_base, uint64_t* p_random_seed)

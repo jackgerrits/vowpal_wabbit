@@ -191,7 +191,8 @@ bool ec_seq_is_label_definition(multi_ex& ec_seq)
   if (ec_seq.empty()) return false;
   bool is_lab = ec_is_label_definition(*ec_seq[0]);
   for (size_t i = 1; i < ec_seq.size(); i++)
-    if (is_lab != ec_is_label_definition(*ec_seq[i])) THROW("error: mixed label definition and examples in ldf data!");
+    if (is_lab != ec_is_label_definition(*ec_seq[i]))
+      throw vw::error("error: mixed label definition and examples in ldf data!");
   return is_lab;
 }
 
@@ -571,7 +572,7 @@ void global_print_newline(workspace& all)
   {
     ssize_t t;
     t = sink->write(temp, 1);
-    if (t != 1) logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
+    if (t != 1) logger::errlog_error("write error: {}", vw::errno_to_string(errno));
   }
 }
 
@@ -811,7 +812,7 @@ multi_ex process_labels(ldf& data, const multi_ex& ec_seq_all)
   // Ensure there are no more labels
   // (can be done in existing loops later but as a side effect learning
   //    will happen with bad example)
-  if (ec_seq_has_label_definition(ec_seq_all)) { THROW("error: label definition encountered in data block"); }
+  if (ec_seq_has_label_definition(ec_seq_all)) { throw vw::error("error: label definition encountered in data block"); }
 
   // all examples were labels return size
   return ret;
@@ -872,9 +873,9 @@ base_learner* csldf_setup(options_i& options, workspace& all)
     ld->treat_as_classifier = true;
   else
   {
-    if (all.training) THROW("ldf requires either m/multiline or mc/multiline-classifier");
+    if (all.training) throw vw::error("ldf requires either m/multiline or mc/multiline-classifier");
     if ((ldf_arg == "singleline" || ldf_arg == "s") || (ldf_arg == "singleline-classifier" || ldf_arg == "sc"))
-      THROW(
+      throw vw::error(
           "ldf requires either m/multiline or mc/multiline-classifier.  s/sc/singleline/singleline-classifier is no "
           "longer supported");
   }

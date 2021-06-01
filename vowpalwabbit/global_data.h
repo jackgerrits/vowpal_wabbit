@@ -312,7 +312,6 @@ void print_result(vw::io::writer* f, float res, float weight, v_array<char> tag)
 void print_result_by_ref(vw::io::writer* f, float res, float weight, const v_array<char>& tag);
 
 void noop_mm(shared_data*, float label);
-void get_prediction(vw::io::reader* f, float& res, float& weight);
 void compile_gram(
     std::vector<std::string> grams, std::array<uint32_t, NUM_NAMESPACES>& dest, char* descriptor, bool quiet);
 void compile_limits(std::vector<std::string> limits, std::array<uint32_t, NUM_NAMESPACES>& dest, bool quiet);

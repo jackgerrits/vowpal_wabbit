@@ -14,6 +14,7 @@
 #include <ostream>
 #include <string>
 #include <utility>
+#include <fmt/format.h>
 #include "future_compat.h"
 
 #ifndef VW_NOEXCEPT
@@ -58,7 +59,7 @@ private:
 
     T* temp = reinterpret_cast<T*>(std::realloc(_begin, sizeof(T) * length));
     if (temp == nullptr)
-    { THROW_OR_RETURN("realloc of " << length << " failed in reserve_nocheck().  out of memory?"); }
+    { throw vw::error(fmt::format("realloc of {} failed in reserve_nocheck().  out of memory?", length)); }
     else
     {
       _begin = temp;

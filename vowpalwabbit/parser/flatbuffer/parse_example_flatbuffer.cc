@@ -252,7 +252,7 @@ void parser::parse_flat_label(shared_data* sd, example* ae, const Example* eg)
     case Label_NONE:
       break;
     default:
-      THROW("Label type in Flatbuffer not understood");
+      throw vw::error("Label type in Flatbuffer not understood");
   }
 }
 

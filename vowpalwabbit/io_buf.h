@@ -11,6 +11,7 @@
 #include <memory>
 #include <cassert>
 #include <cstdlib>
+#include <fmt/format.h>
 
 #include "v_array.h"
 #include "hash.h"
@@ -62,7 +63,8 @@ class io_buf
       if (temp == nullptr)
       {
         // _begin still needs to be freed but the destructor will do it.
-        THROW_OR_RETURN("realloc of " << new_capacity << " failed in resize().  out of memory?");
+        // Exception on a memalloc fail path... :/
+        throw vw::error(fmt::format("realloc of {} failed in resize().  out of memory?", new_capacity));
       }
       _begin = temp;
       _end = _begin + old_size;
@@ -120,7 +122,7 @@ public:
 
   uint32_t hash()
   {
-    if (!_verify_hash) THROW("HASH WAS NOT CALCULATED");
+    if (!_verify_hash) throw vw::error("HASH WAS NOT CALCULATED");
     return _hash;
   }
 
@@ -230,7 +232,7 @@ public:
 
       if (*read_message == '\0') { memcpy(data, p, len); }
       else if (memcmp(data, p, len) != 0)
-        THROW(read_message);
+        throw vw::error(read_message);
       return len;
     }
     return 0;
@@ -262,7 +264,7 @@ inline size_t bin_read(io_buf& i, char* data, size_t len, const char* read_messa
 {
   uint32_t obj_len;
   size_t ret = i.bin_read_fixed(reinterpret_cast<char*>(&obj_len), sizeof(obj_len), "");
-  if (obj_len > len || ret < sizeof(uint32_t)) THROW("bad model format!");
+  if (obj_len > len || ret < sizeof(uint32_t)) throw vw::error("bad model format!");
 
   ret += i.bin_read_fixed(data, obj_len, read_message);
 
@@ -320,7 +322,7 @@ inline size_t bin_text_read_write_fixed_validated(
   size_t nbytes = bin_text_read_write_fixed(io, data, len, read_message, read, msg, text);
   if (read && len > 0)  // only validate bytes read/write if expected length > 0
   {
-    if (nbytes == 0) { THROW("Unexpected end of file encountered."); }
+    if (nbytes == 0) { throw vw::error("Unexpected end of file encountered."); }
   }
   return nbytes;
 }

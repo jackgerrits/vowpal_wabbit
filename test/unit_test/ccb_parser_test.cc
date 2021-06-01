@@ -84,23 +84,23 @@ BOOST_AUTO_TEST_CASE(ccb_parse_label)
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label("shared", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("shared", *label.get()), vw::error);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label("other shared", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("other shared", *label.get()), vw::error);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label("other", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("other", *label.get()), vw::error);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label("ccb unknown", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("ccb unknown", *label.get()), vw::error);
   }
   {
     auto label = scoped_calloc_or_throw<CCB::label>();
-    BOOST_REQUIRE_THROW(parse_ccb_label("ccb slot 1:1.0:0.5,4:0.7", *label.get()), vw::vw_exception);
+    BOOST_REQUIRE_THROW(parse_ccb_label("ccb slot 1:1.0:0.5,4:0.7", *label.get()), vw::error);
   }
 }
 

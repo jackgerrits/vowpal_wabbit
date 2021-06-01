@@ -223,6 +223,6 @@ void cache_features(io_buf& cache, example* ae, uint64_t mask)
 
 uint32_t vw::convert(size_t number)
 {
-  if (number > UINT32_MAX) { THROW("size_t value is out of bounds of uint32_t.") }
+  if (number > UINT32_MAX) { throw vw::error("size_t value is out of bounds of uint32_t."); }
   return static_cast<uint32_t>(number);
 }

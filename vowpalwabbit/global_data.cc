@@ -25,41 +25,6 @@
 #include "io/logger.h"
 namespace logger = vw::io::logger;
 
-struct global_prediction
-{
-  float p;
-  float weight;
-};
-
-size_t really_read(vw::io::reader* sock, void* in, size_t count)
-{
-  char* buf = static_cast<char*>(in);
-  size_t done = 0;
-  ssize_t r = 0;
-  while (done < count)
-  {
-    if ((r = sock->read(buf, static_cast<unsigned int>(count - done))) == 0) { return 0; }
-    else if (r < 0)
-    {
-      THROWERRNO("read(" << sock << "," << count << "-" << done << ")");
-    }
-    else
-    {
-      done += r;
-      buf += r;
-    }
-  }
-  return done;
-}
-
-void get_prediction(vw::io::reader* f, float& res, float& weight)
-{
-  global_prediction p;
-  really_read(f, &p, sizeof(p));
-  res = p.p;
-  weight = p.weight;
-}
-
 int print_tag_by_ref(std::stringstream& ss, const v_array<char>& tag)
 {
   if (tag.begin() != tag.end())
@@ -101,7 +66,7 @@ void print_result_by_ref(vw::io::writer* f, float res, float, const v_array<char
     ss << '\n';
     ssize_t len = ss.str().size();
     ssize_t t = f->write(ss.str().c_str(), static_cast<unsigned int>(len));
-    if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
+    if (t != len) { logger::errlog_error("write error: {}", vw::errno_to_string(errno)); }
   }
 }
 
@@ -115,7 +80,7 @@ void print_raw_text(vw::io::writer* f, std::string s, v_array<char> tag)
   ss << '\n';
   ssize_t len = ss.str().size();
   ssize_t t = f->write(ss.str().c_str(), static_cast<unsigned int>(len));
-  if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
+  if (t != len) { logger::errlog_error("write error: {}", vw::errno_to_string(errno)); }
 }
 
 void print_raw_text_by_ref(vw::io::writer* f, const std::string& s, const v_array<char>& tag)
@@ -128,7 +93,7 @@ void print_raw_text_by_ref(vw::io::writer* f, const std::string& s, const v_arra
   ss << '\n';
   ssize_t len = ss.str().size();
   ssize_t t = f->write(ss.str().c_str(), static_cast<unsigned int>(len));
-  if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
+  if (t != len) { logger::errlog_error("write error: {}", vw::errno_to_string(errno)); }
 }
 
 void set_mm(shared_data* sd, float label)
@@ -141,7 +106,7 @@ void noop_mm(shared_data*, float) {}
 
 void workspace::learn(example& ec)
 {
-  if (l->is_multiline) THROW("This reduction does not support single-line examples.");
+  if (l->is_multiline) throw vw::error("This reduction does not support single-line examples.");
 
   if (ec.test_only || !training)
     vw::LEARNER::as_singleline(l)->predict(ec);
@@ -158,7 +123,7 @@ void workspace::learn(example& ec)
 
 void workspace::learn(multi_ex& ec)
 {
-  if (!l->is_multiline) THROW("This reduction does not support multi-line example.");
+  if (!l->is_multiline) throw vw::error("This reduction does not support multi-line example.");
 
   if (!training)
     vw::LEARNER::as_multiline(l)->predict(ec);
@@ -175,7 +140,7 @@ void workspace::learn(multi_ex& ec)
 
 void workspace::predict(example& ec)
 {
-  if (l->is_multiline) THROW("This reduction does not support single-line examples.");
+  if (l->is_multiline) throw vw::error("This reduction does not support single-line examples.");
 
   // be called directly in library mode, test_only must be explicitly set here. If the example has a label but is passed
   // to predict it would otherwise be incorrectly labelled as test_only = false.
@@ -185,7 +150,7 @@ void workspace::predict(example& ec)
 
 void workspace::predict(multi_ex& ec)
 {
-  if (!l->is_multiline) THROW("This reduction does not support multi-line example.");
+  if (!l->is_multiline) throw vw::error("This reduction does not support multi-line example.");
 
   // be called directly in library mode, test_only must be explicitly set here. If the example has a label but is passed
   // to predict it would otherwise be incorrectly labelled as test_only = false.
@@ -196,14 +161,14 @@ void workspace::predict(multi_ex& ec)
 
 void workspace::finish_example(example& ec)
 {
-  if (l->is_multiline) THROW("This reduction does not support single-line examples.");
+  if (l->is_multiline) throw vw::error("This reduction does not support single-line examples.");
 
   vw::LEARNER::as_singleline(l)->finish_example(*this, ec);
 }
 
 void workspace::finish_example(multi_ex& ec)
 {
-  if (!l->is_multiline) THROW("This reduction does not support multi-line example.");
+  if (!l->is_multiline) throw vw::error("This reduction does not support multi-line example.");
 
   vw::LEARNER::as_multiline(l)->finish_example(*this, ec);
 }

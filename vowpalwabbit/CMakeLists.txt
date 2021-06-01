@@ -66,8 +66,6 @@ set(vw_all_headers
   debug_print.h
   decision_scores.h
   distributionally_robust.h
-  error_constants.h
-  error_data.h
   error_reporting.h
   example_predict.h
   example.h

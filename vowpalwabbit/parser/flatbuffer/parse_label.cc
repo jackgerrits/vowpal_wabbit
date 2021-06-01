@@ -133,7 +133,7 @@ void parser::parse_slates_label(polylabel* l, const Slates_Label* label)
   }
   else
   {
-    THROW("Example type not understood")
+    throw vw::error("Example type not understood");
   }
 }
 

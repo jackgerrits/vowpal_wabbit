@@ -112,7 +112,7 @@ public:
   sparse_parameters& operator=(sparse_parameters&&) noexcept = delete;
   sparse_parameters(sparse_parameters&&) noexcept = delete;
 
-  weight* first() { THROW_OR_RETURN("Allreduce currently not supported in sparse", nullptr); }
+  weight* first() { throw vw::error(vw::error_code::unsupported, "Allreduce currently not supported in sparse"); }
 
   // iterator with stride
   iterator begin()
@@ -183,7 +183,10 @@ public:
   void stride_shift(uint32_t stride_shift) { _stride_shift = stride_shift; }
 
 #ifndef _WIN32
-  void share(size_t /* length */) { THROW_OR_RETURN("Operation not supported on Windows"); }
+  void share(size_t /* length */)
+  {
+    throw vw::error(vw::error_code::unsupported, "Operation not supported on Windows");
+  }
 #endif
 
   ~sparse_parameters()

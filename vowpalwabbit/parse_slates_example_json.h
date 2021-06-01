@@ -29,7 +29,7 @@ inline float get_number(const rapidjson::Value& value)
   }
   else
   {
-    THROW("Tried to get value as number, but type was " << value.GetType());
+    throw vw::error(fmt::format("Tried to get value as number, but type was {}", value.GetType()));
   }
 
   return number;
@@ -49,7 +49,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
   {
     case rapidjson::kNullType:
       // Do nothing?
-      THROW("Null fields not supported")
+      throw vw::error("Null fields not supported");
       break;
     case rapidjson::kFalseType:
       // No nothing for false!
@@ -98,7 +98,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
           }
           break;
           default:
-            THROW("NOT HANDLED")
+            throw vw::error("NOT HANDLED");
         }
       }
       pop_ns(current_example, namespaces);
@@ -181,7 +181,8 @@ void parse_context(const Value& context, workspace& all, v_array<example*>& exam
       {
         auto dedup_id = obj["__aid"].GetUint64();
 
-        if (dedup_examples->find(dedup_id) == dedup_examples->end()) { THROW("dedup id not found: " << dedup_id); }
+        if (dedup_examples->find(dedup_id) == dedup_examples->end())
+        { throw vw::error(fmt::format("dedup id not found: {}", dedup_id)); }
 
         auto* stored_ex = (*dedup_examples)[dedup_id];
         ex->indices = stored_ex->indices;

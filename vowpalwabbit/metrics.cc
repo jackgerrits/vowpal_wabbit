@@ -129,7 +129,7 @@ vw::LEARNER::base_learner* metrics_setup(options_i& options, workspace& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (data->out_file.empty()) THROW("extra_metrics argument (output filename) is missing.");
+  if (data->out_file.empty()) throw vw::error("extra_metrics argument (output filename) is missing.");
 
   auto* base_learner = setup_base(options, all);
 

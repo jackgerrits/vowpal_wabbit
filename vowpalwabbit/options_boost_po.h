@@ -84,7 +84,7 @@ struct options_boost_po : public options_i
 
     // Check if it is the final option or the next option is not a value.
     if (it + 1 == m_command_line.end() || (*(it + 1)).find("--") != std::string::npos)
-    { THROW(key + " option does not have a value."); }
+    { throw vw::error(key + " option does not have a value."); }
 
     // Actually replace the value.
     *(it + 1) = value;
@@ -228,7 +228,7 @@ void check_disagreeing_option_values(T value, const std::string& name, const std
     {
       std::stringstream ss;
       ss << "Disagreeing option values for '" << name << "': '" << value << "' vs '" << item << "'";
-      THROW_EX(vw::vw_argument_disagreement_exception, ss.str());
+      throw vw::error(vw::error_code::options_disagree, ss.str());
     }
   }
 }
@@ -243,7 +243,7 @@ inline void check_disagreeing_option_values(
     {
       std::stringstream ss;
       ss << "Disagreeing option values for '" << name << "': '" << value << "' vs '" << item << "'";
-      THROW_EX(vw::vw_argument_disagreement_exception, ss.str());
+      throw vw::error(vw::error_code::options_disagree, ss.str());
     }
   }
 }

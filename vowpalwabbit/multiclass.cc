@@ -61,7 +61,7 @@ void parse_label(label_t& ld, const std::vector<std::string_view>& words, reduct
       char* char_after_int = nullptr;
       ld.label = int_of_string(words[0], char_after_int);
       if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
-      { THROW("malformed example: label has trailing character(s): " << *char_after_int); }
+      { throw vw::error(fmt::format("malformed example: label has trailing character(s): {}", *char_after_int)); }
       ld.weight = 1.0;
       break;
     }
@@ -70,14 +70,14 @@ void parse_label(label_t& ld, const std::vector<std::string_view>& words, reduct
         char* char_after_int = nullptr;
         ld.label = int_of_string(words[0], char_after_int);
         if (char_after_int != nullptr && *char_after_int != ' ' && *char_after_int != '\0')
-        { THROW("malformed example: label has trailing character(s): " << *char_after_int); }
+        { throw vw::error(fmt::format("malformed example: label has trailing character(s): {}", *char_after_int)); }
       }
       ld.weight = float_of_string(words[1]);
       break;
     default:
-      THROW("malformed example, words.size() = " << words.size());
+      throw vw::error(fmt::format("malformed example, words.size() = {}", words.size()));
   }
-  if (ld.label == 0) THROW("label 0 is not allowed for multiclass. Valid labels are {1,k}");
+  if (ld.label == 0) throw vw::error("label 0 is not allowed for multiclass. Valid labels are {1,k}");
 }
 
 // clang-format off

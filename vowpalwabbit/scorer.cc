@@ -108,7 +108,7 @@ vw::LEARNER::base_learner* scorer_setup(options_i& options, workspace& all)
     multipredict_f = multipredict<expf>;
   }
   else
-    THROW("Unknown link function: " << link);
+    throw vw::error(fmt::format("Unknown link function: {}", link));
 
   l->set_multipredict(multipredict_f);
   l->set_update(update);
