@@ -28,10 +28,7 @@ namespace GD
 template <typename WeightsT, typename FuncT>
 void foreach_feature_no_inter(WeightsT& weights, const features& fs, uint64_t offset, float mult, FuncT func)
 {
-  for (const auto& f : fs)
-  {
-    func(mult * f.value(), f.index() + offset, weights[(f.index() + offset)]);
-  }
+  for (const auto& f : fs) { func(mult * f.value(), f.index() + offset, weights[(f.index() + offset)]); }
 }
 
 template <typename WeightsT, typename FuncT>

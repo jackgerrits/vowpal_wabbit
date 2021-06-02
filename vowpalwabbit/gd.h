@@ -76,11 +76,10 @@ inline void foreach_feature(workspace& all, example& ec, FuncT func)
 template <typename FuncT>
 inline void foreach_feature(workspace& all, example& ec, size_t& num_interacted_features, FuncT func)
 {
-  return all.weights.sparse
-      ? foreach_feature<sparse_parameters, FuncT>(
-            all.weights.sparse_weights, *ec.interactions, all.permutations, ec, num_interacted_features, func)
-      : foreach_feature<dense_parameters, FuncT>(
-            all.weights.dense_weights, *ec.interactions, all.permutations, ec, num_interacted_features, func);
+  return all.weights.sparse ? foreach_feature<sparse_parameters, FuncT>(all.weights.sparse_weights, *ec.interactions,
+                                  all.permutations, ec, num_interacted_features, func)
+                            : foreach_feature<dense_parameters, FuncT>(all.weights.dense_weights, *ec.interactions,
+                                  all.permutations, ec, num_interacted_features, func);
 }
 
 inline float inline_predict(workspace& all, example& ec)

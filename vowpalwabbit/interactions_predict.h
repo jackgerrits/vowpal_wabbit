@@ -316,10 +316,10 @@ inline void generate_interactions(WeightsT& weights, const std::vector<std::vect
 template <typename FuncT>
 inline void generate_interactions(workspace& all, example_predict& ec, size_t& num_features, FuncT func)
 {
-  return all.weights.sparse ? INTERACTIONS::generate_interactions(
-                                  all.weights.sparse_weights, *ec.interactions, all.permutations, ec, num_features, func)
-                            : INTERACTIONS::generate_interactions(
-                                  all.weights.dense_weights, *ec.interactions, all.permutations, ec, num_features, func);
+  return all.weights.sparse ? INTERACTIONS::generate_interactions(all.weights.sparse_weights, *ec.interactions,
+                                  all.permutations, ec, num_features, func)
+                            : INTERACTIONS::generate_interactions(all.weights.dense_weights, *ec.interactions,
+                                  all.permutations, ec, num_features, func);
 }
 
 }  // namespace INTERACTIONS
