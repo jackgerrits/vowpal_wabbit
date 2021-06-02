@@ -38,8 +38,6 @@ Feature options:
   --hash_seed arg (=0, )          seed for hash function
   --ignore arg                    ignore namespaces beginning with character 
                                   <arg>
-  --ignore_linear arg             ignore namespaces beginning with character 
-                                  <arg> for linear terms only
   --keep arg                      keep namespaces beginning with character 
                                   <arg>
   --redefine arg                  redefine namespaces beginning with characters

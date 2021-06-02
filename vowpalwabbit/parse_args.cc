@@ -486,10 +486,6 @@ const char* are_features_compatible(workspace& vw1, workspace& vw2)
 
   if (vw1.ignore_some_linear != vw2.ignore_some_linear) return "ignore_some_linear";
 
-  if (vw1.ignore_some_linear &&
-      !std::equal(vw1.ignore_linear.begin(), vw1.ignore_linear.end(), vw2.ignore_linear.begin()))
-    return "ignore_linear";
-
   if (vw1.redefine_some != vw2.redefine_some) return "redefine_some";
 
   if (vw1.redefine_some && !std::equal(vw1.redefine.begin(), vw1.redefine.end(), vw2.redefine.begin()))
@@ -564,7 +560,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   std::vector<std::string> cubics;
   std::vector<std::string> interactions;
   std::vector<std::string> ignores;
-  std::vector<std::string> ignore_linears;
   std::vector<std::string> keeps;
   std::vector<std::string> redefines;
 
@@ -583,9 +578,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
       .add(make_option("hash", hash_function).keep().help("how to hash the features. Available options: strings, all"))
       .add(make_option("hash_seed", all.hash_seed).keep().default_value(0).help("seed for hash function"))
       .add(make_option("ignore", ignores).keep().help("ignore namespaces beginning with character <arg>"))
-      .add(make_option("ignore_linear", ignore_linears)
-               .keep()
-               .help("ignore namespaces beginning with character <arg> for linear terms only"))
       .add(make_option("keep", keeps).keep().help("keep namespaces beginning with character <arg>"))
       .add(make_option("redefine", redefines)
                .keep()
@@ -807,7 +799,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   for (size_t i = 0; i < 256; i++)
   {
     all.ignore[i] = false;
-    all.ignore_linear[i] = false;
   }
   all.ignore_some = false;
   all.ignore_some_linear = false;
@@ -826,26 +817,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
     {
       *(all.trace_message) << "ignoring namespaces beginning with: ";
       for (auto const& ignore : ignores)
-        for (auto const character : ignore) *(all.trace_message) << character << " ";
-
-      *(all.trace_message) << endl;
-    }
-  }
-
-  if (options.was_supplied("ignore_linear"))
-  {
-    all.ignore_some_linear = true;
-
-    for (auto& i : ignore_linears)
-    {
-      i = spoof_hex_encoded_namespaces(i);
-      for (auto j : i) all.ignore_linear[static_cast<size_t>(static_cast<unsigned char>(j))] = true;
-    }
-
-    if (!all.logger.quiet)
-    {
-      *(all.trace_message) << "ignoring linear terms for namespaces beginning with: ";
-      for (auto const& ignore : ignore_linears)
         for (auto const character : ignore) *(all.trace_message) << character << " ";
 
       *(all.trace_message) << endl;

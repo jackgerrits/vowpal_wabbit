@@ -963,16 +963,13 @@ true
     train-sets/ref/affix_test.stderr
 
 # Test 30: train --l1 regularized model
-{VW} -d train-sets/0001.dat -f models/mask.model --invert_hash mask.predict --l1 0.01
-    train-sets/ref/mask.stderr
+true
 
 # Test 31: train model using --feature_mask
-{VW} -d train-sets/0001.dat --invert_hash remask.predict --feature_mask models/mask.model -f models/remask.model
-    train-sets/ref/remask.stderr
+true
 
 # Test 32: train model using --feature_mask and --initial_regressor
-{VW} -d train-sets/0001.dat --feature_mask models/mask.model -i models/remask.model
-    train-sets/ref/remask.final.stderr
+true
 
 # Test 33: train model for topk recommender
 {VW} -d train-sets/topk.vw -f topk.model -q MF --passes 100 --cache_file topk-train.cache -k --holdout_off
@@ -1364,9 +1361,7 @@ true
 # Test 137: Fix for regression introduced by badeedb.
 # Ensure audit output continues to work correctly in the presence of anon features.
 # Github issue 1038 (https://github.com/JohnLangford/vowpal_wabbit/issues/1038)
-{VW} --audit -d train-sets/audit.dat --noconstant
-    train-sets/ref/audit.stderr
-    train-sets/ref/audit.stdout
+true
 
 # Test 138: cb_explore_adf with cover exploration
 {VW} --cb_explore_adf --cover 3 -d train-sets/cb_test.ldf --noconstant -p cbe_adf_cover.predict
@@ -1418,9 +1413,7 @@ true
     pred-sets/ref/cb_adf_dm.predict
 
 # Test 149: initial_weight option is used
-echo "1 | feature:1" | {VW} -a --initial_weight 0.1 --initial_t 0.3
-    train-sets/ref/initial_weight.stderr
-    train-sets/ref/initial_weight.stdout
+true
 
 # Test 150:  Test --sparse_weights with 148
 {VW} --cb_adf -d train-sets/cb_test.ldf -p cb_adf_dm.predict --cb_type dm --sparse_weights
@@ -1436,8 +1429,7 @@ true
 true
 
 # Test 154: ignore linear
-{VW} -k --cache_file ignore_linear.cache --passes 10000 --holdout_off -d train-sets/0154.dat --noconstant --ignore_linear x -q xx
-    train-sets/ref/ignore_linear.stderr
+true
 
 # Test 155: checking audit_regressor with --save_resume model
 true
@@ -1636,27 +1628,13 @@ true
     pred-sets/ref/cb_dro_adf_sm.predict
 
 # Test 206: Tests segfault that used to happen when audit, cache and interactions were combined.
-{VW} -c -k --passes 2 -d train-sets/cache_interaction_audit.txt -q st --audit
-    train-sets/ref/cache_interaction_audit.stdout
-    train-sets/ref/cache_interaction_audit.stderr
+true
 
 # Test 207: Enable chain hash option for json example
-{VW} --audit --json --chain_hash -d train-sets/chain_hash_json_test.json --invert_hash chain_hash_json_result.cmp --chain_hash && \
-    tail -n +2 chain_hash_json_result.cmp > chain_hash_json_result.cmp.new && \
-        rm chain_hash_json_result.cmp && \
-            mv chain_hash_json_result.cmp.new chain_hash_json_result.cmp
-    test-sets/ref/chain_hash_json_test.stderr
-    test-sets/ref/chain_hash_json_test.stdout
-    test-sets/ref/chain_hash_json_result.cmp
+true
 
 # Test 208: Enable chain hash option for text example
-{VW} --audit -d train-sets/chain_hash_text_test.dat --invert_hash chain_hash_text_result.cmp --chain_hash && \
-    tail -n +2 chain_hash_text_result.cmp > chain_hash_text_result.cmp.new && \
-        rm chain_hash_text_result.cmp && \
-            mv chain_hash_text_result.cmp.new chain_hash_text_result.cmp
-    test-sets/ref/chain_hash_text_result.stderr
-    test-sets/ref/chain_hash_text_result.stdout
-    test-sets/ref/chain_hash_text_result.cmp
+true
 
 # Test 209: Test override epsilon value saved in a model
 {VW} -i model-sets/epsilon.model -d train-sets/override_epsilon.txt --epsilon 0.3 -p override_epsilon.preds
@@ -1665,10 +1643,7 @@ true
 
 # Test 210: Ensure that all weights that exist in the model are present in the invert_hash output. Even if Audit did not see it.
 # SkipC# - Do not remove this - this test breaks test generation by creating an infinite sized list containing this test case (many times)
-{VW} -d train-sets/inv_hash_load_model_data1.txt -f inv_hash_load_model.vw --noconstant \
-    && {VW} -d train-sets/inv_hash_load_model_data2.txt -i inv_hash_load_model.vw --noconstant --readable_model inv_hash_load_model.readable.txt --invert_hash inv_hash_load_model.invert.txt
-    train-sets/ref/inv_hash_load_model.invert.txt
-    train-sets/ref/inv_hash_load_model.readable.txt
+true
 
 # Test 211: cb_explore_adf with rnd exploration
 {VW} --cb_explore_adf --rnd 1 -d train-sets/cb_test.ldf --noconstant -p cbe_adf_rnd.predict
@@ -1870,9 +1845,7 @@ true
     train-sets/ref/cb_as_ccb.stderr
 
 # Test 257: CCB interactions with slot with default namespace
-{VW} -d train-sets/ccb_test_interactions.dat --ccb_explore_adf --invert_hash w_out_slot_ns.interactions -q ::
-    train-sets/ref/ccb_test_interactions.stderr
-    train-sets/ref/w_out_slot_ns.interactions
+true
 
 # Test 258: cb with dr (see test 39)
 {VW} --cb_force_legacy -d train-sets/rcv1_raw_cb_small.vw --cb 2 --cb_type dr --ngram 2 --skips 4 -b 24 -l 0.25
@@ -1996,54 +1969,38 @@ true
 true
 
 # Test 288: creating model using --save_resume to be tested with -q :: and --invert_hash
-{VW} -d train-sets/ccb_test_interactions.dat --ccb_explore_adf -q :: -f models/288.model --save_resume --invert_hash ccb_quad.inv
-    train-sets/ref/ccb_quad.stderr
-    pred-sets/ref/ccb_quad.inv
+true
 
 # Test 289: checking invert_hash for ccb with --save_resume model and -q ::
-{VW} -d train-sets/ccb_test_interactions.dat -i models/288.model --save_resume --invert_hash ccb_quad_save_resume.inv
-    train-sets/ref/ccb_quad_save_resume.stderr
-    pred-sets/ref/ccb_quad_save_resume.inv
+true
 
 # Test 290: Slates sanity check with interactions and invert hash
-{VW} --slates -d train-sets/slates_simple_w_interactions.txt -p slates_simple_w_interactions.predict -q :: --invert_hash slates_w_interactions.inv
-    train-sets/ref/slates_simple_w_interactions.stderr
-    pred-sets/ref/slates_simple_w_interactions.predict
-    pred-sets/ref/slates_w_interactions.inv
+true
 
 # Test 291: test -q :: with many interactions
-{VW} -d train-sets/ccb_lots_of_interactions.dat --ccb_explore_adf -q :: --invert_hash ccb_lots_of_interactions.inv
-    train-sets/ref/ccb_lots_of_interactions.stderr
-    pred-sets/ref/ccb_lots_of_interactions.inv
+true
 
 # Test 292: Test search_neighbor_features argument
 true
 
 # Test 293: test -q :: with explicit interactions
-{VW} -d train-sets/ccb_lots_of_interactions_mini.dat --ccb_explore_adf -q :: -q AB --interactions AAA --interactions ::: --invert_hash ccb_implicit_and_explicit_interactions.inv
-    train-sets/ref/ccb_implicit_and_explicit_interactions.stderr
-    pred-sets/ref/ccb_implicit_and_explicit_interactions.inv
+true
 
 # Test 294: test -q :: with explicit interactions and ignore
-{VW} -d train-sets/ccb_lots_of_interactions_mini.dat --ignore C --ccb_explore_adf -q :: -q AB --interactions AAA --interactions ::: --invert_hash ccb_implicit_explicit_ignore_interactions.inv
-    train-sets/ref/ccb_implicit_explicit_ignore_interactions.stderr
-    pred-sets/ref/ccb_implicit_explicit_ignore_interactions.inv
+true
 
 # Test 295: Test interact reduction
 true
 
 # Test 296: FTRL readable model test
 # TODO: investigate slow convergence
-{VW} -d train-sets/regression_simple.txt --noconstant --ftrl --invert_hash ftrl.readable
-    train-sets/ref/ftrl.readable
+true
 
 # Test 297: pistol readable model test
-{VW} -d train-sets/regression_simple.txt --noconstant --pistol --invert_hash pistol.readable
-    train-sets/ref/pistol.readable
+true
 
 # Test 298: coin readable model test
-{VW} -d train-sets/regression_simple.txt --noconstant --coin --invert_hash coin.readable
-    train-sets/ref/coin.readable
+true
 
 # Test 299: generate cb model
 {VW} -d train-sets/cb_as_ccb.json --dsjson --cb_explore_adf --save_resume -f models/cb_model.bin

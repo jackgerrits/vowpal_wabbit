@@ -144,7 +144,9 @@ void train(gd& g, example& ec, float update)
 {
   if VW_STD17_CONSTEXPR (normalized != 0) { update *= g.update_multiplier; }
   VW_DBG(ec) << "gd: train() spare=" << spare << std::endl;
-  foreach_feature<float, update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare> >(*g.all, ec, update);
+  foreach_feature(*g.all, ec, [&update](float feat_value, uint64_t feat_index, float& feature_weight) {
+    update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(update, feat_value, feature_weight);
+  });
 }
 
 void end_pass(gd& g)
@@ -222,45 +224,45 @@ inline void audit_interaction(audit_results& dat, const audit_strings* f)
   if (!ns_pre.empty()) { dat.ns_pre.push_back(ns_pre); }
 }
 
-inline void audit_feature(audit_results& dat, const float ft_weight, const uint64_t ft_idx)
-{
-  parameters& weights = dat.all.weights;
-  uint64_t index = ft_idx & weights.mask();
-  size_t stride_shift = weights.stride_shift();
+// inline void audit_feature(audit_results& dat, const float ft_weight, const uint64_t ft_idx)
+// {
+//   parameters& weights = dat.all.weights;
+//   uint64_t index = ft_idx & weights.mask();
+//   size_t stride_shift = weights.stride_shift();
 
-  std::string ns_pre;
-  for (std::string& s : dat.ns_pre) ns_pre += s;
+//   std::string ns_pre;
+//   for (std::string& s : dat.ns_pre) ns_pre += s;
 
-  if (dat.all.audit)
-  {
-    std::ostringstream tempstream;
-    tempstream << ':' << (index >> stride_shift) << ':' << ft_weight << ':'
-               << trunc_weight(weights[index], static_cast<float>(dat.all.sd->gravity)) *
-            static_cast<float>(dat.all.sd->contraction);
+//   if (dat.all.audit)
+//   {
+//     std::ostringstream tempstream;
+//     tempstream << ':' << (index >> stride_shift) << ':' << ft_weight << ':'
+//                << trunc_weight(weights[index], static_cast<float>(dat.all.sd->gravity)) *
+//             static_cast<float>(dat.all.sd->contraction);
 
-    if (weights.adaptive)  // adaptive
-      tempstream << '@' << (&weights[index])[1];
+//     if (weights.adaptive)  // adaptive
+//       tempstream << '@' << (&weights[index])[1];
 
-    string_value sv = {weights[index] * ft_weight, ns_pre + tempstream.str()};
-    dat.results.push_back(sv);
-  }
+//     string_value sv = {weights[index] * ft_weight, ns_pre + tempstream.str()};
+//     dat.results.push_back(sv);
+//   }
 
-  if ((dat.all.current_pass == 0 || dat.all.training == false) && dat.all.hash_inv)
-  {
-    // for invert_hash
+//   if ((dat.all.current_pass == 0 || dat.all.training == false) && dat.all.hash_inv)
+//   {
+//     // for invert_hash
 
-    if (dat.offset != 0)
-    {
-      // otherwise --oaa output no features for class > 0.
-      std::ostringstream tempstream;
-      tempstream << '[' << (dat.offset >> stride_shift) << ']';
-      ns_pre += tempstream.str();
-    }
-    const auto strided_index = index >> stride_shift;
-    if (!dat.all.index_name_map.count(strided_index))
-      dat.all.index_name_map.insert(std::make_pair(strided_index, ns_pre));
-  }
-}
+//     if (dat.offset != 0)
+//     {
+//       // otherwise --oaa output no features for class > 0.
+//       std::ostringstream tempstream;
+//       tempstream << '[' << (dat.offset >> stride_shift) << ']';
+//       ns_pre += tempstream.str();
+//     }
+//     const auto strided_index = index >> stride_shift;
+//     if (!dat.all.index_name_map.count(strided_index))
+//       dat.all.index_name_map.insert(std::make_pair(strided_index, ns_pre));
+//   }
+// }
 
 void print_lda_features(workspace& all, example& ec)
 {
@@ -281,46 +283,46 @@ void print_lda_features(workspace& all, example& ec)
   std::cout << " total of " << count << " features." << std::endl;
 }
 
-void print_features(workspace& all, example& ec)
-{
-  if (all.lda > 0)
-    print_lda_features(all, ec);
-  else
-  {
-    audit_results dat(all, ec.ft_offset);
+// void print_features(workspace& all, example& ec)
+// {
+//   if (all.lda > 0)
+//     print_lda_features(all, ec);
+//   else
+//   {
+//     audit_results dat(all, ec.ft_offset);
 
-    for (features& fs : ec)
-    {
-      if (fs.space_names.size() > 0)
-        for (const auto& f : fs.audit_range())
-        {
-          audit_interaction(dat, f.audit()->get());
-          audit_feature(dat, f.value(), f.index() + ec.ft_offset);
-          audit_interaction(dat, nullptr);
-        }
-      else
-      {
-        for (const auto& f : fs) { audit_feature(dat, f.value(), f.index() + ec.ft_offset); }
-      }
-    }
-    size_t num_interacted_features = 0;
-    INTERACTIONS::generate_interactions<audit_results, const uint64_t, audit_feature, true, audit_interaction>(
-        all, ec, dat, num_interacted_features);
+//     for (features& fs : ec)
+//     {
+//       if (fs.space_names.size() > 0)
+//         for (const auto& f : fs.audit_range())
+//         {
+//           audit_interaction(dat, f.audit()->get());
+//           audit_feature(dat, f.value(), f.index() + ec.ft_offset);
+//           audit_interaction(dat, nullptr);
+//         }
+//       else
+//       {
+//         for (const auto& f : fs) { audit_feature(dat, f.value(), f.index() + ec.ft_offset); }
+//       }
+//     }
+//     size_t num_interacted_features = 0;
+//     INTERACTIONS::generate_interactions<audit_results, const uint64_t, audit_feature, true, audit_interaction>(
+//         all, ec, dat, num_interacted_features);
 
-    stable_sort(dat.results.begin(), dat.results.end());
-    if (all.audit)
-    {
-      for (string_value& sv : dat.results) std::cout << '\t' << sv.s;
-      std::cout << std::endl;
-    }
-  }
-}
+//     stable_sort(dat.results.begin(), dat.results.end());
+//     if (all.audit)
+//     {
+//       for (string_value& sv : dat.results) std::cout << '\t' << sv.s;
+//       std::cout << std::endl;
+//     }
+//   }
+// }
 
 void print_audit_features(workspace& all, example& ec)
 {
   if (all.audit) print_result_by_ref(all.stdout_adapter.get(), ec.pred.scalar, -1, ec.tag);
   fflush(stdout);
-  print_features(all, ec);
+  // print_features(all, ec);
 }
 
 float finalize_prediction(shared_data* sd, vw_logger&, float ret)
@@ -331,28 +333,30 @@ float finalize_prediction(shared_data* sd, vw_logger&, float ret)
     logger::errlog_warn("NAN prediction in example {0}, forcing {1}", sd->example_number + 1, ret);
     return ret;
   }
-  if (ret > sd->max_label) return sd->max_label;
-  if (ret < sd->min_label) return sd->min_label;
-  return ret;
+
+  return std::clamp(ret, sd->min_label, sd->max_label);
 }
 
-struct trunc_data
+float finalize_prediction(const shared_data* sd, float value)
 {
-  float prediction;
-  float gravity;
-};
+  if (std::isnan(value)) { return 0.; }
 
-inline void vec_add_trunc(trunc_data& p, const float fx, float& fw)
+  return std::clamp(value, sd->min_label, sd->max_label);
+}
+
+inline float trunc_weight(float w, float gravity)
 {
-  p.prediction += trunc_weight(fw, p.gravity) * fx;
+  return (gravity < fabsf(w)) ? w - vw::math::sign(w) * gravity : 0.f;
 }
 
 inline float trunc_predict(workspace& all, example& ec, double gravity, size_t& num_interacted_features)
 {
   const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
-  trunc_data temp = {simple_red_features.initial, static_cast<float>(gravity)};
-  foreach_feature<trunc_data, vec_add_trunc>(all, ec, temp, num_interacted_features);
-  return temp.prediction;
+  float prediction = simple_red_features.initial;
+  foreach_feature(all, ec, num_interacted_features,
+      [&prediction, float_grav = static_cast<float>(gravity)](float feat_value, uint64_t feat_index,
+          float feature_weight) { prediction += trunc_weight(feature_weight, float_grav) * feat_value; });
+  return prediction;
 }
 
 inline void vec_add_print(float& p, const float fx, float& fw)
@@ -408,22 +412,30 @@ void multipredict(
     multipredict_info<sparse_parameters> mp = {
         count, step, pred, g.all->weights.sparse_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature<multipredict_info<sparse_parameters>, uint64_t, vec_add_trunc_multipredict>(
-          all, ec, mp, num_features_from_interactions);
+      foreach_feature(
+          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+            vec_add_trunc_multipredict(mp, feat_value, feat_index);
+          });
     else
-      foreach_feature<multipredict_info<sparse_parameters>, uint64_t, vec_add_multipredict>(
-          all, ec, mp, num_features_from_interactions);
+      foreach_feature(
+          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+            vec_add_multipredict(mp, feat_value, feat_index);
+          });
   }
   else
   {
     multipredict_info<dense_parameters> mp = {
         count, step, pred, g.all->weights.dense_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature<multipredict_info<dense_parameters>, uint64_t, vec_add_trunc_multipredict>(
-          all, ec, mp, num_features_from_interactions);
+      foreach_feature(
+          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+            vec_add_trunc_multipredict(mp, feat_value, feat_index);
+          });
     else
-      foreach_feature<multipredict_info<dense_parameters>, uint64_t, vec_add_multipredict>(
-          all, ec, mp, num_features_from_interactions);
+      foreach_feature(
+          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+            vec_add_multipredict(mp, feat_value, feat_index);
+          });
   }
   ec.num_features_from_interactions = num_features_from_interactions;
 
@@ -560,8 +572,10 @@ float get_pred_per_update(gd& g, example& ec)
   if (grad_squared == 0 && !stateless) return 1.;
 
   norm_data nd = {grad_squared, 0., 0., {g.neg_power_t, g.neg_norm_power}, {0}};
-  foreach_feature<norm_data,
-      pred_per_update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare, stateless> >(all, ec, nd);
+  foreach_feature(all, ec, [&nd](float feat_value, uint64_t feat_index, float& feature_weight) {
+    pred_per_update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare, stateless>(
+        nd, feat_value, feature_weight);
+  });
   if VW_STD17_CONSTEXPR (normalized != 0)
   {
     if (!stateless)
