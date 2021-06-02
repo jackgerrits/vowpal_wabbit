@@ -139,28 +139,26 @@ void cb_explore_adf_rnd::save_labels(multi_ex& examples)
 
 namespace
 {
-struct LazyGaussian
+struct LazyGaussianInitialWeights
 {
   inline float operator[](uint64_t index) const { return merand48_boxmuller(index); }
 };
-
-inline void vec_add_with_norm(std::pair<float, float>& p, float fx, float fw)
-{
-  p.first += fx * fx;
-  p.second += fx * fw;
-}
 
 }  // namespace
 
 float cb_explore_adf_rnd::get_initial_prediction(example* ec)
 {
-  LazyGaussian w;
+  LazyGaussianInitialWeights weights;
 
-  std::pair<float, float> dotwithnorm(0.f, 0.f);
-  GD::foreach_feature<std::pair<float, float>, float, vec_add_with_norm, LazyGaussian>(
-      w, all->ignore_some_linear, all->ignore_linear, all->interactions, all->permutations, *ec, dotwithnorm);
+  float dot = 0.f;
+  float norm = 0.f;
+  GD::foreach_feature(weights, all->interactions, all->permutations, *ec,
+      [&dot, &norm](float feat_value, uint64_t feat_index, float feature_weight) {
+        dot += feat_value * feat_value;
+        norm += feat_value * feature_weight;
+      });
 
-  return sqrtinvlambda * dotwithnorm.second / std::sqrt(2.0f * std::max(1e-12f, dotwithnorm.first));
+  return sqrtinvlambda * norm / std::sqrt(2.0f * std::max(1e-12f, dot));
 }
 
 void cb_explore_adf_rnd::get_initial_predictions(multi_ex& examples, uint32_t id)

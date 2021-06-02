@@ -164,10 +164,6 @@ struct flat_example
   features fs;              // all the features
 };
 
-flat_example* flatten_example(workspace& all, example* ec);
-flat_example* flatten_sort_example(workspace& all, example* ec);
-void free_flatten_example(flat_example* fec);
-
 inline int example_is_newline(example const& ec) { return ec.is_newline; }
 
 inline bool valid_ns(char c) { return !(c == '|' || c == ':'); }

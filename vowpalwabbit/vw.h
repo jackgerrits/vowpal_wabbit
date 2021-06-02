@@ -118,7 +118,6 @@ size_t get_tag_length(example* ec);
 const char* get_tag(example* ec);
 size_t get_feature_number(example* ec);
 float get_confidence(example* ec);
-feature* get_features(workspace& all, example* ec, size_t& feature_number);
 void return_features(feature* f);
 
 void add_constant_feature(workspace& all, example* ec);

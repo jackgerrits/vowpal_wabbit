@@ -194,7 +194,6 @@ public:
   bool ignore_some;
   std::array<bool, NUM_NAMESPACES> ignore;  // a set of namespaces to ignore
   bool ignore_some_linear;
-  std::array<bool, NUM_NAMESPACES> ignore_linear;  // a set of namespaces to ignore for linear
 
   bool redefine_some;                                  // --redefine param was used
   std::array<unsigned char, NUM_NAMESPACES> redefine;  // keeps new chars for namespaces

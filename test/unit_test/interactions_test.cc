@@ -52,10 +52,13 @@ void eval_count_of_generated_ft_naive(
 
   v_array<float> results;
 
-  eval_gen_data dat(new_features_cnt, new_features_value);
   size_t ignored = 0;
   ec.interactions = &interactions;
-  INTERACTIONS::generate_interactions<eval_gen_data, uint64_t, ft_cnt, false, nullptr>(all, ec, dat, ignored);
+  INTERACTIONS::generate_interactions(all, ec, ignored,
+      [&new_features_cnt, &new_features_value](float feat_value, uint64_t feat_index, float& feature_weight) {
+        ++new_features_cnt;
+        new_features_value += feat_value * feat_value;
+      });
   ec.interactions = &all.interactions;
 }
 
