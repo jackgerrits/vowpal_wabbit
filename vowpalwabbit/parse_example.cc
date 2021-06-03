@@ -63,16 +63,10 @@ public:
   std::string_view _base;
   unsigned char _index;
   float _v;
-  bool _redefine_some;
-  std::array<unsigned char, NUM_NAMESPACES>* _redefine;
   parser* _p;
   example* _ae;
-  std::array<uint64_t, NUM_NAMESPACES>* _affix_features;
-  std::array<bool, NUM_NAMESPACES>* _spelling_features;
-  v_array<char> _spelling;
   uint32_t _hash_seed;
   uint64_t _parse_mask;
-  std::array<std::vector<std::shared_ptr<feature_dict>>, NUM_NAMESPACES>* _namespace_dictionaries;
 
   ~TC_parser() {}
 
@@ -225,110 +219,6 @@ public:
           fs.space_names.push_back(audit_strings_ptr(new audit_strings(std::string{_base}, std::string{feature_name})));
         }
       }
-
-      if (((*_affix_features)[_index] > 0) && (!feature_name.empty()))
-      {
-        features& affix_fs = _ae->feature_space[affix_namespace];
-        if (affix_fs.size() == 0) _ae->indices.push_back(affix_namespace);
-        uint64_t affix = (*_affix_features)[_index];
-
-        while (affix > 0)
-        {
-          bool is_prefix = affix & 0x1;
-          uint64_t len = (affix >> 1) & 0x7;
-          std::string_view affix_name(feature_name);
-          if (affix_name.size() > len)
-          {
-            if (is_prefix)
-              affix_name.remove_suffix(affix_name.size() - len);
-            else
-              affix_name.remove_prefix(affix_name.size() - len);
-          }
-
-          word_hash = _p->hasher(affix_name.data(), affix_name.length(), (uint64_t)_channel_hash) *
-              (affix_constant + (affix & 0xF) * quadratic_constant);
-          affix_fs.push_back(_v, word_hash);
-          if (audit)
-          {
-            v_array<char> affix_v = v_init<char>();
-            if (_index != ' ') affix_v.push_back(_index);
-            affix_v.push_back(is_prefix ? '+' : '-');
-            affix_v.push_back('0' + static_cast<char>(len));
-            affix_v.push_back('=');
-            affix_v.insert(affix_v.end(), affix_name.begin(), affix_name.end());
-            affix_v.push_back('\0');
-            affix_fs.space_names.push_back(audit_strings_ptr(new audit_strings("affix", affix_v.begin())));
-          }
-          affix >>= 4;
-        }
-      }
-      if ((*_spelling_features)[_index])
-      {
-        features& spell_fs = _ae->feature_space[spelling_namespace];
-        if (spell_fs.size() == 0) _ae->indices.push_back(spelling_namespace);
-        // v_array<char> spelling;
-        _spelling.clear();
-        for (char c : feature_name)
-        {
-          char d = 0;
-          if ((c >= '0') && (c <= '9'))
-            d = '0';
-          else if ((c >= 'a') && (c <= 'z'))
-            d = 'a';
-          else if ((c >= 'A') && (c <= 'Z'))
-            d = 'A';
-          else if (c == '.')
-            d = '.';
-          else
-            d = '#';
-          // if ((spelling.size() == 0) || (spelling.last() != d))
-          _spelling.push_back(d);
-        }
-
-        std::string_view spelling_strview(_spelling.begin(), _spelling.size());
-        word_hash = hashstring(spelling_strview.data(), spelling_strview.length(), (uint64_t)_channel_hash);
-        spell_fs.push_back(_v, word_hash);
-        if (audit)
-        {
-          v_array<char> spelling_v = v_init<char>();
-          if (_index != ' ')
-          {
-            spelling_v.push_back(_index);
-            spelling_v.push_back('_');
-          }
-          spelling_v.insert(spelling_v.end(), spelling_strview.begin(), spelling_strview.end());
-          spelling_v.push_back('\0');
-          spell_fs.space_names.push_back(audit_strings_ptr(new audit_strings("spelling", spelling_v.begin())));
-        }
-      }
-      if ((*_namespace_dictionaries)[_index].size() > 0)
-      {
-        // Heterogeneous lookup not yet implemented in std
-        // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0919r0.html
-        const std::string feature_name_str(feature_name);
-        for (const auto& map : (*_namespace_dictionaries)[_index])
-        {
-          const auto& feats_it = map->find(feature_name_str);
-          if ((feats_it != map->end()) && (feats_it->second->values.size() > 0))
-          {
-            const auto& feats = feats_it->second;
-            features& dict_fs = _ae->feature_space[dictionary_namespace];
-            if (dict_fs.size() == 0) _ae->indices.push_back(dictionary_namespace);
-            dict_fs.values.insert(dict_fs.values.end(), feats->values.begin(), feats->values.end());
-            dict_fs.indicies.insert(dict_fs.indicies.end(), feats->indicies.begin(), feats->indicies.end());
-            dict_fs.sum_feat_sq += feats->sum_feat_sq;
-            if (audit)
-              for (const auto& id : feats->indicies)
-              {
-                std::stringstream ss;
-                ss << _index << '_';
-                ss << feature_name;
-                ss << '=' << id;
-                dict_fs.space_names.push_back(audit_strings_ptr(new audit_strings("dictionary", ss.str())));
-              }
-          }
-        }
-      }
     }
   }
 
@@ -375,7 +265,6 @@ public:
     {
       // NameSpaceInfo --> 'String' NameSpaceInfoValue
       _index = (unsigned char)(_line[_read_idx]);
-      if (_redefine_some) _index = (*_redefine)[_index];  // redefine _index
       if (_ae->feature_space[_index].size() == 0) _new_index = true;
       std::string_view name = read_name();
       if (audit) { _base = name; }
@@ -451,17 +340,11 @@ public:
 
   TC_parser(std::string_view line, workspace& all, example* ae) : _line(line)
   {
-    _spelling = v_init<char>();
     if (!_line.empty())
     {
       this->_read_idx = 0;
       this->_p = all.example_parser;
-      this->_redefine_some = all.redefine_some;
-      this->_redefine = &all.redefine;
       this->_ae = ae;
-      this->_affix_features = &all.affix_features;
-      this->_spelling_features = &all.spelling_features;
-      this->_namespace_dictionaries = &all.namespace_dictionaries;
       this->_hash_seed = all.hash_seed;
       this->_parse_mask = all.parse_mask;
       listNameSpace();

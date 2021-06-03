@@ -398,17 +398,6 @@ void end_pass_example(workspace& all, example* ae)
   all.example_parser->in_pass_counter = 0;
 }
 
-void feature_limit(workspace& all, example* ex)
-{
-  for (namespace_index index : ex->indices)
-    if (all.limit[index] < ex->feature_space[index].size())
-    {
-      features& fs = ex->feature_space[index];
-      fs.sort(all.parse_mask);
-      unique_features(fs, all.limit[index]);
-    }
-}
-
 namespace vw
 {
 example& get_unused_example(workspace* all)
@@ -461,28 +450,8 @@ void setup_example(workspace& all, example* ae)
 
   ae->weight = all.example_parser->lbl_parser.get_weight(&ae->l, ae->_reduction_features);
 
-  if (all.ignore_some)
-  {
-    for (unsigned char* i = ae->indices.begin(); i != ae->indices.end(); i++)
-    {
-      if (all.ignore[*i])
-      {
-        // Delete namespace
-        ae->feature_space[*i].clear();
-        i = ae->indices.erase(i);
-        // Offset the increment for this iteration so that is processes this index again which is actually the next
-        // item.
-        i--;
-      }
-    }
-  }
-
-  if (all.skip_gram_transformer != nullptr) { all.skip_gram_transformer->generate_grams(ae); }
-
   if (all.add_constant)  // add constant feature
     vw::add_constant_feature(all, ae);
-
-  if (!all.limit_strings.empty()) feature_limit(all, ae);
 
   uint64_t multiplier = static_cast<uint64_t>(all.wpp) << all.weights.stride_shift();
 
@@ -541,60 +510,6 @@ void add_label(example* ec, float label, float weight, float base)
   auto& simple_red_features = ec->_reduction_features.template get<simple_label_reduction_features>();
   simple_red_features.initial = base;
   ec->weight = weight;
-}
-
-example* import_example(workspace& all, const std::string& label, primitive_feature_space* features, size_t len)
-{
-  example* ret = &get_unused_example(&all);
-  all.example_parser->lbl_parser.default_label(&ret->l);
-
-  if (label.length() > 0) parse_example_label(all, *ret, label);
-
-  for (size_t i = 0; i < len; i++)
-  {
-    unsigned char index = features[i].name;
-    ret->indices.push_back(index);
-    for (size_t j = 0; j < features[i].len; j++)
-      ret->feature_space[index].push_back(features[i].fs[j].x, features[i].fs[j].weight_index);
-  }
-
-  setup_example(all, ret);
-  all.example_parser->end_parsed_examples++;
-  return ret;
-}
-
-primitive_feature_space* export_example(workspace& all, example* ec, size_t& len)
-{
-  len = ec->indices.size();
-  primitive_feature_space* fs_ptr = new primitive_feature_space[len];
-
-  size_t fs_count = 0;
-
-  for (size_t idx = 0; idx < len; ++idx)
-  {
-    namespace_index i = ec->indices[idx];
-    fs_ptr[fs_count].name = i;
-    fs_ptr[fs_count].len = ec->feature_space[i].size();
-    fs_ptr[fs_count].fs = new feature[fs_ptr[fs_count].len];
-
-    uint32_t stride_shift = all.weights.stride_shift();
-
-    auto& f = ec->feature_space[i];
-    for (size_t f_count = 0; f_count < fs_ptr[fs_count].len; f_count++)
-    {
-      feature t = {f.values[f_count], f.indicies[f_count]};
-      t.weight_index >>= stride_shift;
-      fs_ptr[fs_count].fs[f_count] = t;
-    }
-    fs_count++;
-  }
-  return fs_ptr;
-}
-
-void releaseFeatureSpace(primitive_feature_space* features, size_t len)
-{
-  for (size_t i = 0; i < len; i++) delete[] features[i].fs;
-  delete (features);
 }
 
 void parse_example_label(workspace& all, example& ec, std::string label)
@@ -694,7 +609,6 @@ const char* get_tag(example* ec) { return ec->tag.begin(); }
 
 size_t get_feature_number(example* ec) { return ec->get_num_features(); }
 
-float get_confidence(example* ec) { return ec->confidence; }
 }  // namespace vw
 
 void adjust_used_index(workspace&)

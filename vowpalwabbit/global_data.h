@@ -38,7 +38,6 @@
 
 #include "options.h"
 #include "version.h"
-#include "kskip_ngram_transformer.h"
 
 typedef float weight;
 
@@ -48,13 +47,6 @@ typedef vw::LEARNER::base_learner* (*reduction_setup_fn)(vw::config::options_i&,
 using options_deleter_type = void (*)(vw::config::options_i*);
 
 struct shared_data;
-
-struct dictionary_info
-{
-  std::string name;
-  uint64_t file_hash;
-  std::shared_ptr<feature_dict> dict;
-};
 
 struct vw_logger
 {
@@ -191,29 +183,6 @@ public:
 
   // Referenced by examples as their set of interactions. Can be overriden by reductions.
   std::vector<std::vector<namespace_index>> interactions;
-  bool ignore_some;
-  std::array<bool, NUM_NAMESPACES> ignore;  // a set of namespaces to ignore
-  bool ignore_some_linear;
-
-  bool redefine_some;                                  // --redefine param was used
-  std::array<unsigned char, NUM_NAMESPACES> redefine;  // keeps new chars for namespaces
-  std::unique_ptr<vw::kskip_ngram_transformer> skip_gram_transformer;
-  std::vector<std::string> limit_strings;      // descriptor of feature limits
-  std::array<uint32_t, NUM_NAMESPACES> limit;  // count to limit features by
-  std::array<uint64_t, NUM_NAMESPACES>
-      affix_features;  // affixes to generate (up to 16 per namespace - 4 bits per affix)
-  std::array<bool, NUM_NAMESPACES> spelling_features;  // generate spelling features for which namespace
-  std::vector<std::string> dictionary_path;            // where to look for dictionaries
-
-  // feature_dict can be created in either loaded_dictionaries or namespace_dictionaries.
-  // use shared pointers to avoid the question of ownership
-  std::vector<dictionary_info> loaded_dictionaries;  // which dictionaries have we loaded from a file to memory?
-  // This array is required to be value initialized so that the std::vectors are constructed.
-  std::array<std::vector<std::shared_ptr<feature_dict>>, NUM_NAMESPACES>
-      namespace_dictionaries{};  // each namespace has a list of dictionaries attached to it
-
-  VW_DEPRECATED("delete_prediction has been deprecated")
-  void (*delete_prediction)(void*);
 
   vw_logger logger;
   bool audit;     // should I print lots of debugging information?
@@ -313,7 +282,6 @@ void print_result_by_ref(vw::io::writer* f, float res, float weight, const v_arr
 void noop_mm(shared_data*, float label);
 void compile_gram(
     std::vector<std::string> grams, std::array<uint32_t, NUM_NAMESPACES>& dest, char* descriptor, bool quiet);
-void compile_limits(std::vector<std::string> limits, std::array<uint32_t, NUM_NAMESPACES>& dest, bool quiet);
 
 VW_DEPRECATED("Use print_tag_by_ref instead")
 int print_tag(std::stringstream& ss, v_array<char> tag);

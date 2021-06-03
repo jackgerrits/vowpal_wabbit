@@ -64,7 +64,6 @@
 #include "get_pmf.h"
 #include "pmf_to_pdf.h"
 #include "sample_pdf.h"
-#include "kskip_ngram_transformer.h"
 
 #include "io/io_adapter.h"
 #include "io/custom_streambuf.h"
@@ -136,182 +135,6 @@ std::string find_in_path(std::vector<std::string> paths, std::string fname)
     if (f.good()) return full;
   }
   return "";
-}
-
-void parse_dictionary_argument(workspace& all, const std::string& str)
-{
-  if (str.length() == 0) return;
-  // expecting 'namespace:file', for instance 'w:foo.txt'
-  // in the case of just 'foo.txt' it's applied to the default namespace
-
-  char ns = ' ';
-  std::string_view s(str);
-  if ((str.length() > 2) && (str[1] == ':'))
-  {
-    ns = str[0];
-    s.remove_prefix(2);
-  }
-
-  std::string fname = find_in_path(all.dictionary_path, std::string(s));
-  if (fname == "")
-  { throw vw::error(fmt::format("error: cannot find dictionary '{}' in path; try adding --dictionary_path", s)); }
-
-  bool is_gzip = ends_with(fname, ".gz");
-  std::unique_ptr<vw::io::reader> file_adapter;
-  try
-  {
-    file_adapter = is_gzip ? vw::io::open_compressed_file_reader(fname) : vw::io::open_file_reader(fname);
-  }
-  catch (...)
-  {
-    throw vw::error(fmt::format("error: cannot read dictionary from file '{}', opening failed", fname));
-  }
-
-  uint64_t fd_hash = hash_file_contents(file_adapter.get());
-
-  if (!all.logger.quiet)
-    *(all.trace_message) << "scanned dictionary '" << s << "' from '" << fname << "', hash=" << std::hex << fd_hash
-                         << std::dec << endl;
-
-  // see if we've already read this dictionary
-  for (size_t id = 0; id < all.loaded_dictionaries.size(); id++)
-  {
-    if (all.loaded_dictionaries[id].file_hash == fd_hash)
-    {
-      all.namespace_dictionaries[static_cast<size_t>(ns)].push_back(all.loaded_dictionaries[id].dict);
-      return;
-    }
-  }
-
-  std::unique_ptr<vw::io::reader> fd;
-  try
-  {
-    fd = vw::io::open_file_reader(fname);
-  }
-  catch (...)
-  {
-    throw vw::error(fmt::format("error: cannot re-read dictionary from file '{}', opening failed", fname));
-  }
-  auto map = std::make_shared<feature_dict>();
-  // mimicing old v_hashmap behavior for load factor.
-  // A smaller factor will generally use more memory but have faster access
-  map->max_load_factor(0.25);
-  example* ec = vw::alloc_examples(1);
-
-  size_t def = static_cast<size_t>(' ');
-
-  ssize_t size = 2048, pos, nread;
-  char rc;
-  char* buffer = calloc_or_throw<char>(size);
-  do
-  {
-    pos = 0;
-    do
-    {
-      nread = fd->read(&rc, 1);
-      if ((rc != EOF) && (nread > 0)) buffer[pos++] = rc;
-      if (pos >= size - 1)
-      {
-        size *= 2;
-        const auto new_buffer = static_cast<char*>(realloc(buffer, size));
-        if (new_buffer == nullptr)
-        {
-          free(buffer);
-          vw::dealloc_examples(ec, 1);
-          throw vw::error("error: memory allocation failed in reading dictionary");
-        }
-        else
-          buffer = new_buffer;
-      }
-    } while ((rc != EOF) && (rc != '\n') && (nread > 0));
-    buffer[pos] = 0;
-
-    // we now have a line in buffer
-    char* c = buffer;
-    while (*c == ' ' || *c == '\t') ++c;  // skip initial whitespace
-    char* d = c;
-    while (*d != ' ' && *d != '\t' && *d != '\n' && *d != '\0') ++d;  // gobble up initial word
-    if (d == c) continue;                                             // no word
-    if (*d != ' ' && *d != '\t') continue;                            // reached end of line
-    std::string word(c, d - c);
-    if (map->find(word) != map->end())  // don't overwrite old values!
-    { continue; }
-    d--;
-    *d = '|';  // set up for parser::read_line
-    vw::read_line(all, ec, d);
-    // now we just need to grab stuff from the default namespace of ec!
-    if (ec->feature_space[def].size() == 0) { continue; }
-    std::unique_ptr<features> arr(new features);
-    arr->deep_copy_from(ec->feature_space[def]);
-    map->emplace(word, std::move(arr));
-
-    // clear up ec
-    ec->tag.clear();
-    ec->indices.clear();
-    for (size_t i = 0; i < 256; i++) { ec->feature_space[i].clear(); }
-  } while ((rc != EOF) && (nread > 0));
-  free(buffer);
-  vw::dealloc_examples(ec, 1);
-
-  if (!all.logger.quiet)
-    *(all.trace_message) << "dictionary " << s << " contains " << map->size() << " item"
-                         << (map->size() == 1 ? "" : "s") << endl;
-
-  all.namespace_dictionaries[static_cast<size_t>(ns)].push_back(map);
-  dictionary_info info = {std::string{s}, fd_hash, map};
-  all.loaded_dictionaries.push_back(info);
-}
-
-void parse_affix_argument(workspace& all, std::string str)
-{
-  if (str.length() == 0) return;
-  char* cstr = calloc_or_throw<char>(str.length() + 1);
-  vw::string_cpy(cstr, (str.length() + 1), str.c_str());
-
-  char* next_token;
-  char* p = strtok_s(cstr, ",", &next_token);
-
-  try
-  {
-    while (p)
-    {
-      char* q = p;
-      uint16_t prefix = 1;
-      if (q[0] == '+') { q++; }
-      else if (q[0] == '-')
-      {
-        prefix = 0;
-        q++;
-      }
-      if ((q[0] < '1') || (q[0] > '7'))
-        throw vw::error(fmt::format("malformed affix argument (length must be 1..7): {}", p));
-
-      uint16_t len = static_cast<uint16_t>(q[0] - '0');
-      uint16_t ns = static_cast<uint16_t>(' ');  // default namespace
-      if (q[1] != 0)
-      {
-        if (valid_ns(q[1]))
-          ns = static_cast<uint16_t>(q[1]);
-        else
-          throw vw::error(fmt::format("malformed affix argument (invalid namespace): {}", p));
-
-        if (q[2] != 0) throw vw::error(fmt::format("malformed affix argument (too long): {}", p));
-      }
-
-      uint16_t afx = (len << 1) | (prefix & 0x1);
-      all.affix_features[ns] <<= 4;
-      all.affix_features[ns] |= afx;
-
-      p = strtok_s(nullptr, ",", &next_token);
-    }
-  }
-  catch (...)
-  {
-    free(cstr);
-    throw;
-  }
-
-  free(cstr);
 }
 
 void parse_diagnostics(options_i& options, workspace& all)
@@ -449,54 +272,13 @@ const char* are_features_compatible(workspace& vw1, workspace& vw2)
 {
   if (vw1.example_parser->hasher != vw2.example_parser->hasher) return "hasher";
 
-  if (!std::equal(vw1.spelling_features.begin(), vw1.spelling_features.end(), vw2.spelling_features.begin()))
-    return "spelling_features";
-
-  if (!std::equal(vw1.affix_features.begin(), vw1.affix_features.end(), vw2.affix_features.begin()))
-    return "affix_features";
-
-  if (vw1.skip_gram_transformer != nullptr && vw2.skip_gram_transformer != nullptr)
-  {
-    const auto& vw1_ngram_strings = vw1.skip_gram_transformer->get_initial_ngram_definitions();
-    const auto& vw2_ngram_strings = vw2.skip_gram_transformer->get_initial_ngram_definitions();
-    const auto& vw1_skips_strings = vw1.skip_gram_transformer->get_initial_skip_definitions();
-    const auto& vw2_skips_strings = vw2.skip_gram_transformer->get_initial_skip_definitions();
-
-    if (!std::equal(vw1_ngram_strings.begin(), vw1_ngram_strings.end(), vw2_ngram_strings.begin())) return "ngram";
-
-    if (!std::equal(vw1_skips_strings.begin(), vw1_skips_strings.end(), vw2_skips_strings.begin())) return "skips";
-  }
-  else if (vw1.skip_gram_transformer != nullptr || vw2.skip_gram_transformer != nullptr)
-  {
-    // If one of them didn't define the ngram transformer then they differ by ngram (skips depends on ngram)
-    return "ngram";
-  }
-
-  if (!std::equal(vw1.limit.begin(), vw1.limit.end(), vw2.limit.begin())) return "limit";
-
   if (vw1.num_bits != vw2.num_bits) return "num_bits";
 
   if (vw1.permutations != vw2.permutations) return "permutations";
 
   if (vw1.interactions.size() != vw2.interactions.size()) return "interactions size";
 
-  if (vw1.ignore_some != vw2.ignore_some) return "ignore_some";
-
-  if (vw1.ignore_some && !std::equal(vw1.ignore.begin(), vw1.ignore.end(), vw2.ignore.begin())) return "ignore";
-
-  if (vw1.ignore_some_linear != vw2.ignore_some_linear) return "ignore_some_linear";
-
-  if (vw1.redefine_some != vw2.redefine_some) return "redefine_some";
-
-  if (vw1.redefine_some && !std::equal(vw1.redefine.begin(), vw1.redefine.end(), vw2.redefine.begin()))
-    return "redefine";
-
   if (vw1.add_constant != vw2.add_constant) return "add_constant";
-
-  if (vw1.dictionary_path.size() != vw2.dictionary_path.size()) return "dictionary_path size";
-
-  if (!std::equal(vw1.dictionary_path.begin(), vw1.dictionary_path.end(), vw2.dictionary_path.begin()))
-    return "dictionary_path";
 
   for (auto i = std::begin(vw1.interactions), j = std::begin(vw2.interactions); i != std::end(vw1.interactions);
        ++i, ++j)
@@ -550,64 +332,22 @@ std::string spoof_hex_encoded_namespaces(const std::string& arg)
   return res;
 }
 
-void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_settings_duplicated,
-    std::vector<std::string>& dictionary_nses)
+void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_settings_duplicated)
 {
   std::string hash_function("strings");
   uint32_t new_bits;
-  std::vector<std::string> spelling_ns;
-  std::vector<std::string> quadratics;
-  std::vector<std::string> cubics;
   std::vector<std::string> interactions;
-  std::vector<std::string> ignores;
-  std::vector<std::string> keeps;
-  std::vector<std::string> redefines;
-
-  std::vector<std::string> ngram_strings;
-  std::vector<std::string> skip_strings;
-
-  std::vector<std::string> dictionary_path;
 
   bool noconstant;
   bool leave_duplicate_interactions;
-  std::string affix;
-  std::string q_colon;
 
   option_group_definition feature_options("Feature options");
   feature_options
       .add(make_option("hash", hash_function).keep().help("how to hash the features. Available options: strings, all"))
       .add(make_option("hash_seed", all.hash_seed).keep().default_value(0).help("seed for hash function"))
-      .add(make_option("ignore", ignores).keep().help("ignore namespaces beginning with character <arg>"))
-      .add(make_option("keep", keeps).keep().help("keep namespaces beginning with character <arg>"))
-      .add(make_option("redefine", redefines)
-               .keep()
-               .help("redefine namespaces beginning with characters of std::string S as namespace N. <arg> shall be in "
-                     "form "
-                     "'N:=S' where := is operator. Empty N or S are treated as default namespace. Use ':' as a "
-                     "wildcard in S.")
-               .keep())
       .add(make_option("bit_precision", new_bits).short_name("b").help("number of bits in the feature table"))
       .add(make_option("noconstant", noconstant).help("Don't add a constant feature"))
       .add(make_option("constant", all.initial_constant).short_name("C").help("Set initial value of constant"))
-      .add(make_option("ngram", ngram_strings)
-               .help("Generate N grams. To generate N grams for a single namespace 'foo', arg should be fN."))
-      .add(make_option("skips", skip_strings)
-               .help("Generate skips in N grams. This in conjunction with the ngram tag can be used to generate "
-                     "generalized n-skip-k-gram. To generate n-skips for a single namespace 'foo', arg should be fN."))
-      .add(make_option("feature_limit", all.limit_strings)
-               .help("limit to N features. To apply to a single namespace 'foo', arg should be fN"))
-      .add(make_option("affix", affix)
-               .keep()
-               .help("generate prefixes/suffixes of features; argument '+2a,-3b,+1' means generate 2-char prefixes for "
-                     "namespace a, 3-char suffixes for b and 1 char prefixes for default namespace"))
-      .add(make_option("spelling", spelling_ns)
-               .keep()
-               .help("compute spelling features for a give namespace (use '_' for default namespace)"))
-      .add(make_option("dictionary", dictionary_nses)
-               .keep()
-               .help("read a dictionary for additional features (arg either 'x:file' or just 'file')"))
-      .add(make_option("dictionary_path", dictionary_path)
-               .help("look in this directory for dictionaries; defaults to current directory or env{PATH}"))
       .add(make_option("interactions", interactions)
                .keep()
                .help("Create feature interactions of any level between namespaces."))
@@ -615,61 +355,11 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
                .help("Use permutations instead of combinations for feature interactions of same namespace."))
       .add(make_option("leave_duplicate_interactions", leave_duplicate_interactions)
                .help("Don't remove interactions with duplicate combinations of namespaces. For ex. this is a "
-                     "duplicate: '-q ab -q ba' and a lot more in '-q ::'."))
-      .add(make_option("quadratic", quadratics).short_name("q").keep().help("Create and use quadratic features"))
-      // TODO this option is unused - remove?
-      .add(make_option("q:", q_colon).help("DEPRECATED ':' corresponds to a wildcard for all printable characters"))
-      .add(make_option("cubic", cubics).keep().help("Create and use cubic features"));
+                     "duplicate: '-q ab -q ba' and a lot more in '-q ::'."));
   options.add_and_parse(feature_options);
 
   // feature manipulation
   all.example_parser->hasher = getHasher(hash_function);
-
-  if (options.was_supplied("spelling"))
-  {
-    for (size_t id = 0; id < spelling_ns.size(); id++)
-    {
-      spelling_ns[id] = spoof_hex_encoded_namespaces(spelling_ns[id]);
-      if (spelling_ns[id][0] == '_')
-        all.spelling_features[static_cast<unsigned char>(' ')] = true;
-      else
-        all.spelling_features[static_cast<size_t>(spelling_ns[id][0])] = true;
-    }
-  }
-
-  if (options.was_supplied("q:"))
-  {
-    *(all.trace_message)
-        << "WARNING: '--q:' is deprecated and not supported. You can use : as a wildcard in interactions." << endl;
-  }
-
-  if (options.was_supplied("affix")) parse_affix_argument(all, spoof_hex_encoded_namespaces(affix));
-
-  // Process ngram and skips arguments
-  if (options.was_supplied("skips"))
-  {
-    if (!options.was_supplied("ngram")) { throw vw::error("You can not skip unless ngram is > 1"); }
-  }
-
-  if (options.was_supplied("ngram"))
-  {
-    if (options.was_supplied("sort_features")) { throw vw::error("ngram is incompatible with sort_features."); }
-
-    std::vector<std::string> hex_decoded_ngram_strings;
-    hex_decoded_ngram_strings.reserve(ngram_strings.size());
-    std::transform(ngram_strings.begin(), ngram_strings.end(), std::back_inserter(hex_decoded_ngram_strings),
-        [](const std::string& arg) { return spoof_hex_encoded_namespaces(arg); });
-
-    std::vector<std::string> hex_decoded_skip_strings;
-    hex_decoded_skip_strings.reserve(skip_strings.size());
-    std::transform(skip_strings.begin(), skip_strings.end(), std::back_inserter(hex_decoded_skip_strings),
-        [](const std::string& arg) { return spoof_hex_encoded_namespaces(arg); });
-
-    all.skip_gram_transformer = vw::make_unique<vw::kskip_ngram_transformer>(
-        vw::kskip_ngram_transformer::build(hex_decoded_ngram_strings, hex_decoded_skip_strings, all.logger.quiet));
-  }
-
-  if (options.was_supplied("feature_limit")) compile_limits(all.limit_strings, all.limit, all.logger.quiet);
 
   if (options.was_supplied("bit_precision"))
   {
@@ -688,10 +378,10 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
   // prepare namespace interactions
   std::vector<std::vector<namespace_index>> decoded_interactions;
 
-  if ( ( (!all.interactions.empty() && /*data was restored from old model file directly to v_array and will be overriden automatically*/
-          (options.was_supplied("quadratic") || options.was_supplied("cubic") || options.was_supplied("interactions")) ) )
-       ||
-       interactions_settings_duplicated /*settings were restored from model file to file_options and overriden by params from command line*/)
+  // data was restored from old model file directly to v_array and will be overriden automatically
+  if ((!all.interactions.empty() && options.was_supplied("interactions"))
+      // settings were restored from model file to file_options and overriden by params from command line
+      || interactions_settings_duplicated)
   {
     *(all.trace_message)
         << "WARNING: model file has set of {-q, --cubic, --interactions} settings stored, but they'll be "
@@ -700,58 +390,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
     // in case arrays were already filled in with values from old model file - reset them
     if (!all.interactions.empty()) { all.interactions.clear(); }
-  }
-
-  if (options.was_supplied("quadratic"))
-  {
-    if (!all.logger.quiet) *(all.trace_message) << "creating quadratic features for pairs: ";
-
-    for (auto& i : quadratics)
-    {
-      if (i.size() != 2) { throw vw::error("error, quadratic features must involve two sets.)"); }
-      auto encoded = spoof_hex_encoded_namespaces(i);
-      decoded_interactions.emplace_back(encoded.begin(), encoded.end());
-      if (!all.logger.quiet) *(all.trace_message) << i << " ";
-    }
-
-    if (!all.logger.quiet && !options.was_supplied("leave_duplicate_interactions"))
-    {
-      bool contains_wildcard_quadratic =
-          std::find_if(quadratics.begin(), quadratics.end(), [](const std::string& interaction) {
-            return interaction.find(wildcard_namespace) != std::string::npos;
-          }) != quadratics.end();
-      if (contains_wildcard_quadratic)
-      {
-        *(all.trace_message) << "\n"
-                             << "WARNING: any duplicate namespace interactions will be removed\n"
-                             << "You can use --leave_duplicate_interactions to disable this behaviour.";
-      }
-    }
-
-    if (!all.logger.quiet) *(all.trace_message) << endl;
-  }
-
-  if (options.was_supplied("cubic"))
-  {
-    if (!all.logger.quiet) *(all.trace_message) << "creating cubic features for triples: ";
-    for (const auto& i : cubics)
-    {
-      if (i.size() != 3) { throw vw::error("error, cubic features must involve three sets."); }
-      auto encoded = spoof_hex_encoded_namespaces(i);
-      decoded_interactions.emplace_back(encoded.begin(), encoded.end());
-      if (!all.logger.quiet) *(all.trace_message) << i << " ";
-    }
-    if (!all.logger.quiet) *(all.trace_message) << endl;
-
-    bool contains_wildcard_cubic = std::find_if(cubics.begin(), cubics.end(), [](const std::string& interaction) {
-      return interaction.find(wildcard_namespace) != std::string::npos;
-    }) != cubics.end();
-    if (contains_wildcard_cubic)
-    {
-      *(all.trace_message) << "\n"
-                           << "WARNING: any duplicate namespace interactions will be removed\n"
-                           << "You can use --leave_duplicate_interactions to disable this behaviour.";
-    }
   }
 
   if (options.was_supplied("interactions"))
@@ -795,156 +433,6 @@ void parse_feature_tweaks(options_i& options, workspace& all, bool interactions_
 
     all.interactions = std::move(decoded_interactions);
   }
-
-  for (size_t i = 0; i < 256; i++)
-  {
-    all.ignore[i] = false;
-  }
-  all.ignore_some = false;
-  all.ignore_some_linear = false;
-
-  if (options.was_supplied("ignore"))
-  {
-    all.ignore_some = true;
-
-    for (auto& i : ignores)
-    {
-      i = spoof_hex_encoded_namespaces(i);
-      for (auto j : i) all.ignore[static_cast<size_t>(static_cast<unsigned char>(j))] = true;
-    }
-
-    if (!all.logger.quiet)
-    {
-      *(all.trace_message) << "ignoring namespaces beginning with: ";
-      for (auto const& ignore : ignores)
-        for (auto const character : ignore) *(all.trace_message) << character << " ";
-
-      *(all.trace_message) << endl;
-    }
-  }
-
-  if (options.was_supplied("keep"))
-  {
-    for (size_t i = 0; i < 256; i++) all.ignore[i] = true;
-
-    all.ignore_some = true;
-
-    for (auto& i : keeps)
-    {
-      i = spoof_hex_encoded_namespaces(i);
-      for (const auto& j : i) all.ignore[static_cast<size_t>(static_cast<unsigned char>(j))] = false;
-    }
-
-    if (!all.logger.quiet)
-    {
-      *(all.trace_message) << "using namespaces beginning with: ";
-      for (auto const& keep : keeps)
-        for (auto const character : keep) *(all.trace_message) << character << " ";
-
-      *(all.trace_message) << endl;
-    }
-  }
-
-  // --redefine param code
-  all.redefine_some = false;  // false by default
-
-  if (options.was_supplied("redefine"))
-  {
-    // initail values: i-th namespace is redefined to i itself
-    for (size_t i = 0; i < 256; i++) all.redefine[i] = static_cast<unsigned char>(i);
-
-    // note: --redefine declaration order is matter
-    // so --redefine :=L --redefine ab:=M  --ignore L  will ignore all except a and b under new M namspace
-
-    for (const auto& arg : redefines)
-    {
-      const std::string& argument = spoof_hex_encoded_namespaces(arg);
-      size_t arg_len = argument.length();
-
-      size_t operator_pos = 0;  // keeps operator pos + 1 to stay unsigned type
-      bool operator_found = false;
-      unsigned char new_namespace = ' ';
-
-      // let's find operator ':=' position in N:=S
-      for (size_t i = 0; i < arg_len; i++)
-      {
-        if (operator_found)
-        {
-          if (i > 2) { new_namespace = argument[0]; }  // N is not empty
-          break;
-        }
-        else if (argument[i] == ':')
-          operator_pos = i + 1;
-        else if ((argument[i] == '=') && (operator_pos == i))
-          operator_found = true;
-      }
-
-      if (!operator_found) throw vw::error("argument of --redefine is malformed. Valid format is N:=S, :=S or N:=");
-
-      if (++operator_pos > 3)  // seek operator end
-        *(all.trace_message)
-            << "WARNING: multiple namespaces are used in target part of --redefine argument. Only first one ('"
-            << new_namespace << "') will be used as target namespace." << endl;
-
-      all.redefine_some = true;
-
-      // case ':=S' doesn't require any additional code as new_namespace = ' ' by default
-
-      if (operator_pos == arg_len)  // S is empty, default namespace shall be used
-        all.redefine[static_cast<int>(' ')] = new_namespace;
-      else
-        for (size_t i = operator_pos; i < arg_len; i++)
-        {
-          // all namespaces from S are redefined to N
-          unsigned char c = argument[i];
-          if (c != ':')
-            all.redefine[c] = new_namespace;
-          else
-          {
-            // wildcard found: redefine all except default and break
-            for (size_t j = 0; j < 256; j++) all.redefine[j] = new_namespace;
-            break;  // break processing S
-          }
-        }
-    }
-  }
-
-  if (options.was_supplied("dictionary"))
-  {
-    if (options.was_supplied("dictionary_path"))
-      for (const std::string& path : dictionary_path)
-        if (directory_exists(path)) all.dictionary_path.push_back(path);
-    if (directory_exists(".")) all.dictionary_path.push_back(".");
-
-#if _WIN32
-    std::string PATH;
-    char* buf;
-    size_t buf_size;
-    auto err = _dupenv_s(&buf, &buf_size, "PATH");
-    if (!err && buf_size != 0)
-    {
-      PATH = std::string(buf, buf_size);
-      free(buf);
-    }
-    const char delimiter = ';';
-#else
-    const std::string PATH = getenv("PATH");
-    const char delimiter = ':';
-#endif
-    if (!PATH.empty())
-    {
-      size_t previous = 0;
-      size_t index = PATH.find(delimiter);
-      while (index != std::string::npos)
-      {
-        all.dictionary_path.push_back(PATH.substr(previous, index - previous));
-        previous = index + 1;
-        index = PATH.find(delimiter, previous);
-      }
-      all.dictionary_path.push_back(PATH.substr(previous));
-    }
-  }
-
   if (noconstant) all.add_constant = false;
 }
 
@@ -1432,15 +920,14 @@ options_i& load_header_merge_options(
   return options;
 }
 
-void parse_modules(options_i& options, workspace& all, bool interactions_settings_duplicated,
-    std::vector<std::string>& dictionary_nses)
+void parse_modules(options_i& options, workspace& all, bool interactions_settings_duplicated)
 {
   option_group_definition rand_options("Randomization options");
   rand_options.add(make_option("random_seed", all.random_seed).help("seed random number generator"));
   options.add_and_parse(rand_options);
   all.get_random_state()->set_random_state(all.random_seed);
 
-  parse_feature_tweaks(options, all, interactions_settings_duplicated, dictionary_nses);  // feature tweaks
+  parse_feature_tweaks(options, all, interactions_settings_duplicated);  // feature tweaks
 
   parse_example_tweaks(options, all);  // example manipulation
 
@@ -1608,12 +1095,8 @@ workspace* initialize(std::unique_ptr<options_i, options_deleter_type> options, 
     bool interactions_settings_duplicated;
     load_header_merge_options(*all.options.get(), all, *model, interactions_settings_duplicated);
 
-    std::vector<std::string> dictionary_nses;
-    parse_modules(*all.options.get(), all, interactions_settings_duplicated, dictionary_nses);
+    parse_modules(*all.options.get(), all, interactions_settings_duplicated);
     parse_sources(*all.options.get(), all, *model, skipModelLoad);
-
-    // we must delay so parse_mask is fully defined.
-    for (size_t id = 0; id < dictionary_nses.size(); id++) parse_dictionary_argument(all, dictionary_nses[id]);
 
     all.options->check_unregistered();
 
@@ -1694,39 +1177,6 @@ workspace* initialize(
   std::unique_ptr<options_i, options_deleter_type> options(
       new config::options_boost_po(argc, argv), [](vw::config::options_i* ptr) { delete ptr; });
   return initialize(std::move(options), model, skipModelLoad, trace_listener, trace_context);
-}
-
-// Create a new vw instance while sharing the model with another instance
-// The extra arguments will be appended to those of the other vw instance
-workspace* seed_vw_model(
-    workspace* vw_model, const std::string extra_args, trace_message_t trace_listener, void* trace_context)
-{
-  options_serializer_boost_po serializer;
-  for (auto const& option : vw_model->options->get_all_options())
-  {
-    if (vw_model->options->was_supplied(option->m_name))
-    {
-      // ignore no_stdin since it will be added by vw::initialize, and ignore -i since we don't want to reload the
-      // model.
-      if (option->m_name == "no_stdin" || option->m_name == "initial_regressor") { continue; }
-
-      serializer.add(*option);
-    }
-  }
-
-  auto serialized_options = serializer.str();
-  serialized_options = serialized_options + " " + extra_args;
-
-  workspace* new_model =
-      vw::initialize(serialized_options.c_str(), nullptr, true /* skipModelLoad */, trace_listener, trace_context);
-  free_it(new_model->sd);
-
-  // reference model states stored in the specified vw instance
-  new_model->weights.shallow_copy(vw_model->weights);  // regressor
-  new_model->sd = vw_model->sd;                        // shared data
-  new_model->example_parser->_shared_data = new_model->sd;
-
-  return new_model;
 }
 
 void finish(workspace& all, bool delete_all)

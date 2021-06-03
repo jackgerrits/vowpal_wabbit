@@ -1,4 +1,4 @@
-creating quadratic features for pairs: GT
+creating features for following interactions: GT 
 predictions = cbe_adf_dsjson_chain_hash.predict
 Num weight bits = 18
 learning rate = 0.5

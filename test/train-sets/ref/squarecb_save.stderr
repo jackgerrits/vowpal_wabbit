@@ -1,4 +1,4 @@
-creating quadratic features for pairs: UA
+creating features for following interactions: UA 
 final_regressor = models/sqcb_ld.model
 Num weight bits = 18
 learning rate = 0.5
@@ -22,5 +22,5 @@ finished run
 number of examples = 113
 weighted example sum = 113.000000
 weighted label sum = 0.000000
-average loss = 0.286852
+average loss = 0.286846
 total feature number = 3503

@@ -29,7 +29,7 @@ verify_cubic_ABC() {
     # Run vw
     rm -f "$DataSet" "$ih"
     echo "1 'cubic_test|A 1 |B 2 3 |C 4 5 6" > $DataSet
-    $vw --quiet --cubic ABC -d "$DataSet" --invert_hash "$ih"
+    $vw --quiet --interactions ABC -d "$DataSet" --invert_hash "$ih"
 
     # Verify single features existence
     for f1 in 'A^1' 'B^2' 'B^3' 'C^4' 'C^5' 'C^6'; do

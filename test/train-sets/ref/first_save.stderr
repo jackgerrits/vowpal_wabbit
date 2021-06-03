@@ -1,4 +1,4 @@
-creating quadratic features for pairs: UA 
+creating features for following interactions: UA 
 final_regressor = models/first_ld.model
 Num weight bits = 18
 learning rate = 0.5
