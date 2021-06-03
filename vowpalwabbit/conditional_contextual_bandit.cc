@@ -76,6 +76,7 @@ struct ccb
   std::vector<bool> exclude_list, include_list;
   std::vector<CCB::label> stored_labels;
   size_t action_with_label = 0;
+  std::vector<uint64_t> moved_feature_group_hashes;
 
   multi_ex cb_ex;
 
@@ -202,23 +203,35 @@ void clear_pred_and_label(ccb& data)
 // true if there exists at least 1 action in the cb multi-example
 bool has_action(multi_ex& cb_ex) { return !cb_ex.empty(); }
 
-// This function intentionally does not handle increasing the num_features of the example because
-// the output_example function has special logic to ensure the number of feaures is correctly calculated.
-// Copy anything in default namespace for slot to ccb_slot_namespace in shared
-// Copy other slot namespaces to shared
-void inject_slot_features(example* shared, example* slot)
+// Move anything in default namespace for slot to ccb_slot_namespace in shared
+// Move other slot namespaces to shared
+void inject_slot_features(example* shared, example* slot, std::vector<uint64_t>& moved_feature_group_hashes)
 {
+  moved_feature_group_hashes.clear();
   for (auto it = slot->feature_space.begin(); it != slot->feature_space.end(); ++it)
   {
     // constant namespace should be ignored, as it already exists and we don't want to double it up.
     if (it.index() == constant_namespace) { continue; }
 
-    if (index == default_namespace)  // slot default namespace has a special namespace in shared
-    { LabelDict::add_example_namespace(*shared, ccb_slot_namespace, slot->feature_space[default_namespace]); }
-    else
+    auto destination_namespace_index = it.index();
+    auto destination_namespace_hash = it.hash();
+
+    // slot default namespace has a special namespace in shared
+    if (it.index() == default_namespace)
     {
-      LabelDict::add_example_namespace(*shared, index, slot->feature_space[index]);
+      destination_namespace_index = ccb_slot_namespace;
+      destination_namespace_hash = ccb_slot_namespace;
     }
+
+    shared->num_features += (*it).size();
+    shared->feature_space.merge_feature_group(std::move(*it), destination_namespace_hash, destination_namespace_index);
+    shared->reset_total_sum_feat_sq();
+    moved_feature_group_hashes.push_back(it.hash());
+  }
+
+  for (auto hash : moved_feature_group_hashes)
+  {
+    slot->feature_space.remove_feature_group(hash);
   }
 }
 
@@ -243,41 +256,47 @@ void inject_slot_id(ccb& data, example* shared, size_t id)
     index = data.slot_id_hashes[id];
   }
 
-  shared->feature_space[ccb_id_namespace].push_back(1., index);
-  shared->indices.push_back(ccb_id_namespace);
+  auto& feat_group = shared->feature_space.get_or_create_feature_group(ccb_id_namespace, ccb_id_namespace);
+  feat_group.clear();
+  feat_group.push_back(1., index);
 
   if (audit)
   {
     auto current_index_str = "index" + std::to_string(id);
-    shared->feature_space[ccb_id_namespace].space_names.push_back(
+    feat_group.space_names.push_back(
         std::make_shared<audit_strings>(data.id_namespace_str, current_index_str));
   }
 }
 
 // Since the slot id is the only thing in this namespace, the popping the value off will work correctly.
-template <bool audit>
 void remove_slot_id(example* shared)
 {
-  shared->feature_space[ccb_id_namespace].indicies.pop_back();
-  shared->feature_space[ccb_id_namespace].values.pop_back();
-  shared->indices.pop_back();
-
-  if (audit) { shared->feature_space[ccb_id_namespace].space_names.pop_back(); }
+  shared->feature_space.remove_feature_group(ccb_id_namespace);
 }
 
-void remove_slot_features(example* shared, example* slot)
+void remove_slot_features(example* shared, example* slot, const std::vector<uint64_t>& moved_feature_group_hashes)
 {
-  for (auto index : slot->indices)
+  for (auto ns_hash : moved_feature_group_hashes)
   {
-    // constant namespace should be ignored, as it already exists and we don't want to double it up.
-    if (index == constant_namespace) { continue; }
+    auto destination_namespace_index = shared->feature_space.get_index_for_hash(ns_hash);
+    auto destination_namespace_hash = ns_hash;
+    auto* feat_space = shared->feature_space.get_feature_group(ns_hash);
+    assert(feat_space != nullptr);
 
-    if (index == default_namespace)  // slot default namespace has a special namespace in shared
-    { LabelDict::del_example_namespace(*shared, ccb_slot_namespace, slot->feature_space[default_namespace]); }
-    else
+    if (ns_hash == ccb_slot_namespace)
     {
-      LabelDict::del_example_namespace(*shared, index, slot->feature_space[index]);
+      destination_namespace_index = default_namespace;
+      destination_namespace_hash = default_namespace;
     }
+
+    shared->num_features += (*feat_space).size();
+    slot->feature_space.merge_feature_group(std::move(*feat_space), destination_namespace_hash, destination_namespace_index);
+    slot->reset_total_sum_feat_sq();
+  }
+
+  for (auto hash : moved_feature_group_hashes)
+  {
+    shared->feature_space.remove_feature_group(hash);
   }
 }
 
@@ -289,7 +308,7 @@ void build_cb_example(multi_ex& cb_ex, example* slot, const CCB::label& ccb_labe
 
   // Merge the slot features with the shared example and set it in the cb multi-example
   // TODO is it imporant for total_sum_feat_sq and num_features to be correct at this point?
-  inject_slot_features(data.shared, slot);
+  inject_slot_features(data.shared, slot, data.moved_feature_group_hashes);
   cb_ex.push_back(data.shared);
 
   // Retrieve the list of actions explicitly available for the slot (if the list is empty, then all actions are
@@ -474,15 +493,11 @@ void learn_or_predict(ccb& data, multi_learner& base, multi_ex& examples)
         data.action_score_pool.acquire_object(*(decision_scores.end() - 1));
       }
 
-      remove_slot_features(data.shared, slot);
+      remove_slot_features(data.shared, slot, data.moved_feature_group_hashes);
 
       if (should_augment_with_slot_info)
       {
-        if (data.all->audit || data.all->hash_inv) { remove_slot_id<true>(data.shared); }
-        else
-        {
-          remove_slot_id<false>(data.shared);
-        }
+        remove_slot_id(data.shared);
       }
 
       // Put back the original shared example tag.
