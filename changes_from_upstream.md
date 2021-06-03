@@ -40,3 +40,4 @@
 - Remove baseline, mutlilabel_oaa, plt, print, audit_regressor
 - Remove autolink, boosting, cbzo, confidence, ect, oaa, topk
 - ignore_linear option removed
+- remove ignore, keep, redefine, ngram, skips, feature_limit, affix, spelling, dictionary, dictionary_path, --quadratic, --cubic (use --interactions)

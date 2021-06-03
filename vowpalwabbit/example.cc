@@ -116,21 +116,6 @@ void copy_example_data_with_label(example* dst, const example* src)
   copy_example_label(dst, src);
 }
 
-void move_feature_namespace(example* dst, example* src, namespace_index c)
-{
-  if (std::find(src->indices.begin(), src->indices.end(), c) == src->indices.end()) return;  // index not present in src
-  if (std::find(dst->indices.begin(), dst->indices.end(), c) == dst->indices.end()) dst->indices.push_back(c);
-
-  auto& fdst = dst->feature_space[c];
-  auto& fsrc = src->feature_space[c];
-
-  src->num_features -= fsrc.size();
-  src->reset_total_sum_feat_sq();
-  std::swap(fdst, fsrc);
-  dst->num_features += fdst.size();
-  dst->reset_total_sum_feat_sq();
-}
-
 }  // namespace vw
 
 std::string cb_label_to_string(const example& ec)

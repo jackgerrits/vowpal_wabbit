@@ -173,28 +173,6 @@ void workspace::finish_example(multi_ex& ec)
   vw::LEARNER::as_multiline(l)->finish_example(*this, ec);
 }
 
-void compile_limits(std::vector<std::string> limits, std::array<uint32_t, NUM_NAMESPACES>& dest, bool /*quiet*/)
-{
-  for (size_t i = 0; i < limits.size(); i++)
-  {
-    std::string limit = limits[i];
-    if (isdigit(limit[0]))
-    {
-      int n = atoi(limit.c_str());
-      logger::errlog_warn("limiting to {} features for each namespace.", n);
-      for (size_t j = 0; j < 256; j++) dest[j] = n;
-    }
-    else if (limit.size() == 1)
-      logger::log_error("You must specify the namespace index before the n");
-    else
-    {
-      int n = atoi(limit.c_str() + 1);
-      dest[static_cast<uint32_t>(limit[0])] = n;
-      logger::errlog_warn("limiting to {0} for namespaces {1}", n, limit[0]);
-    }
-  }
-}
-
 VW_WARNING_STATE_PUSH
 VW_WARNING_DISABLE_DEPRECATED_USAGE
 
@@ -212,8 +190,6 @@ workspace::workspace() : options(nullptr, nullptr)
 
   reg_mode = 0;
   current_pass = 0;
-
-  delete_prediction = nullptr;
 
   bfgs = false;
   no_bias = false;
@@ -256,14 +232,6 @@ workspace::workspace() : options(nullptr, nullptr)
   eta_decay_rate = 1.0;
   initial_weight = 0.0;
   initial_constant = 0.0;
-
-
-  for (size_t i = 0; i < NUM_NAMESPACES; i++)
-  {
-    limit[i] = INT_MAX;
-    affix_features[i] = 0;
-    spelling_features[i] = 0;
-  }
 
   invariant_updates = true;
   normalized_idx = 2;

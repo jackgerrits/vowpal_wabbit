@@ -95,7 +95,6 @@ set(vw_all_headers
   metric_sink.h
   multiclass.h
   numeric_casts.h
-  kskip_ngram_transformer.h
   object_pool.h
   offset_tree.h
   options_boost_po.h
@@ -200,7 +199,6 @@ set(vw_all_sources
   marginal.cc
   metrics.cc
   multiclass.cc
-  kskip_ngram_transformer.cc
   offset_tree.cc
   options_boost_po.cc
   options_serializer_boost_po.cc

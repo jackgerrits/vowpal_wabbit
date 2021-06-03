@@ -325,62 +325,22 @@ void save_load_header(
       bytes_read_write += bin_text_read_write_fixed_validated(
           model_file, reinterpret_cast<char*>(&all.lda), sizeof(all.lda), "", read, msg, text);
 
-      // TODO: validate ngram_len?
-      auto* g_transformer = all.skip_gram_transformer.get();
-      uint32_t ngram_len =
-          (g_transformer != nullptr) ? static_cast<uint32_t>(g_transformer->get_initial_ngram_definitions().size()) : 0;
+      uint32_t ngram_len = 0;
       msg << ngram_len << " ngram:";
       bytes_read_write += bin_text_read_write_fixed_validated(
           model_file, reinterpret_cast<char*>(&ngram_len), sizeof(ngram_len), "", read, msg, text);
-
-      std::vector<std::string> temp_vec;
-      const auto& ngram_strings = g_transformer != nullptr ? g_transformer->get_initial_ngram_definitions() : temp_vec;
-      for (size_t i = 0; i < ngram_len; i++)
-      {
-        // have '\0' at the end for sure
-        char ngram[4] = {0, 0, 0, 0};
-        if (!read)
-        {
-          msg << ngram_strings[i] << " ";
-          memcpy(ngram, ngram_strings[i].c_str(), std::min(static_cast<size_t>(3), ngram_strings[i].size()));
-        }
-        bytes_read_write += bin_text_read_write_fixed_validated(model_file, ngram, 3, "", read, msg, text);
-        if (read)
-        {
-          std::string temp(ngram);
-          file_options += " --ngram";
-          file_options += " " + temp;
-        }
-      }
+      if (ngram_len != 0)
+      { throw vw::error("Cannot load a model which contains ngrams. This feature is not a part of the overhaul."); }
 
       msg << "\n";
       bytes_read_write += bin_text_read_write_fixed_validated(model_file, nullptr, 0, "", read, msg, text);
 
-      // TODO: validate skips?
-      uint32_t skip_len =
-          (g_transformer != nullptr) ? static_cast<uint32_t>(g_transformer->get_initial_skip_definitions().size()) : 0;
+      uint32_t skip_len = 0;
       msg << skip_len << " skip:";
       bytes_read_write += bin_text_read_write_fixed_validated(
           model_file, reinterpret_cast<char*>(&skip_len), sizeof(skip_len), "", read, msg, text);
-
-      const auto& skip_strings = g_transformer != nullptr ? g_transformer->get_initial_skip_definitions() : temp_vec;
-      for (size_t i = 0; i < skip_len; i++)
-      {
-        char skip[4] = {0, 0, 0, 0};
-        if (!read)
-        {
-          msg << skip_strings[i] << " ";
-          memcpy(skip, skip_strings[i].c_str(), std::min(static_cast<size_t>(3), skip_strings[i].size()));
-        }
-
-        bytes_read_write += bin_text_read_write_fixed_validated(model_file, skip, 3, "", read, msg, text);
-        if (read)
-        {
-          std::string temp(skip);
-          file_options += " --skips";
-          file_options += " " + temp;
-        }
-      }
+      if (skip_len != 0)
+      { throw vw::error("Cannot load a model which contains skips. This feature is not a part of the overhaul."); }
 
       msg << "\n";
       bytes_read_write += bin_text_read_write_fixed_validated(model_file, nullptr, 0, "", read, msg, text);

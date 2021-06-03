@@ -1,4 +1,4 @@
-creating cubic features for triples: abc 
+creating features for following interactions: abc 
 final_regressor = models/xxor.model
 Num weight bits = 18
 learning rate = 0.5
