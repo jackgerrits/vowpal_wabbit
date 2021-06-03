@@ -160,5 +160,4 @@ inline void set_weight(workspace& all, uint32_t index, uint32_t offset, float va
   (&all.weights[((uint64_t)index) << all.weights.stride_shift()])[offset] = value;
 }
 
-
 }  // namespace vw
