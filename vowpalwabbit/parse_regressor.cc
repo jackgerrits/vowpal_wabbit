@@ -330,9 +330,7 @@ void save_load_header(
       bytes_read_write += bin_text_read_write_fixed_validated(
           model_file, reinterpret_cast<char*>(&ngram_len), sizeof(ngram_len), "", read, msg, text);
       if (ngram_len != 0)
-      {
-        throw vw::error("Cannot load a model which contains ngrams. This feature is not a part of the overhaul.");
-      }
+      { throw vw::error("Cannot load a model which contains ngrams. This feature is not a part of the overhaul."); }
 
       msg << "\n";
       bytes_read_write += bin_text_read_write_fixed_validated(model_file, nullptr, 0, "", read, msg, text);
@@ -342,9 +340,7 @@ void save_load_header(
       bytes_read_write += bin_text_read_write_fixed_validated(
           model_file, reinterpret_cast<char*>(&skip_len), sizeof(skip_len), "", read, msg, text);
       if (skip_len != 0)
-      {
-        throw vw::error("Cannot load a model which contains skips. This feature is not a part of the overhaul.");
-      }
+      { throw vw::error("Cannot load a model which contains skips. This feature is not a part of the overhaul."); }
 
       msg << "\n";
       bytes_read_write += bin_text_read_write_fixed_validated(model_file, nullptr, 0, "", read, msg, text);

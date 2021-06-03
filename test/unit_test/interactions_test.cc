@@ -96,8 +96,8 @@ BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_test)
 
 BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_permuations_test)
 {
-  auto& vw = *vw::initialize(
-      "--quiet --interactions :: --leave_duplicate_interactions --permutations --noconstant", nullptr, false, nullptr, nullptr);
+  auto& vw = *vw::initialize("--quiet --interactions :: --leave_duplicate_interactions --permutations --noconstant",
+      nullptr, false, nullptr, nullptr);
   auto* ex = vw::read_example(vw, std::string("3 |f a b c |e x y z"));
 
   auto interactions =
