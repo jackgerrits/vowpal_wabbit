@@ -38,13 +38,13 @@ struct example_predict
   using iterator = VW::namespaced_features::iterator;
 
   /// If indices is modified this iterator is invalidated.
-  iterator begin();
+  iterator begin() { return feature_space.begin(); }
   /// If indices is modified this iterator is invalidated.
-  iterator end();
+  iterator end() { return feature_space.end(); }
 
   VW::namespaced_features feature_space;
 
-  v_array<namespace_index> indices;
+  // v_array<namespace_index> indices;
   // std::array<features, NUM_NAMESPACES> feature_space;  // Groups of feature values.
   uint64_t ft_offset = 0;                              // An offset for all feature values.
 

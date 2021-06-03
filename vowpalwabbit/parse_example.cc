@@ -261,7 +261,7 @@ public:
       }
       if ((*_spelling_features)[_index])
       {
-        features& spell_fs = _ae->feature_space.get_or_create_feature_group(spelling_namespace);
+        features& spell_fs = _ae->feature_space.get_or_create_feature_group(spelling_namespace, spelling_namespace);
         // v_array<char> spelling;
         _spelling.clear();
         for (char c : feature_name)

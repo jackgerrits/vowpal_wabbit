@@ -124,19 +124,20 @@ struct namespaced_features
 
   // TODO - don't generate this per call.
   std::vector<namespace_index> get_indices() const;
+  namespace_index get_index_for_hash(uint64_t hash) const;
 
   // Returns empty range if not found
-  std::pair<indexed_iterator, indexed_iterator> get_namespace_index_groups(namespace_index index);
+  std::pair<indexed_iterator, indexed_iterator> get_namespace_index_groups(namespace_index ns_index);
   // Returns empty range if not found
-  std::pair<const_indexed_iterator, const_indexed_iterator> get_namespace_index_groups(namespace_index index) const;
+  std::pair<const_indexed_iterator, const_indexed_iterator> get_namespace_index_groups(namespace_index ns_index) const;
 
   // If a feature group already exists in this "slot" it will be merged
   template <typename FeaturesT>
-  features& merge_feature_group(FeaturesT&& ftrs, uint64_t hash, namespace_index index);
+  features& merge_feature_group(FeaturesT&& ftrs, uint64_t hash, namespace_index ns_index);
 
   // If no feature group already exists a default one will be created.
   // Creating new feature groups will invalidate any pointers or references held.
-  features& get_or_create_feature_group(uint64_t hash, namespace_index index);
+  features& get_or_create_feature_group(uint64_t hash, namespace_index ns_index);
 
   const features& operator[](uint64_t hash) const;
   features& operator[](uint64_t hash);
@@ -144,14 +145,14 @@ struct namespaced_features
   // Removing a feature group will invalidate any pointers or references held.
   void remove_feature_group(uint64_t hash);
 
-  generic_range<indexed_iterator> namespace_index_range(namespace_index index);
-  generic_range<const_indexed_iterator> namespace_index_range(namespace_index index) const;
-  indexed_iterator namespace_index_begin(namespace_index index);
-  indexed_iterator namespace_index_end(namespace_index index);
-  const_indexed_iterator namespace_index_begin(namespace_index index) const;
-  const_indexed_iterator namespace_index_end(namespace_index index) const;
-  const_indexed_iterator namespace_index_cbegin(namespace_index index) const;
-  const_indexed_iterator namespace_index_cend(namespace_index index) const;
+  generic_range<indexed_iterator> namespace_index_range(namespace_index ns_index);
+  generic_range<const_indexed_iterator> namespace_index_range(namespace_index ns_index) const;
+  indexed_iterator namespace_index_begin(namespace_index ns_index);
+  indexed_iterator namespace_index_end(namespace_index ns_index);
+  const_indexed_iterator namespace_index_begin(namespace_index ns_index) const;
+  const_indexed_iterator namespace_index_end(namespace_index ns_index) const;
+  const_indexed_iterator namespace_index_cbegin(namespace_index ns_index) const;
+  const_indexed_iterator namespace_index_cend(namespace_index ns_index) const;
 
   iterator begin();
   iterator end();

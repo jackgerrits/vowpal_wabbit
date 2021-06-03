@@ -92,7 +92,7 @@ void predict_or_learn(mwt& c, single_learner& base, example& ec)
     for (auto it = ec.begin(); it != ec.end(); ++it)
     {
       if(c.namespaces[it.index()]){
-        c.feature_space.insert({it.hash(), features{}})
+        c.feature_space.insert({it.hash(), features{}});
         if (learn)
         {
           auto& feats = c.feature_space[it.hash()];

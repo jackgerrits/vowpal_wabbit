@@ -32,6 +32,15 @@ std::vector<namespace_index> namespaced_features::get_indices() const
   return indices_copy;
 }
 
+namespace_index namespaced_features::get_index_for_hash(uint64_t hash) const
+{
+  auto it = _hash_to_index_mapping.find(hash);
+#ifndef VW_NOEXCEPT
+  if (it == _hash_to_index_mapping.end()) { THROW("No index found for hash: " << hash); }
+#endif
+  return _namespace_indices[it->second];
+}
+
 std::pair<namespaced_features::indexed_iterator, namespaced_features::indexed_iterator>
 namespaced_features::get_namespace_index_groups(namespace_index ns_index)
 {
