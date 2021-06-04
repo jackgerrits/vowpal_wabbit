@@ -70,9 +70,7 @@ void del_example_namespace_from_memory(label_feature_map& lfm, example& ec, size
 void set_label_features(label_feature_map& lfm, size_t lab, const features& source_feature_group)
 {
   if (lfm.find(lab) == lfm.end()) return;
-  features tmp_features;
-  tmp_features.deep_copy_from(source_feature_group);
-  lfm.emplace(lab, std::move(tmp_features));
+  lfm.emplace(lab, source_feature_group);
 }
 
 }  // namespace LabelDict
