@@ -642,15 +642,17 @@ void end_pass_example(vw& all, example* ae)
   all.example_parser->in_pass_counter = 0;
 }
 
-void feature_limit(vw& all, example* ex)
+void feature_limit(const vw& all, example* ex)
 {
-  for (namespace_index index : ex->indices)
-    if (all.limit[index] < ex->feature_space[index].size())
+  for (auto it = ex->feature_space.begin(); it != ex->feature_space.end(); ++it)
+  {
+    if (all.limit[it.index()] < (*it).size())
     {
-      features& fs = ex->feature_space[index];
+      features& fs = *it;
       fs.sort(all.parse_mask);
-      unique_features(fs, all.limit[index]);
+      unique_features(fs, all.limit[it.index()]);
     }
+  }
 }
 
 namespace VW

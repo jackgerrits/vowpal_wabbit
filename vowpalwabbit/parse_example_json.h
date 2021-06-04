@@ -1207,8 +1207,11 @@ public:
 
     auto* stored_ex = (*ctx.dedup_examples)[i];
 
-    new_ex->indices = stored_ex->indices;
-    for (auto& ns : new_ex->indices) { new_ex->feature_space[ns].deep_copy_from(stored_ex->feature_space[ns]); }
+    for (auto it = stored_ex->feature_space.cbegin(); it != stored_ex->feature_space.cend(); ++it)
+    {
+      new_ex->feature_space.merge_feature_group(*it, it.hash(), it.index());
+    }
+
     new_ex->ft_offset = stored_ex->ft_offset;
     return return_state;
   }

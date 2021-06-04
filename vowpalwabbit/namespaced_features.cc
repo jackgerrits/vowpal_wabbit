@@ -128,6 +128,14 @@ void namespaced_features::remove_feature_group(uint64_t hash)
   }
 }
 
+void namespaced_features::clear() {
+  _feature_groups.clear();
+  _namespace_indices.clear();
+  _namespace_hashes.clear();
+  _legacy_indices_to_index_mapping.clear();
+  _hash_to_index_mapping.clear();
+}
+
 generic_range<namespaced_features::indexed_iterator> namespaced_features::namespace_index_range(
     namespace_index ns_index)
 {

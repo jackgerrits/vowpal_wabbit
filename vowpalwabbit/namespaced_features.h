@@ -145,6 +145,8 @@ struct namespaced_features
   // Removing a feature group will invalidate any pointers or references held.
   void remove_feature_group(uint64_t hash);
 
+  void clear();
+
   generic_range<indexed_iterator> namespace_index_range(namespace_index ns_index);
   generic_range<const_indexed_iterator> namespace_index_range(namespace_index ns_index) const;
   indexed_iterator namespace_index_begin(namespace_index ns_index);
