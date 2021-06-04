@@ -222,23 +222,23 @@ void subtract_feature(example& ec, float feature_value_x, uint64_t weight_index)
 // Iterate over all features of ecsub including quadratic and cubic features and subtract them from ec.
 void subtract_example(vw& all, example* ec, example* ecsub)
 {
-  features& wap_fs = ec->feature_space[wap_ldf_namespace];
+  features& wap_fs = ec->feature_space.get_or_create_feature_group(wap_ldf_namespace, wap_ldf_namespace);
   wap_fs.sum_feat_sq = 0;
   GD::foreach_feature<example&, uint64_t, subtract_feature>(all, *ecsub, *ec);
-  ec->indices.push_back(wap_ldf_namespace);
   ec->num_features += wap_fs.size();
   ec->reset_total_sum_feat_sq();
 }
 
 void unsubtract_example(example* ec)
 {
-  if (ec->indices.empty())
+  if (ec->feature_space.empty())
   {
     logger::errlog_error("internal error (bug): trying to unsubtract_example, but there are no namespaces!");
     return;
   }
 
-  if (ec->indices.back() != wap_ldf_namespace)
+  auto* wap_fs = ec->feature_space.get_feature_group(wap_ldf_namespace);
+  if (wap_fs == nullptr)
   {
     logger::errlog_error(
       "internal error (bug): trying to unsubtract_example, but either it wasn't added, or something was added "
@@ -246,11 +246,9 @@ void unsubtract_example(example* ec)
     return;
   }
 
-  features& fs = ec->feature_space[wap_ldf_namespace];
-  ec->num_features -= fs.size();
+  ec->num_features -= wap_fs->size();
   ec->reset_total_sum_feat_sq();
-  fs.clear();
-  ec->indices.pop_back();
+  ec->feature_space.remove_feature_group(wap_ldf_namespace);
 }
 
 void make_single_prediction(ldf& data, single_learner& base, example& ec)
@@ -772,7 +770,7 @@ void inline process_label(ldf& data, example* ec)
   for (auto const& cost : costs)
   {
     const auto lab = static_cast<size_t>(cost.x);
-    LabelDict::set_label_features(data.label_features, lab, ec->feature_space[ec->indices[0]]);
+    LabelDict::set_label_features(data.label_features, lab, *ec->feature_space.begin());
   }
 }
 

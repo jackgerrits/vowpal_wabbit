@@ -198,7 +198,7 @@ void cb_explore_adf_base<ExploreType>::output_example(vw& all, multi_ex& ec_seq)
   for (const auto& example : ec_seq)
   {
     num_features += example->get_num_features();
-    num_namespaces += example->indices.size();
+    num_namespaces += example->feature_space.size();
   }
 
   if (_metrics)

@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include <cassert>
+#include <set>
 
 #include "feature_group.h"
 #include "generic_range.h"
@@ -129,8 +130,7 @@ struct namespaced_features
   // Returns nullptr if not found.
   const features* get_feature_group(uint64_t hash) const;
 
-  // TODO - don't generate this per call.
-  std::vector<namespace_index> get_indices() const;
+  const std::set<namespace_index>& get_indices() const;
   namespace_index get_index_for_hash(uint64_t hash) const;
 
   // Returns empty range if not found
@@ -172,11 +172,14 @@ struct namespaced_features
 
 private:
   std::vector<features> _feature_groups;
+  // Can have duplicate values.
   std::vector<namespace_index> _namespace_indices;
+  // Should never have duplicate values.
   std::vector<uint64_t> _namespace_hashes;
 
   std::unordered_map<namespace_index, std::vector<size_t>> _legacy_indices_to_index_mapping;
   std::unordered_map<uint64_t, size_t> _hash_to_index_mapping;
+  std::set<namespace_index> _contained_indices;
 };
 
 // If a feature group already exists in this "slot" it will be merged
@@ -193,6 +196,8 @@ features& namespaced_features::merge_feature_group(FeaturesT&& ftrs, uint64_t ha
     auto new_index = _feature_groups.size() - 1;
     _hash_to_index_mapping[hash] = new_index;
     _legacy_indices_to_index_mapping[ns_index].push_back(new_index);
+    // If size is 1, that means this is the first time the ns_index is added and we should add it to the set.
+    if (_legacy_indices_to_index_mapping[ns_index].size() == 1) { _contained_indices.insert(ns_index); }
     existing_group = &_feature_groups.back();
   }
   else
@@ -201,9 +206,9 @@ features& namespaced_features::merge_feature_group(FeaturesT&& ftrs, uint64_t ha
     auto existing_index = _hash_to_index_mapping[hash];
     // Should we ensure that this doesnt already exist under a DIFFERENT namespace_index?
     // However, his shouldn't be possible as ns_index depends on hash.
-    auto& indices_list = _legacy_indices_to_index_mapping[ns_index];
-    if (std::find(indices_list.begin(), indices_list.end(), ns_index) == indices_list.end())
-    { indices_list.push_back(existing_index); }
+    auto& ns_indices_list = _legacy_indices_to_index_mapping[ns_index];
+    if (std::find(ns_indices_list.begin(), ns_indices_list.end(), ns_index) == ns_indices_list.end())
+    { ns_indices_list.push_back(existing_index); }
   }
   return *existing_group;
 }
