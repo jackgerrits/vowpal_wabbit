@@ -43,7 +43,7 @@ struct vw_dbg
 // TODO: Should this be moved to the io library and made to use the logger?
 //       we'll need to break the dependency on depth_indent_string() though
 #define VW_DBG(e) \
-  if VW_STD17_CONSTEXPR (VW_DEBUG_LOG) VW_LOG_SINK << debug_depth_indent_string(e)
+  if constexpr (VW_DEBUG_LOG) VW_LOG_SINK << debug_depth_indent_string(e)
 
 #define VW_DBG_0 \
-  if VW_STD17_CONSTEXPR (VW_DEBUG_LOG) VW_LOG_SINK
+  if constexpr (VW_DEBUG_LOG) VW_LOG_SINK

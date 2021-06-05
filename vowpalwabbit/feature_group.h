@@ -336,9 +336,6 @@ struct features
   inline bool empty() const { return values.empty(); }
   inline bool nonempty() const { return !empty(); }
 
-  VW_DEPRECATED("Freeing space names is handled directly by truncation or removal.")
-  void free_space_names(size_t i);
-
   // default iterator for values & features
   inline iterator begin() { return {values.begin(), indicies.begin()}; }
   inline const_iterator begin() const { return {values.begin(), indicies.begin()}; }

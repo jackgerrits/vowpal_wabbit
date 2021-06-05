@@ -1636,14 +1636,6 @@ void read_line_json_s(workspace& all, v_array<example*>& examples, char* line, s
       GetParseError_En(result.Code()), handler.error().str(), (current_state ? current_state->name : "null")));
 }
 
-template <bool audit>
-VW_DEPRECATED("read_line_json has been deprecated; use read_line_json_s instead.")
-void read_line_json(workspace& all, v_array<example*>& examples, char* line, example_factory_t example_factory,
-    void* ex_factory_context, std::unordered_map<uint64_t, example*>* dedup_examples = nullptr)
-{
-  read_line_json_s<audit>(all, examples, line, strlen(line), example_factory, ex_factory_context, dedup_examples);
-}
-
 inline void apply_pdrop(workspace& all, float pdrop, v_array<example*>& examples)
 {
   if (all.example_parser->lbl_parser.label_type == label_type_t::cb)

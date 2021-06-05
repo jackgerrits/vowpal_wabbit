@@ -5,10 +5,6 @@
 #pragma once
 
 #include <cstdint>
-#ifndef _WIN32
-#  include <sys/mman.h>
-#endif
-
 #include "memory.h"
 
 typedef float weight;
@@ -72,11 +68,6 @@ public:
   dense_parameters& operator=(dense_parameters&&) noexcept = delete;
   dense_parameters(dense_parameters&&) noexcept = delete;
 
-  weight* first()
-  {
-    return _begin;
-  }  // TODO: Temporary fix for allreduce.
-     // iterator with stride
   iterator begin() { return iterator(_begin, _begin, stride()); }
   iterator end() { return iterator(_begin + _weight_mask + 1, _begin, stride()); }
 
@@ -123,21 +114,6 @@ public:
   uint32_t stride_shift() const { return _stride_shift; }
 
   void stride_shift(uint32_t stride_shift) { _stride_shift = stride_shift; }
-
-#ifndef _WIN32
-#  ifndef DISABLE_SHARED_WEIGHTS
-  void share(size_t length)
-  {
-    float* shared_weights = static_cast<float*>(mmap(
-        nullptr, (length << _stride_shift) * sizeof(float), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0));
-    size_t float_count = length << _stride_shift;
-    weight* dest = shared_weights;
-    memcpy(dest, _begin, float_count * sizeof(float));
-    free(_begin);
-    _begin = dest;
-  }
-#  endif
-#endif
 
   ~dense_parameters()
   {

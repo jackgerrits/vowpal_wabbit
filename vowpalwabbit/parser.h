@@ -105,17 +105,10 @@ struct dsjson_metrics
 
 void enable_sources(workspace& all, bool quiet, size_t passes, input_options& input_options);
 
-VW_DEPRECATED("Function is no longer used")
-void adjust_used_index(workspace& all);
-
 // parser control
 void lock_done(parser& p);
 void set_done(workspace& all);
 
 // source control functions
 void reset_source(workspace& all, size_t numbits);
-VW_DEPRECATED("Function is no longer used")
-void finalize_source(parser* source);
-VW_DEPRECATED("Function is no longer used")
-void set_compressed(parser* par);
 void free_parser(workspace& all);

@@ -59,9 +59,8 @@ struct uncertainty
   }
 };
 
-inline void predict_with_confidence(uncertainty& d, const float fx, float& fw)
+inline void predict_with_confidence(uncertainty& d, const float fx, float* w)
 {
-  float* w = &fw;
   d.pred += w[W_XT] * fx;
   float sqrtf_ng2 = sqrtf(w[W_G2]);
   float uncertain = ((d.b.data.ftrl_beta + sqrtf_ng2) / d.b.data.ftrl_alpha + d.b.data.l2_lambda);
@@ -71,7 +70,7 @@ inline void predict_with_confidence(uncertainty& d, const float fx, float& fw)
 float sensitivity(ftrl& b, base_learner& /* base */, example& ec)
 {
   uncertainty uncertain(b);
-  GD::foreach_feature(*(b.all), ec, [&uncertain](float feat_value, uint64_t feat_index, float feature_weight) {
+  GD::foreach_feature(*(b.all), ec, [&uncertain](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
     predict_with_confidence(uncertain, feat_value, feature_weight);
   });
 
@@ -104,7 +103,7 @@ void multipredict(
     GD::multipredict_info<sparse_parameters> mp = {
         count, step, pred, all.weights.sparse_weights, static_cast<float>(all.sd->gravity)};
     GD::foreach_feature(
-        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float feature_weight) {
+        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
           GD::vec_add_multipredict(mp, feat_value, feature_weight);
         });
   }
@@ -113,7 +112,7 @@ void multipredict(
     GD::multipredict_info<dense_parameters> mp = {
         count, step, pred, all.weights.dense_weights, static_cast<float>(all.sd->gravity)};
     GD::foreach_feature(
-        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float feature_weight) {
+        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
           GD::vec_add_multipredict(mp, feat_value, feature_weight);
         });
   }
@@ -134,9 +133,8 @@ void multipredict(
   }
 }
 
-void inner_update_proximal(ftrl_update_data& d, float x, float& wref)
+void inner_update_proximal(ftrl_update_data& d, float x, float* w)
 {
-  float* w = &wref;
   float gradient = d.update * x;
   float ng2 = w[W_G2] + gradient * gradient;
   float sqrt_ng2 = sqrtf(ng2);
@@ -156,10 +154,8 @@ void inner_update_proximal(ftrl_update_data& d, float x, float& wref)
   }
 }
 
-void inner_update_pistol_state_and_predict(ftrl_update_data& d, float x, float& wref)
+void inner_update_pistol_state_and_predict(ftrl_update_data& d, float x, float* w)
 {
-  float* w = &wref;
-
   float fabs_x = std::fabs(x);
   if (fabs_x > w[W_MX]) w[W_MX] = fabs_x;
 
@@ -170,9 +166,8 @@ void inner_update_pistol_state_and_predict(ftrl_update_data& d, float x, float& 
   d.predict += w[W_XT] * x;
 }
 
-void inner_update_pistol_post(ftrl_update_data& d, float x, float& wref)
+void inner_update_pistol_post(ftrl_update_data& d, float x, float* w)
 {
-  float* w = &wref;
   float gradient = d.update * x;
 
   w[W_ZT] += -gradient;
@@ -186,9 +181,8 @@ void inner_update_pistol_post(ftrl_update_data& d, float x, float& wref)
 // W_MX 3  maximum absolute value
 // W_WE 4  Wealth
 // W_MG 5  Maximum Lipschitz constant
-void inner_coin_betting_predict(ftrl_update_data& d, float x, float& wref)
+void inner_coin_betting_predict(ftrl_update_data& d, float x, float* w)
 {
-  float* w = &wref;
   float w_mx = w[W_MX];
   float w_xt = 0.0;
 
@@ -202,9 +196,8 @@ void inner_coin_betting_predict(ftrl_update_data& d, float x, float& wref)
   if (w_mx > 0) d.normalized_squared_norm_x += x * x / (w_mx * w_mx);
 }
 
-void inner_coin_betting_update_after_prediction(ftrl_update_data& d, float x, float& wref)
+void inner_coin_betting_update_after_prediction(ftrl_update_data& d, float x, float* w)
 {
-  float* w = &wref;
   float fabs_x = std::fabs(x);
   float gradient = d.update * x;
 
@@ -235,7 +228,7 @@ void coin_betting_predict(ftrl& b, single_learner&, example& ec)
 
   size_t num_features_from_interactions = 0;
   GD::foreach_feature(*b.all, ec, num_features_from_interactions,
-      [&update_data = b.data](float feat_value, uint64_t feat_index, float& feature_weight) {
+      [&update_data = b.data](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
         inner_coin_betting_predict(update_data, feat_value, feature_weight);
       });
 
@@ -256,7 +249,7 @@ void update_state_and_predict_pistol(ftrl& b, single_learner&, example& ec)
 
   size_t num_features_from_interactions = 0;
   GD::foreach_feature(*b.all, ec, num_features_from_interactions,
-      [&update_data = b.data](float feat_value, uint64_t feat_index, float& feature_weight) {
+      [&update_data = b.data](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
         inner_update_pistol_state_and_predict(update_data, feat_value, feature_weight);
       }
 
@@ -272,7 +265,7 @@ void update_after_prediction_proximal(ftrl& b, example& ec)
   b.data.update = b.all->loss->first_derivative(b.all->sd, ec.pred.scalar, ec.l.simple.label) * ec.weight;
 
   GD::foreach_feature(
-      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t feat_index, float& feature_weight) {
+      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
         inner_update_proximal(update_data, feat_value, feature_weight);
       });
 }
@@ -282,7 +275,7 @@ void update_after_prediction_pistol(ftrl& b, example& ec)
   b.data.update = b.all->loss->first_derivative(b.all->sd, ec.pred.scalar, ec.l.simple.label) * ec.weight;
 
   GD::foreach_feature(
-      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t feat_index, float& feature_weight) {
+      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
         inner_update_pistol_post(update_data, feat_value, feature_weight);
       });
 }
@@ -291,7 +284,7 @@ void coin_betting_update_after_prediction(ftrl& b, example& ec)
 {
   b.data.update = b.all->loss->first_derivative(b.all->sd, ec.pred.scalar, ec.l.simple.label) * ec.weight;
   GD::foreach_feature(
-      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t feat_index, float& feature_weight) {
+      *b.all, ec, [&update_data = b.data](float feat_value, uint64_t /*feat_index*/, float* feature_weight) {
         inner_coin_betting_update_after_prediction(update_data, feat_value, feature_weight);
       });
 }

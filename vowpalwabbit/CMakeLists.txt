@@ -240,7 +240,7 @@ add_library(vw STATIC ${vw_all_sources} ${vw_all_headers})
 
 target_link_libraries(vw
   PUBLIC
-    VowpalWabbit::explore Boost::boost ${spdlog_target} fmt::fmt
+    Boost::boost ${spdlog_target} fmt::fmt
   PRIVATE
     vw_common_flags Boost::program_options ${CMAKE_DL_LIBS} ${LINK_THREADS} vw_io
     # Workaround an issue where RapidJSON needed to be exported tom install the target. This is
@@ -271,24 +271,6 @@ target_include_directories(vw PUBLIC
 # Add natvis file if the Generator is Visual Studio
 if (MSVC_IDE)
   target_sources(vw PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/vw_types.natvis> )
-endif()
-
-if(NOT WIN32)
-  find_file(HELP2MAN_EXECUTABLE help2man HINTS /bin /usr/bin /usr/local/bin)
-  if (HELP2MAN_EXECUTABLE)
-    add_custom_target(manpage ALL
-      COMMAND ${HELP2MAN_EXECUTABLE}
-        --no-info
-        --name="Vowpal Wabbit -- fast online learning tool" $<TARGET_FILE:vw-bin>
-        --output=$<TARGET_FILE:vw-bin>.1
-      DEPENDS vw-bin)
-
-      if(VW_INSTALL)
-        install(FILES $<TARGET_FILE:vw-bin>.1 DESTINATION share/man/man1)
-      endif()
-  else()
-    message(STATUS "help2man not found, please install it to generate manpages")
-  endif()
 endif()
 
 # build main executable

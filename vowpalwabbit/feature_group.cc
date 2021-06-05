@@ -17,8 +17,6 @@ struct feature_slice  // a helper struct for functions using the set {v,i,space_
   audit_strings space_name;
 };
 
-void features::free_space_names(size_t i) { space_names.erase(space_names.begin() + i, space_names.end()); }
-
 void features::clear()
 {
   sum_feat_sq = 0.f;

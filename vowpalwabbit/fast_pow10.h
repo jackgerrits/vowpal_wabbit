@@ -88,7 +88,7 @@ static constexpr std::array<float, VALUES_BELOW_ZERO> pow_10_negative_lookup_tab
 
 // std::array::operator[] const is made constexpr in C++14, so this can only be guaranteed to be constexpr when this
 // standard is used.
-VW_STD14_CONSTEXPR inline float fast_pow10(int8_t exponent)
+constexpr inline float fast_pow10(int8_t exponent)
 {
   // If the result would be above the range float can represent, return inf.
   return exponent > details::VALUES_ABOVE_ZERO ? std::numeric_limits<float>::infinity()

@@ -11,6 +11,24 @@
 #include <vector>
 #include <string>
 
+template <typename FuncT>
+concept ForEachFeatWeightValueFunc = requires(FuncT func, float feature_value, uint64_t feature_index, float feature_weight)
+{
+  {
+    func(feature_value, feature_index, feature_weight)
+  }
+  ->std::convertible_to<void>;
+};
+
+template <typename FuncT>
+concept ForEachFeatWeightPtrFunc = requires(FuncT func, float feature_value, uint64_t feature_index, float* feature_weight)
+{
+  {
+    func(feature_value, feature_index, feature_weight)
+  }
+  ->std::convertible_to<void>;
+};
+
 namespace INTERACTIONS
 {
 /*
@@ -20,14 +38,6 @@ namespace INTERACTIONS
  * Previous behaviour was: include interactions of feature with itself only if its value != value^2.
  *
  */
-
-// 3 template functions to pass FuncT() proper argument (feature idx in regressor, or its coefficient)
-
-template <typename WeightsT, typename FuncT>
-inline void call_FuncT(WeightsT& weights, float ft_value, uint64_t ft_idx, FuncT func)
-{
-  func(ft_value, ft_idx, weights[ft_idx]);
-}
 
 // state data used in non-recursive feature generation algorithm
 // contains N feature_gen_data records (where N is length of interaction)
@@ -54,15 +64,26 @@ inline float INTERACTION_VALUE(float value1, float value2) { return value1 * val
 
 // #define GEN_INTER_LOOP
 
-template <typename WeightsT, typename FuncT>
-inline void inner_kernel(WeightsT& weights, features::const_iterator& begin, features::const_iterator& end,
-    uint64_t offset, feature_value ft_value, feature_index halfhash, FuncT func)
+inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end,
+    uint64_t offset, feature_value ft_value, feature_index halfhash, ForEachFeatWeightValueFunc auto func)
 {
   for (; begin != end; ++begin)
   {
     const auto interacted_value = INTERACTION_VALUE(ft_value, begin.value());
     const auto interacted_index = (begin.index() ^ halfhash) + offset;
     func(interacted_value, interacted_index, weights[interacted_index]);
+  }
+}
+
+
+inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end,
+    uint64_t offset, feature_value ft_value, feature_index halfhash, ForEachFeatWeightPtrFunc auto func)
+{
+  for (; begin != end; ++begin)
+  {
+    const auto interacted_value = INTERACTION_VALUE(ft_value, begin.value());
+    const auto interacted_index = (begin.index() ^ halfhash) + offset;
+    func(interacted_value, interacted_index, &weights[interacted_index]);
   }
 }
 

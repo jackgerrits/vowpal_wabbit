@@ -63,7 +63,7 @@ private:
 /// // Lambda has executed at this point.
 /// \endcode
 template <typename TScopeExitLambda>
-VW_ATTR(nodiscard)
+[[ nodiscard ]]
 inline details::scope_exit_caller<TScopeExitLambda> scope_exit(TScopeExitLambda&& lambda) noexcept
 {
   return details::scope_exit_caller<TScopeExitLambda>(std::forward<TScopeExitLambda>(lambda));

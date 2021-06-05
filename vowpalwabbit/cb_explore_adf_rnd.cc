@@ -153,7 +153,7 @@ float cb_explore_adf_rnd::get_initial_prediction(example* ec)
   float dot = 0.f;
   float norm = 0.f;
   GD::foreach_feature(weights, all->interactions, all->permutations, *ec,
-      [&dot, &norm](float feat_value, uint64_t feat_index, float feature_weight) {
+      [&dot, &norm](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
         dot += feat_value * feat_value;
         norm += feat_value * feature_weight;
       });

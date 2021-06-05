@@ -129,7 +129,7 @@ private:
 /// }
 /// \endcode
 template <typename T>
-VW_ATTR(nodiscard)
+[[ nodiscard ]]
 inline details::swap_guard_impl<T> swap_guard(T& original_location, T& value_to_swap) noexcept
 {
   return details::swap_guard_impl<T>(&original_location, &value_to_swap);
@@ -161,7 +161,7 @@ inline details::swap_guard_impl<T> swap_guard(T& original_location, T& value_to_
 /// }
 /// \endcode
 template <typename T>
-VW_ATTR(nodiscard)
+[[ nodiscard ]]
 inline details::swap_guard_impl_rvalue<T> swap_guard(T& original_location, T&& value_to_swap) noexcept
 {
   return details::swap_guard_impl_rvalue<T>(&original_location, std::forward<T>(value_to_swap));
@@ -193,7 +193,7 @@ inline details::swap_guard_impl_rvalue<T> swap_guard(T& original_location, T&& v
 /// }
 /// \endcode
 template <typename T>
-VW_ATTR(nodiscard)
+[[ nodiscard ]]
 inline details::swap_guard_impl_rvalue<T> stash_guard(T& original_location) noexcept
 {
   return details::swap_guard_impl_rvalue<T>(&original_location, std::forward<T>(T()));
