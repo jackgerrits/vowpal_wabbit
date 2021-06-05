@@ -102,8 +102,8 @@ void multipredict(
   {
     GD::multipredict_info<sparse_parameters> mp = {
         count, step, pred, all.weights.sparse_weights, static_cast<float>(all.sd->gravity)};
-    GD::foreach_feature(
-        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
+    GD::foreach_feature(all, ec, num_features_from_interactions,
+        [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
           GD::vec_add_multipredict(mp, feat_value, feature_weight);
         });
   }
@@ -111,8 +111,8 @@ void multipredict(
   {
     GD::multipredict_info<dense_parameters> mp = {
         count, step, pred, all.weights.dense_weights, static_cast<float>(all.sd->gravity)};
-    GD::foreach_feature(
-        all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
+    GD::foreach_feature(all, ec, num_features_from_interactions,
+        [&mp](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
           GD::vec_add_multipredict(mp, feat_value, feature_weight);
         });
   }

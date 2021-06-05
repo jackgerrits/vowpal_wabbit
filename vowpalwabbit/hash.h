@@ -42,15 +42,15 @@ namespace MURMUR_HASH_3
 {
   //-----------------------------------------------------------------------------
   // Finalization mix - force all bits of a hash block to avalanche
-  constexpr static inline uint32_t fmix(uint32_t h) noexcept
-  {
-    h ^= h >> 16;
-    h *= 0x85ebca6b;
-    h ^= h >> 13;
-    h *= 0xc2b2ae35;
-    h ^= h >> 16;
+constexpr static inline uint32_t fmix(uint32_t h) noexcept
+{
+  h ^= h >> 16;
+  h *= 0x85ebca6b;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35;
+  h ^= h >> 16;
 
-    return h;
+  return h;
   }
 
   //-----------------------------------------------------------------------------

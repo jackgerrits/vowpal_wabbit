@@ -216,10 +216,10 @@ void subtract_example(workspace& all, example* ec, example* ecsub)
 {
   features& wap_fs = ec->feature_space[wap_ldf_namespace];
   wap_fs.sum_feat_sq = 0;
-// Substract a given feature from example ec.
-// Rather than finding the corresponding namespace and feature in ec,
-// add a new feature with opposite value (but same index) to ec to a special wap_ldf_namespace.
-// This is faster and allows fast undo in unsubtract_example().
+  // Substract a given feature from example ec.
+  // Rather than finding the corresponding namespace and feature in ec,
+  // add a new feature with opposite value (but same index) to ec to a special wap_ldf_namespace.
+  // This is faster and allows fast undo in unsubtract_example().
   GD::foreach_feature(all, *ecsub, [ec](float feat_value, uint64_t feat_index, float /*feature_weight*/) {
     ec->feature_space[wap_ldf_namespace].push_back(-feat_value, feat_index);
   });

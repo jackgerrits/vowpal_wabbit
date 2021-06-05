@@ -412,13 +412,13 @@ void multipredict(
     multipredict_info<sparse_parameters> mp = {
         count, step, pred, g.all->weights.sparse_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_trunc_multipredict(mp, feat_value, feat_index);
           });
     else
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_multipredict(mp, feat_value, feat_index);
           });
   }
@@ -427,13 +427,13 @@ void multipredict(
     multipredict_info<dense_parameters> mp = {
         count, step, pred, g.all->weights.dense_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_trunc_multipredict(mp, feat_value, feat_index);
           });
     else
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_multipredict(mp, feat_value, feat_index);
           });
   }

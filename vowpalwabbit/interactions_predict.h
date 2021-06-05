@@ -12,7 +12,8 @@
 #include <string>
 
 template <typename FuncT>
-concept ForEachFeatWeightValueFunc = requires(FuncT func, float feature_value, uint64_t feature_index, float feature_weight)
+concept ForEachFeatWeightValueFunc = requires(
+    FuncT func, float feature_value, uint64_t feature_index, float feature_weight)
 {
   {
     func(feature_value, feature_index, feature_weight)
@@ -21,7 +22,8 @@ concept ForEachFeatWeightValueFunc = requires(FuncT func, float feature_value, u
 };
 
 template <typename FuncT>
-concept ForEachFeatWeightPtrFunc = requires(FuncT func, float feature_value, uint64_t feature_index, float* feature_weight)
+concept ForEachFeatWeightPtrFunc = requires(
+    FuncT func, float feature_value, uint64_t feature_index, float* feature_weight)
 {
   {
     func(feature_value, feature_index, feature_weight)
@@ -64,8 +66,8 @@ inline float INTERACTION_VALUE(float value1, float value2) { return value1 * val
 
 // #define GEN_INTER_LOOP
 
-inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end,
-    uint64_t offset, feature_value ft_value, feature_index halfhash, ForEachFeatWeightValueFunc auto func)
+inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end, uint64_t offset,
+    feature_value ft_value, feature_index halfhash, ForEachFeatWeightValueFunc auto func)
 {
   for (; begin != end; ++begin)
   {
@@ -75,9 +77,8 @@ inline void inner_kernel(auto& weights, features::const_iterator& begin, feature
   }
 }
 
-
-inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end,
-    uint64_t offset, feature_value ft_value, feature_index halfhash, ForEachFeatWeightPtrFunc auto func)
+inline void inner_kernel(auto& weights, features::const_iterator& begin, features::const_iterator& end, uint64_t offset,
+    feature_value ft_value, feature_index halfhash, ForEachFeatWeightPtrFunc auto func)
 {
   for (; begin != end; ++begin)
   {
