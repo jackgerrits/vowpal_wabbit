@@ -51,7 +51,7 @@ constexpr static inline uint32_t fmix(uint32_t h) noexcept
   h ^= h >> 16;
 
   return h;
-  }
+}
 
   //-----------------------------------------------------------------------------
   // Block read - if your platform needs to do endian-swapping or can only
