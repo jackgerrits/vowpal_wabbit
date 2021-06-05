@@ -8,17 +8,6 @@
 #include <cstddef>
 #include <functional>
 
-#ifndef _WIN32
-#  define NOMINMAX
-#  include <sys/mman.h>
-#endif
-
-// It appears that on OSX MAP_ANONYMOUS is mapped to MAP_ANON
-// https://github.com/leftmike/foment/issues/4
-#ifdef __APPLE__
-#  define MAP_ANONYMOUS MAP_ANON
-#endif
-
 #include "array_parameters_dense.h"
 #include "vw_exception.h"
 
@@ -112,8 +101,6 @@ public:
   sparse_parameters& operator=(sparse_parameters&&) noexcept = delete;
   sparse_parameters(sparse_parameters&&) noexcept = delete;
 
-  weight* first() { throw vw::error(vw::error_code::unsupported, "Allreduce currently not supported in sparse"); }
-
   // iterator with stride
   iterator begin()
   {
@@ -181,13 +168,6 @@ public:
   uint32_t stride_shift() const { return _stride_shift; }
 
   void stride_shift(uint32_t stride_shift) { _stride_shift = stride_shift; }
-
-#ifndef _WIN32
-  void share(size_t /* length */)
-  {
-    throw vw::error(vw::error_code::unsupported, "Operation not supported on Windows");
-  }
-#endif
 
   ~sparse_parameters()
   {
@@ -279,17 +259,6 @@ public:
     else
       dense_weights.set_zero(offset);
   }
-#ifndef _WIN32
-#  ifndef DISABLE_SHARED_WEIGHTS
-  inline void share(size_t length)
-  {
-    if (sparse)
-      sparse_weights.share(length);
-    else
-      dense_weights.share(length);
-  }
-#  endif
-#endif
 
   inline void stride_shift(uint32_t stride_shift)
   {

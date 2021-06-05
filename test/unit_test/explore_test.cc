@@ -8,7 +8,7 @@
 #include "test_common.h"
 
 #include <vector>
-#include "../../explore/explore.h"
+#include "explore.h"
 
 #include "cb_explore_pdf.h"
 

@@ -10,9 +10,9 @@
 #include "future_compat.h"
 #include "hash.h"
 
-VW_STD14_CONSTEXPR inline uint64_t hashall(const char* s, size_t len, uint64_t h) { return uniform_hash(s, len, h); }
+constexpr inline uint64_t hashall(const char* s, size_t len, uint64_t h) { return uniform_hash(s, len, h); }
 
-VW_STD14_CONSTEXPR inline uint64_t hashstring(const char* s, size_t len, uint64_t h)
+constexpr inline uint64_t hashstring(const char* s, size_t len, uint64_t h)
 {
   const char* front = s;
   while (len > 0 && front[0] <= 0x20 && static_cast<int>(front[0]) >= 0)

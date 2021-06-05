@@ -35,8 +35,6 @@ int print_tag_by_ref(std::stringstream& ss, const v_array<char>& tag)
   return tag.begin() != tag.end();
 }
 
-int print_tag(std::stringstream& ss, v_array<char> tag) { return print_tag_by_ref(ss, tag); }
-
 std::string workspace::get_setupfn_name(reduction_setup_fn setup_fn)
 {
   const auto loc = _setup_name_map.find(setup_fn);
@@ -47,11 +45,6 @@ std::string workspace::get_setupfn_name(reduction_setup_fn setup_fn)
 void workspace::build_setupfn_name_dict()
 {
   for (auto&& setup_tuple : reduction_stack) { _setup_name_map[std::get<1>(setup_tuple)] = std::get<0>(setup_tuple); }
-}
-
-void print_result(vw::io::writer* f, float res, float unused, v_array<char> tag)
-{
-  print_result_by_ref(f, res, unused, tag);
 }
 
 void print_result_by_ref(vw::io::writer* f, float res, float, const v_array<char>& tag)
@@ -210,8 +203,6 @@ workspace::workspace() : options(nullptr, nullptr)
               // updates (see parse_args.cc)
   numpasses = 1;
 
-  print = print_result;
-  print_text = print_raw_text;
   print_by_ref = print_result_by_ref;
   print_text_by_ref = print_raw_text_by_ref;
   lda = 0;

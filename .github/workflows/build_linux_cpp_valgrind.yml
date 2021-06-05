@@ -17,8 +17,9 @@ jobs:
       image: jackgerrits/vowpalwabbit-ubuntu-2004
     runs-on: ubuntu-latest
     steps:
-      # v1 must be used because newer versions require a node.js version that will not run on this old image.
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - name: Install Valgrind
         shell: bash
         run: |

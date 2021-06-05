@@ -173,37 +173,11 @@ public:
     (--_end)->~T();
   }
 
-  VW_DEPRECATED("v_array::pop() is deprecated. Use pop_back()")
-  T pop()
-  {
-    T ret = back();
-    pop_back();
-    return ret;
-  }
-
-  VW_DEPRECATED("v_array::last() is deprecated. Use back()")
-  T last() const { return *(_end - 1); }
-
   bool empty() const { return _begin == _end; }
 
-  VW_DEPRECATED("v_array::decr() is deprecated. Use pop_back()")
-  void decr() { _end--; }
-
-  VW_DEPRECATED("v_array::incr() is deprecated. Use push_back()")
-  void incr()
-  {
-    if (_end == _end_array) reserve_nocheck(2 * capacity() + 3);
-    _end++;
-  }
   T& operator[](size_t i) const { return _begin[i]; }
   inline size_t size() const { return _end - _begin; }
   inline size_t capacity() const { return _end_array - _begin; }
-
-  // maintain the original (deprecated) interface for compatibility. To be removed in vw 10
-  VW_DEPRECATED(
-      "v_array::resize() is deprecated. Use reserve() instead. For standard resize behavior, use "
-      "resize_but_with_stl_behavior()")
-  void resize(size_t length) { reserve_nocheck(length); }
 
   // change the number of elements in the vector
   // to be renamed to resize() in vw 10
@@ -421,44 +395,8 @@ inline v_array<T> v_init()
   return v_array<T>();
 }
 
-template <class T>
-VW_DEPRECATED("Use v_array's copy constructor or assignment directly instead")
-void copy_array(v_array<T>& dst, const v_array<T>& src)
-{
-  dst = src;
-}
 
-template <class T>
-VW_DEPRECATED("Use v_array's copy constructor or assignment directly instead")
-void copy_array_no_memcpy(v_array<T>& dst, const v_array<T>& src)
-{
-  dst.clear();
-  for (const auto& item : src) { dst.push_back(item); }
-}
 
-template <class T>
-VW_DEPRECATED("Use v_array's copy constructor directly instead")
-void copy_array(v_array<T>& dst, const v_array<T>& src, T (*copy_item)(const T&))
-{
-  dst.clear();
-  for (const auto& item : src) { dst.push_back(copy_item(*item)); }
-}
-
-template <class T>
-VW_DEPRECATED("Use v_array::insert instead")
-void push_many(v_array<T>& v, const T* src, size_t num)
-{
-  v.insert(v.end(), src, src + num);
-}
-
-template <class T>
-VW_DEPRECATED("calloc_reserve is no longer supported. You should use appropriate constructors instead.")
-void calloc_reserve(v_array<T>& v, size_t length)
-{
-  v.clear();
-  v.reserve(length);
-  std::memset(v.begin(), 0, length * sizeof(T));
-}
 
 template <class T>
 bool v_array_contains(const v_array<T>& A, T x)
@@ -485,39 +423,3 @@ std::ostream& operator<<(std::ostream& os, const v_array<std::pair<T, U> >& v)
   os << " ]";
   return os;
 }
-
-VW_WARNING_STATE_PUSH
-VW_WARNING_DISABLE_DEPRECATED_USAGE
-
-template <class T>
-VW_DEPRECATED("pop is deprecated and will be removed in a future version.")
-v_array<T> pop(v_array<v_array<T> >& stack)
-{
-  if (stack.size() > 0)
-  {
-    stack.pop_back();
-    return stack.back();
-  }
-  return v_array<T>();
-}
-
-VW_DEPRECATED("v_string is deprecated and will be removed in a future version.")
-typedef v_array<unsigned char> v_string;
-
-VW_DEPRECATED("string2v_string is deprecated and will be removed in a future version.")
-inline v_string string2v_string(const std::string& s)
-{
-  v_string res;
-  if (!s.empty()) { res.insert(res.end(), s.begin(), s.end()); }
-  return res;
-}
-
-VW_DEPRECATED("v_string2string is deprecated and will be removed in a future version.")
-inline std::string v_string2string(const v_string& v_s)
-{
-  std::string res;
-  for (auto i = v_s.cbegin(); i != v_s.cend(); ++i) res.push_back(*i);
-  return res;
-}
-
-VW_WARNING_STATE_POP

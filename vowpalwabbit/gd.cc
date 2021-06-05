@@ -142,9 +142,9 @@ float average_update(float total_weight, float normalized_sum_norm_x, float neg_
 template <bool sqrt_rate, bool feature_mask_off, size_t adaptive, size_t normalized, size_t spare>
 void train(gd& g, example& ec, float update)
 {
-  if VW_STD17_CONSTEXPR (normalized != 0) { update *= g.update_multiplier; }
+  if constexpr (normalized != 0) { update *= g.update_multiplier; }
   VW_DBG(ec) << "gd: train() spare=" << spare << std::endl;
-  foreach_feature(*g.all, ec, [&update](float feat_value, uint64_t feat_index, float& feature_weight) {
+  foreach_feature(*g.all, ec, [&update](float feat_value, uint64_t /*feat_index*/, float& feature_weight) {
     update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare>(update, feat_value, feature_weight);
   });
 }
@@ -354,7 +354,7 @@ inline float trunc_predict(workspace& all, example& ec, double gravity, size_t& 
   const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
   float prediction = simple_red_features.initial;
   foreach_feature(all, ec, num_interacted_features,
-      [&prediction, float_grav = static_cast<float>(gravity)](float feat_value, uint64_t feat_index,
+      [&prediction, float_grav = static_cast<float>(gravity)](float feat_value, uint64_t /*feat_index*/,
           float feature_weight) { prediction += trunc_weight(feature_weight, float_grav) * feat_value; });
   return prediction;
 }
@@ -412,13 +412,13 @@ void multipredict(
     multipredict_info<sparse_parameters> mp = {
         count, step, pred, g.all->weights.sparse_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_trunc_multipredict(mp, feat_value, feat_index);
           });
     else
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_multipredict(mp, feat_value, feat_index);
           });
   }
@@ -427,13 +427,13 @@ void multipredict(
     multipredict_info<dense_parameters> mp = {
         count, step, pred, g.all->weights.dense_weights, static_cast<float>(all.sd->gravity)};
     if (l1)
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_trunc_multipredict(mp, feat_value, feat_index);
           });
     else
-      foreach_feature(
-          all, ec, num_features_from_interactions, [&mp](float feat_value, uint64_t feat_index, float& feature_weight) {
+      foreach_feature(all, ec, num_features_from_interactions,
+          [&mp](float feat_value, uint64_t feat_index, float& /*feature_weight*/) {
             vec_add_multipredict(mp, feat_value, feat_index);
           });
   }
@@ -473,7 +473,7 @@ inline float compute_rate_decay(power_data& s, float& fw)
     else
       rate_decay = powf(w[adaptive], s.minus_power_t);
   }
-  if VW_STD17_CONSTEXPR (normalized != 0)
+  if constexpr (normalized != 0)
   {
     if (sqrt_rate)
     {
@@ -523,7 +523,7 @@ inline void pred_per_update_feature(norm_data& nd, float x, float& fw)
       w = nd.extra_state;
     }
     if (adaptive) w[adaptive] += nd.grad_squared * x2;
-    if VW_STD17_CONSTEXPR (normalized != 0)
+    if constexpr (normalized != 0)
     {
       float x_abs = fabsf(x);
       if (x_abs > w[normalized])  // new scale discovered
@@ -572,11 +572,11 @@ float get_pred_per_update(gd& g, example& ec)
   if (grad_squared == 0 && !stateless) return 1.;
 
   norm_data nd = {grad_squared, 0., 0., {g.neg_power_t, g.neg_norm_power}, {0}};
-  foreach_feature(all, ec, [&nd](float feat_value, uint64_t feat_index, float& feature_weight) {
+  foreach_feature(all, ec, [&nd](float feat_value, uint64_t /*feat_index*/, float& feature_weight) {
     pred_per_update_feature<sqrt_rate, feature_mask_off, adaptive, normalized, spare, stateless>(
         nd, feat_value, feature_weight);
   });
-  if VW_STD17_CONSTEXPR (normalized != 0)
+  if constexpr (normalized != 0)
   {
     if (!stateless)
     {
@@ -600,7 +600,7 @@ template <bool sqrt_rate, bool feature_mask_off, bool adax, size_t adaptive, siz
     bool stateless>
 float sensitivity(gd& g, example& ec)
 {
-  if VW_STD17_CONSTEXPR (adaptive || normalized)
+  if constexpr (adaptive || normalized)
     return get_pred_per_update<sqrt_rate, feature_mask_off, adax, adaptive, normalized, spare, stateless>(g, ec);
   else
   {

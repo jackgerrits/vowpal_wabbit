@@ -211,18 +211,16 @@ void compute_wap_values(std::vector<COST_SENSITIVE::wclass*> costs)
     costs[i]->wap_value = costs[i - 1]->wap_value + (costs[i]->x - costs[i - 1]->x) / static_cast<float>(i);
 }
 
-// Substract a given feature from example ec.
-// Rather than finding the corresponding namespace and feature in ec,
-// add a new feature with opposite value (but same index) to ec to a special wap_ldf_namespace.
-// This is faster and allows fast undo in unsubtract_example().
-void subtract_feature(example& ec, float feature_value_x, uint64_t weight_index) {}
-
 // Iterate over all features of ecsub including quadratic and cubic features and subtract them from ec.
 void subtract_example(workspace& all, example* ec, example* ecsub)
 {
   features& wap_fs = ec->feature_space[wap_ldf_namespace];
   wap_fs.sum_feat_sq = 0;
-  GD::foreach_feature(all, *ecsub, [ec](float feat_value, uint64_t feat_index, float feature_weight) {
+  // Substract a given feature from example ec.
+  // Rather than finding the corresponding namespace and feature in ec,
+  // add a new feature with opposite value (but same index) to ec to a special wap_ldf_namespace.
+  // This is faster and allows fast undo in unsubtract_example().
+  GD::foreach_feature(all, *ecsub, [ec](float feat_value, uint64_t feat_index, float /*feature_weight*/) {
     ec->feature_space[wap_ldf_namespace].push_back(-feat_value, feat_index);
   });
   ec->indices.push_back(wap_ldf_namespace);

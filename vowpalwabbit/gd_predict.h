@@ -15,20 +15,18 @@
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::gd_predict
 
-template <typename FuncT>
-concept ForEachFeatFunc = requires(FuncT func, float feature_value, uint64_t feature_index, float& feature_weight)
-{
-  {
-    func(func, feature_index, feature_weight)
-  }
-  ->std::convertible_to<void>;
-};
 namespace GD
 {
-template <typename WeightsT, typename FuncT>
-void foreach_feature_no_inter(WeightsT& weights, const features& fs, uint64_t offset, float mult, FuncT func)
+void foreach_feature_no_inter(
+    auto& weights, const features& fs, uint64_t offset, float mult, ForEachFeatWeightValueFunc auto func)
 {
   for (const auto& f : fs) { func(mult * f.value(), f.index() + offset, weights[(f.index() + offset)]); }
+}
+
+void foreach_feature_no_inter(
+    auto& weights, const features& fs, uint64_t offset, float mult, ForEachFeatWeightPtrFunc auto func)
+{
+  for (const auto& f : fs) { func(mult * f.value(), f.index() + offset, &weights[(f.index() + offset)]); }
 }
 
 template <typename WeightsT, typename FuncT>
@@ -62,8 +60,9 @@ inline float inline_predict(WeightsT& weights, const std::vector<std::vector<nam
 {
   auto accumulator = initial;
   foreach_feature(weights, interactions, permutations, ec,
-      [&accumulator](
-          float feat_value, uint64_t feat_index, float feature_weight) { accumulator += feat_value * feature_weight; });
+      [&accumulator](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
+        accumulator += feat_value * feature_weight;
+      });
   return accumulator;
 }
 
@@ -73,8 +72,9 @@ inline float inline_predict(WeightsT& weights, const std::vector<std::vector<nam
 {
   auto accumulator = initial;
   foreach_feature(weights, interactions, permutations, ec, num_interacted_features,
-      [&accumulator](
-          float feat_value, uint64_t feat_index, float feature_weight) { accumulator += feat_value * feature_weight; });
+      [&accumulator](float feat_value, uint64_t /*feat_index*/, float feature_weight) {
+        accumulator += feat_value * feature_weight;
+      });
   return accumulator;
 }
 }  // namespace GD

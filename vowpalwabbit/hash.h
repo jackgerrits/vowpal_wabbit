@@ -29,8 +29,6 @@ license as described in the file LICENSE.
 //----
 #pragma once
 
-#include "future_compat.h"
-
 #include <sys/types.h>
 #include <cstdint>
 
@@ -44,16 +42,16 @@ namespace MURMUR_HASH_3
 {
   //-----------------------------------------------------------------------------
   // Finalization mix - force all bits of a hash block to avalanche
-  VW_STD14_CONSTEXPR static inline uint32_t fmix(uint32_t h) noexcept
-  {
-    h ^= h >> 16;
-    h *= 0x85ebca6b;
-    h ^= h >> 13;
-    h *= 0xc2b2ae35;
-    h ^= h >> 16;
+constexpr static inline uint32_t fmix(uint32_t h) noexcept
+{
+  h ^= h >> 16;
+  h *= 0x85ebca6b;
+  h ^= h >> 13;
+  h *= 0xc2b2ae35;
+  h ^= h >> 16;
 
-    return h;
-  }
+  return h;
+}
 
   //-----------------------------------------------------------------------------
   // Block read - if your platform needs to do endian-swapping or can only
@@ -64,7 +62,7 @@ namespace MURMUR_HASH_3
   }
 }
 
-VW_STD14_CONSTEXPR inline uint64_t uniform_hash(const void* key, size_t len, uint64_t seed)
+constexpr inline uint64_t uniform_hash(const void* key, size_t len, uint64_t seed)
 {
   const uint8_t* data = (const uint8_t*)key;
   const int nblocks = (int)len / 4;
@@ -91,25 +89,23 @@ VW_STD14_CONSTEXPR inline uint64_t uniform_hash(const void* key, size_t len, uin
   }
 
   // --- tail
-  const uint8_t * tail = (const uint8_t*)(data + nblocks * 4);
+  const uint8_t* tail = (const uint8_t*)(data + nblocks * 4);
 
   uint32_t k1 = 0;
 
-  // The 'fall through' comments below silence the implicit-fallthrough warning introduced in GCC 7.
-  // Once we move to C++17 these should be replaced with the [[fallthrough]] attribute.
   switch (len & 3u)
   {
   case 3:
     k1 ^= tail[2] << 16;
-    VW_FALLTHROUGH
+    [[fallthrough]];
   case 2:
     k1 ^= tail[1] << 8;
-    VW_FALLTHROUGH
+    [[fallthrough]];
   case 1: k1 ^= tail[0];
     k1 *= c1;
     k1 = rotl32(k1, 15);
     k1 *= c2; h1 ^= k1;
-    VW_FALLTHROUGH
+    [[fallthrough]];
   default:
     break;
   }

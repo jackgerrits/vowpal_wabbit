@@ -1,37 +1,5 @@
 #pragma once
 
-#if __cplusplus >= 201103L || defined(_MSC_VER) && (_MSC_VER >= 1900)
-
-#if __cplusplus >= 201402L || defined(_MSC_VER) && (_MSC_VER >= 1910) && (_MSVC_LANG >= 201402L)
-#define HAS_STD14
-#endif
-
-#if __cplusplus >= 201703L  || defined(_MSC_VER) && (_MSC_VER >= 1914) && (_MSVC_LANG >= 201703L)
-#define HAS_STD17
-#endif
-
-#ifdef HAS_STD17
-#define VW_STD17_CONSTEXPR constexpr
-#define VW_ATTR(name) [[ name ]]
-#    define VW_FALLTHROUGH VW_ATTR(fallthrough);
-#else
-#define VW_STD17_CONSTEXPR
-#define VW_ATTR(name)
-#    define VW_FALLTHROUGH  // fall through
-#endif
-
-#ifdef HAS_STD14
-#define VW_STD14_CONSTEXPR constexpr
-#define VW_DEPRECATED(message) [[deprecated(message)]]
-#else
-#define VW_STD14_CONSTEXPR
-#define VW_DEPRECATED(message)
-#endif
-
-#else
-#error "At least C++11 is required."
-#endif
-
 // The following section handles silencing specific warnings in the codebase. This section doesn't need to be modified, skip to the next block to add warnings.
 #if defined(_MSC_VER)
     #define VW_WARNING_STATE_PUSH           __pragma(warning( push ))

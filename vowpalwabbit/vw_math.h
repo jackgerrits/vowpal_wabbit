@@ -25,7 +25,7 @@ bool are_same_rel(T lhs, T rhs, T tolerance = DEFAULT_TOLERANCE)
   return std::abs(lhs - rhs) <= (tolerance * (std::abs(lhs) + std::abs(rhs)));
 }
 
-VW_STD14_CONSTEXPR inline int64_t factorial(int64_t n) noexcept
+constexpr inline int64_t factorial(int64_t n) noexcept
 {
   int64_t result = 1;
   for (int64_t i = 2; i <= n; i++) { result *= i; }
@@ -47,7 +47,7 @@ inline int64_t number_of_permutations_with_repetition(int64_t n, int64_t k)
 constexpr inline float sign(float w) noexcept { return (w <= 0.f) ? -1.f : 1.f; }
 
 /// C(n,k) = n!/(k!(n-k)!)
-VW_STD14_CONSTEXPR inline int64_t choose(int64_t n, int64_t k) noexcept
+constexpr inline int64_t choose(int64_t n, int64_t k) noexcept
 {
   if (k > n) return 0;
   if (k < 0) return 0;
