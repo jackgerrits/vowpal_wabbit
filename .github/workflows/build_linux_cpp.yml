@@ -20,8 +20,9 @@ jobs:
       matrix:
         BUILD_CONFIGURATION: ['Debug', 'Release']
     steps:
-      # v1 must be used because newer versions require a node.js version that will not run on this old image.
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - name: Build C++
         shell: bash
         run: ./.scripts/linux/build.sh ${{ matrix.config.BUILD_CONFIGURATION }}

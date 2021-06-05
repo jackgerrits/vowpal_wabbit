@@ -16,7 +16,9 @@ jobs:
       image: jackgerrits/vowpalwabbit-ubuntu-2004
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - name: Build with coverage C++
         shell: bash
         run: ./.scripts/linux/build-with-coverage.sh
