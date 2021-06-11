@@ -50,6 +50,84 @@ int read_features_string(vw* all, v_array<example*>& examples)
   return static_cast<int>(num_chars_initial);
 }
 
+void add_many(std::string& str, char c, size_t how_many)
+{
+  str.reserve(str.size() + how_many);
+  for (auto i = 0; i < how_many; i++) { str += c; }
+}
+
+bool is_encoded_char(char c)
+{
+  auto current = static_cast<uint8_t>(c);
+  return (current < 32 || current > 126);
+}
+
+std::string VW::diagnostics::make_diagnostic_underline(VW::string_view line, size_t start_idx, size_t end_idx)
+{
+  assert(end_idx >= start_idx);
+  assert(start_idx < line.size());
+  assert(end_idx < line.size());
+  auto encoded_start_index = VW::diagnostics::to_encoded_string_index(line, start_idx);
+  auto encoded_end_index = VW::diagnostics::to_encoded_string_index(line, end_idx);
+  // One of the 4 is already ^
+  if ((start_idx == end_idx) && is_encoded_char(line[end_idx])) { encoded_end_index += 3; }
+  if ((start_idx != end_idx) && is_encoded_char(line[end_idx])) { encoded_end_index += 4; }
+
+  std::string result;
+  if (encoded_start_index > 0) { add_many(result, ' ', encoded_start_index); }
+  result += '^';
+  if (encoded_start_index != encoded_end_index) { add_many(result, '~', encoded_end_index - encoded_start_index); }
+  return result;
+}
+
+size_t VW::diagnostics::to_encoded_string_index(VW::string_view str, size_t index)
+{
+  size_t encoded_index = 0;
+  index = std::min(str.size(), index);
+  for (size_t i = 0; i < index; i++)
+  {
+    if (is_encoded_char(str[i]))
+    {
+      // Every encoded character is width 4.
+      encoded_index += 4;
+    }
+    else
+    {
+      encoded_index++;
+    }
+  }
+  return encoded_index;
+}
+
+std::string byte_to_hex_string(uint8_t data)
+{
+  constexpr std::array<char, 16> hex_characters = {
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+  std::string ret = "\\x";
+  ret.reserve(4);
+
+  ret += hex_characters[data >> 4];
+  ret += hex_characters[data & 0x0F];
+  return ret;
+}
+
+std::string VW::diagnostics::encode_string(VW::string_view str)
+{
+  std::string result = "";
+  result.reserve(str.size());
+  for (size_t i = 0; i < str.size(); i++)
+  {
+    auto current = static_cast<uint8_t>(str[i]);
+    if (current < 32 || current > 126) {result += byte_to_hex_string(str[i]); }
+    else
+    {
+      result += str[i];
+    }
+  }
+  return result;
+}
+
 template <bool audit>
 class TC_parser
 {
@@ -78,27 +156,16 @@ public:
 
   // TODO: Currently this function is called by both warning and error conditions. We only log
   //      to warning here though.
-  inline FORCE_INLINE void parserWarning(const char* message, VW::string_view var_msg, const char* message2)
+  inline FORCE_INLINE void parserWarning(
+      VW::string_view message, VW::string_view input_line, size_t index)
   {
-    // VW::string_view will output the entire view into the output stream.
-    // That means if there is a null character somewhere in the range, it will terminate
-    // the stringstream at that point! Minor hack to give us the behavior we actually want here (i think)..
-    // the alternative is to do what the old code was doing.. str(_line).c_str()...
-    // TODO: Find a sane way to handle nulls in the middle of a string (either VW::string_view or substring)
-    auto tmp_view = _line.substr(0, _line.find('\0'));
-    std::stringstream ss;
-    ss << message << var_msg << message2 << "in Example #" << this->_p->end_parsed_examples.load() << ": \"" << tmp_view
-       << "\"";
-
-    if (_p->strict_parse)
-    {
-      // maintain newline behavior
-      ss << std::endl;
-      THROW_EX(VW::strict_parse_exception, ss.str());
-    }
+    auto encoded_line = VW::diagnostics::encode_string(input_line);
+    auto pointer = VW::diagnostics::make_diagnostic_underline(input_line, index, index);
+    auto msg = fmt::format("Parse error: {}\n{}\n{}", message, encoded_line, pointer);
+    if (_p->strict_parse) { THROW_EX(VW::strict_parse_exception, msg); }
     else
     {
-      logger::errlog_warn(ss.str());
+      logger::errlog_warn(msg);
     }
   }
 
@@ -137,8 +204,8 @@ public:
       if (std::isnan(_v))
       {
         _v = float_feature_value = 0.f;
-        parserWarning(
-            "warning: invalid feature value:\"", _line.substr(_read_idx), "\" read as NaN. Replacing with 0.");
+        auto warning_msg = fmt::format("warning: invalid feature value:\"{}\" read as NaN. Replacing with 0.", _line.substr(_read_idx));
+        parserWarning(warning_msg, _line, _read_idx);
       }
       _read_idx += end_read;
       return true;
@@ -147,7 +214,7 @@ public:
     {
       _v = float_feature_value = 0.f;
       // syntax error
-      parserWarning("malformed example! '|', ':', space, or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("'|', ':', space, or EOL expected", _line, _read_idx);
       return true;
     }
   }
@@ -346,20 +413,19 @@ public:
       size_t end_read = 0;
       VW::string_view sv = _line.substr(_read_idx);
       _cur_channel_v = parseFloat(sv.begin(), end_read, sv.end());
-      if (end_read + _read_idx >= _line.size())
-      { parserWarning("malformed example! Float expected after : \"", _line.substr(0, _read_idx), "\""); }
+      if (end_read + _read_idx >= _line.size()) { parserWarning("Float expected", _line, _read_idx); }
       if (std::isnan(_cur_channel_v))
       {
         _cur_channel_v = 1.f;
-        parserWarning(
-            "warning: invalid namespace value:\"", _line.substr(_read_idx), "\" read as NaN. Replacing with 1.");
+        auto err_msg = fmt::format("invalid namespace value:\"{}\" read as NaN. Replacing with 0.", _line.substr(_read_idx));
+        parserWarning(err_msg, _line, _read_idx);
       }
       _read_idx += end_read;
     }
     else
     {
       // syntax error
-      parserWarning("malformed example! '|',':', space, or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("'|',':', space, or EOL expected", _line, _read_idx);
     }
   }
 
@@ -369,7 +435,7 @@ public:
         _line[_read_idx] == ':' || _line[_read_idx] == '\r')
     {
       // syntax error
-      parserWarning("malformed example! String expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("String expected", _line, _read_idx);
     }
     else
     {
@@ -395,7 +461,7 @@ public:
     if (!(_read_idx >= _line.size() || _line[_read_idx] == '|' || _line[_read_idx] == '\r'))
     {
       // syntax error
-      parserWarning("malformed example! '|',space, or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("'|', space, or EOL expected", _line, _read_idx);
     }
   }
 
@@ -429,8 +495,7 @@ public:
     else
     {
       // syntax error
-      parserWarning(
-          "malformed example! '|',String,space, or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("'|', String, space, or EOL expected", _line, _read_idx);
     }
     if (_new_index && _ae->feature_space[_index].size() > 0) _ae->indices.push_back(_index);
   }
@@ -445,7 +510,7 @@ public:
     if (_read_idx < _line.size() && _line[_read_idx] != '\r')
     {
       // syntax error
-      parserWarning("malformed example! '|' or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
+      parserWarning("'|' or EOL expected", _line, _read_idx);
     }
   }
 
