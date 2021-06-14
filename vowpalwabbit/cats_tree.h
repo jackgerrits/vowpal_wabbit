@@ -6,11 +6,11 @@
 #include "learner.h"
 #include "options.h"
 #include "error_reporting.h"
-namespace VW
+namespace vw
 {
 namespace cats_tree
 {
-LEARNER::base_learner* setup(config::options_i& options, vw& all);
+LEARNER::base_learner* setup(config::options_i& options, workspace& all);
 
 struct tree_node
 {
@@ -82,4 +82,4 @@ private:
 };
 
 }  // namespace cats_tree
-}  // namespace VW
+}  // namespace vw

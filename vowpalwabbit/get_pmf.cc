@@ -11,18 +11,18 @@
 
 // Aliases
 using std::endl;
-using VW::cb_continuous::continuous_label;
-using VW::cb_continuous::continuous_label_elm;
-using VW::config::make_option;
-using VW::config::option_group_definition;
-using VW::config::options_i;
-using VW::LEARNER::single_learner;
+using vw::cb_continuous::continuous_label;
+using vw::cb_continuous::continuous_label_elm;
+using vw::config::make_option;
+using vw::config::option_group_definition;
+using vw::config::options_i;
+using vw::LEARNER::single_learner;
 
 // Enable/Disable indented debug statements
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_explore_get_pmf
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
@@ -43,7 +43,7 @@ private:
 int get_pmf::learn(example& ec, experimental::api_status*)
 {
   _base->learn(ec);
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
 int get_pmf::predict(example& ec, experimental::api_status*)
@@ -51,7 +51,7 @@ int get_pmf::predict(example& ec, experimental::api_status*)
   uint32_t base_prediction;
 
   {  // predict & restore prediction
-    auto restore = VW::stash_guard(ec.pred);
+    auto restore = vw::stash_guard(ec.pred);
     _base->predict(ec);
     base_prediction = ec.pred.multiclass - 1;
   }
@@ -60,7 +60,7 @@ int get_pmf::predict(example& ec, experimental::api_status*)
   ec.pred.a_s.clear();
   ec.pred.a_s.push_back({base_prediction, 1.0f});
 
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
 void get_pmf::init(single_learner* p_base, float epsilon)
@@ -79,7 +79,7 @@ void predict_or_learn(get_pmf& reduction, single_learner&, example& ec)
   else
     reduction.predict(ec, &status);
 
-  if (status.get_error_code() != VW::experimental::error_code::success)
+  if (status.get_error_code() != vw::experimental::error_code::success)
   { VW_DBG(ec) << status.get_error_msg() << endl; }
 }
 
@@ -87,7 +87,7 @@ void predict_or_learn(get_pmf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* get_pmf_setup(config::options_i& options, vw& all)
+LEARNER::base_learner* get_pmf_setup(config::options_i& options, workspace& all)
 {
   option_group_definition new_options("Continuous actions - convert to pmf");
   bool invoked = false;
@@ -109,4 +109,4 @@ LEARNER::base_learner* get_pmf_setup(config::options_i& options, vw& all)
   return make_base(l);
 }
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

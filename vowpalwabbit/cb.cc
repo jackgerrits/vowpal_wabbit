@@ -16,9 +16,9 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CB
 {
@@ -32,7 +32,7 @@ std::pair<bool, cb_class> get_observed_cost_cb(const label& ld)
   return std::make_pair(false, CB::cb_class{});
 }
 
-void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<VW::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data*, CB::label& ld, std::vector<vw::string_view>& words, reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -89,7 +89,7 @@ label_parser cb_label = {
   // default_label
   [](polylabel* v) { CB::default_label(v->cb); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     CB::parse_label(p, sd, v->cb, words, red_features);
   },
   // cache_label
@@ -122,7 +122,7 @@ std::string known_cost_to_str(CB::cb_class* known_cost)
   return label_string.str();
 }
 
-void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, CB::cb_class* known_cost)
+void print_update(workspace& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, CB::cb_class* known_cost)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -192,7 +192,7 @@ void default_label(CB_EVAL::label& ld)
 bool test_label(CB_EVAL::label& ld) { return CB::is_test_label(ld.event); }
 
 
-void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<VW::string_view>& words,
+void parse_label(parser* p, shared_data* sd, CB_EVAL::label& ld, std::vector<vw::string_view>& words,
     reduction_features& red_features)
 {
   if (words.size() < 2) THROW("Evaluation can not happen without an action and an exploration");
@@ -211,7 +211,7 @@ label_parser cb_eval = {
   // default_label
   [](polylabel* v) { CB_EVAL::default_label(v->cb_eval); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     CB_EVAL::parse_label(p, sd, v->cb_eval, words, red_features);
   },
   // cache_label

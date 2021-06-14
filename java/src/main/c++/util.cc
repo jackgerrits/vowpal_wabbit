@@ -26,7 +26,7 @@ void rethrow_cpp_exception_as_java_exception(JNIEnv* env)
   {
     throw_java_exception(env, "java/lang/OutOfMemoryError", e.what());
   }
-  catch (const VW::vw_unrecognised_option_exception& e)
+  catch (const vw::vw_unrecognised_option_exception& e)
   {
     throw_java_exception(env, "java/lang/IllegalArgumentException", e.what());
   }

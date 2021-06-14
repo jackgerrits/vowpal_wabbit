@@ -18,12 +18,12 @@
 //#define B_SEARCH_MAX_ITER 50
 #define B_SEARCH_MAX_ITER 20
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace COST_SENSITIVE;
-using namespace VW::config;
+using namespace vw::config;
 
 // TODO: cs_active should have its own logger instance (since it uses its own debug flag)
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 using std::endl;
 
@@ -60,8 +60,8 @@ struct cs_active
   bool is_baseline;
   bool use_domination;
 
-  vw* all;  // statistics, loss
-  VW::LEARNER::base_learner* l;
+  workspace* all;  // statistics, loss
+  vw::LEARNER::base_learner* l;
 
   v_array<lq_data> query_data;
 
@@ -102,7 +102,7 @@ inline void inner_loop(cs_active& cs_a, single_learner& base, example& ec, uint3
   base.predict(ec, i - 1);
   if (is_learn)
   {
-    vw& all = *cs_a.all;
+    workspace& all = *cs_a.all;
     ec.weight = 1.;
     if (is_simulation)
     {
@@ -188,7 +188,7 @@ void predict_or_learn(cs_active& cs_a, single_learner& base, example& ec)
     std::stringstream filename;
     filename << cs_a.all->final_regressor_name << "." << ec.example_counter << "." << cs_a.all->sd->queries << "."
              << cs_a.num_any_queries;
-    VW::save_predictor(*(cs_a.all), filename.str());
+    vw::save_predictor(*(cs_a.all), filename.str());
     *(cs_a.all->trace_message) << endl << "Number of examples with at least one query = " << cs_a.num_any_queries;
     // Double label query budget
     cs_a.min_labels *= 2;
@@ -287,13 +287,13 @@ void predict_or_learn(cs_active& cs_a, single_learner& base, example& ec)
   ec.l.cs = ld;
 }
 
-void finish_example(vw& all, cs_active&, example& ec)
+void finish_example(workspace& all, cs_active&, example& ec)
 {
   COST_SENSITIVE::output_example(all, ec, ec.l.cs, ec.pred.active_multiclass.predicted_class);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-base_learner* cs_active_setup(options_i& options, vw& all)
+base_learner* cs_active_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<cs_active>();
 

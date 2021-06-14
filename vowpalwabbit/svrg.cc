@@ -10,8 +10,8 @@
 #include "vw.h"
 #include "reductions.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 namespace SVRG
 {
@@ -28,7 +28,7 @@ struct svrg
   // calculation.
 
   // The VW process' global state.
-  vw* all;
+  workspace* all;
 };
 
 // Mimic GD::inline_predict but with offset for predicting with either
@@ -42,7 +42,7 @@ inline void vec_add(float& p, const float x, float& w)
 }
 
 template <int offset>
-inline float inline_predict(vw& all, example& ec)
+inline float inline_predict(workspace& all, example& ec)
 {
   const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
   float acc = simple_red_features.initial;
@@ -118,11 +118,11 @@ void learn(svrg& s, single_learner& base, example& ec)
     if (s.prev_pass != pass && !s.all->logger.quiet)
     {
       *(s.all->trace_message) << "svrg pass " << pass << ": committing stable point" << std::endl;
-      for (uint32_t j = 0; j < VW::num_weights(*s.all); j++)
+      for (uint32_t j = 0; j < vw::num_weights(*s.all); j++)
       {
-        float w = VW::get_weight(*s.all, j, W_INNER);
-        VW::set_weight(*s.all, j, W_STABLE, w);
-        VW::set_weight(*s.all, j, W_STABLEGRAD, 0.f);
+        float w = vw::get_weight(*s.all, j, W_INNER);
+        vw::set_weight(*s.all, j, W_STABLE, w);
+        vw::set_weight(*s.all, j, W_STABLEGRAD, 0.f);
       }
       s.stable_grad_count = 0;
       *(s.all->trace_message) << "svrg pass " << pass << ": computing exact gradient" << std::endl;
@@ -163,7 +163,7 @@ void save_load(svrg& s, io_buf& model_file, bool read, bool text)
 
 using namespace SVRG;
 
-base_learner* svrg_setup(options_i& options, vw& all)
+base_learner* svrg_setup(options_i& options, workspace& all)
 {
   auto s = scoped_calloc_or_throw<svrg>();
 

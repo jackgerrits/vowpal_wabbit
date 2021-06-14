@@ -14,11 +14,11 @@
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_sample
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace VW
+namespace vw
 {
 // cb_sample is used to automatically sample and swap from a cb explore pdf.
 struct cb_sample_data
@@ -66,7 +66,7 @@ struct cb_sample_data
     {
       uint64_t seed = _random_state->get_current_state();
 
-      VW::string_view tag_seed;
+      vw::string_view tag_seed;
       const bool tag_provided_seed = try_extract_random_seed(*examples[0], tag_seed);
       if (tag_provided_seed) { seed = uniform_hash(tag_seed.begin(), tag_seed.size(), 0); }
 
@@ -100,7 +100,7 @@ struct cb_sample_data
 private:
   std::shared_ptr<rand_state> _random_state;
 };
-}  // namespace VW
+}  // namespace vw
 
 template <bool is_learn>
 void learn_or_predict(cb_sample_data &data, multi_learner &base, multi_ex &examples)
@@ -118,7 +118,7 @@ base_learner *cb_sample_setup(options_i &options, vw &all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  auto data = VW::make_unique<cb_sample_data>(all.get_random_state());
+  auto data = vw::make_unique<cb_sample_data>(all.get_random_state());
 
   auto* l = make_reduction_learner(std::move(data), as_multiline(setup_base(options, all)), learn_or_predict<true>,
       learn_or_predict<false>, all.get_setupfn_name(cb_sample_setup))

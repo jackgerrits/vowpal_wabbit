@@ -20,13 +20,13 @@ static void bench_text(benchmark::State& state, ExtraArgs&&... extra_args)
   auto example_string = res[0];
 
   auto es = const_cast<char*>(example_string.c_str());
-  auto vw = VW::initialize("--cb 2 --quiet");
+  auto vw = vw::initialize("--cb 2 --quiet");
   auto examples = v_init<example*>();
-  examples.push_back(&VW::get_unused_example(vw));
+  examples.push_back(&vw::get_unused_example(vw));
   for (auto _ : state)
   {
-    VW::read_line(*vw, examples[0], es);
-    VW::empty_example(*vw, *examples[0]);
+    vw::read_line(*vw, examples[0], es);
+    vw::empty_example(*vw, *examples[0]);
     benchmark::ClobberMemory();
   }
   examples.delete_v();
@@ -34,10 +34,10 @@ static void bench_text(benchmark::State& state, ExtraArgs&&... extra_args)
 
 static void benchmark_learn_simple(benchmark::State& state, std::string example_string)
 {
-  auto vw = VW::initialize("--quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--quiet", nullptr, false, nullptr, nullptr);
 
-  auto* example = VW::read_example(*vw, example_string);
-  VW::setup_example(*vw, example);
+  auto* example = vw::read_example(*vw, example_string);
+  vw::setup_example(*vw, example);
 
   for (auto _ : state)
   {
@@ -49,13 +49,13 @@ static void benchmark_learn_simple(benchmark::State& state, std::string example_
 
 static void benchmark_cb_adf_learn(benchmark::State& state)
 {
-  auto vw = VW::initialize("--cb_explore_adf --epsilon 0.1 --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--cb_explore_adf --epsilon 0.1 --quiet", nullptr, false, nullptr, nullptr);
   multi_ex examples;
-  examples.push_back(VW::read_example(*vw, std::string("shared | s_1 s_2")));
-  examples.push_back(VW::read_example(*vw, std::string("0:1.0:0.5 | a_1 b_1 c_1")));
-  examples.push_back(VW::read_example(*vw, std::string("| a_2 b_2 c_2")));
-  examples.push_back(VW::read_example(*vw, std::string("| a_3 b_3 c_3")));
-  for (auto* example : examples) { VW::setup_example(*vw, example); }
+  examples.push_back(vw::read_example(*vw, std::string("shared | s_1 s_2")));
+  examples.push_back(vw::read_example(*vw, std::string("0:1.0:0.5 | a_1 b_1 c_1")));
+  examples.push_back(vw::read_example(*vw, std::string("| a_2 b_2 c_2")));
+  examples.push_back(vw::read_example(*vw, std::string("| a_3 b_3 c_3")));
+  for (auto* example : examples) { vw::setup_example(*vw, example); }
 
   for (auto _ : state)
   {
@@ -67,19 +67,19 @@ static void benchmark_cb_adf_learn(benchmark::State& state)
 
 static void benchmark_ccb_adf_learn(benchmark::State& state, std::string feature_string)
 {
-  auto vw = VW::initialize("--ccb_explore_adf --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--ccb_explore_adf --quiet", nullptr, false, nullptr, nullptr);
 
   multi_ex examples;
-  examples.push_back(VW::read_example(*vw, std::string("ccb shared |User " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb action |Action1 " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb action |Action2 " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb action |Action3 " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb action |Action4 " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb action |Action5 " + feature_string)));
-  examples.push_back(VW::read_example(*vw, std::string("ccb slot 0:0:0.2 |Slot h")));
-  examples.push_back(VW::read_example(*vw, std::string("ccb slot 1:0:0.25 |Slot i")));
-  examples.push_back(VW::read_example(*vw, std::string("ccb slot 2:0:0.333333 |Slot j")));
-  for (auto* example : examples) { VW::setup_example(*vw, example); }
+  examples.push_back(vw::read_example(*vw, std::string("ccb shared |User " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb action |Action1 " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb action |Action2 " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb action |Action3 " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb action |Action4 " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb action |Action5 " + feature_string)));
+  examples.push_back(vw::read_example(*vw, std::string("ccb slot 0:0:0.2 |Slot h")));
+  examples.push_back(vw::read_example(*vw, std::string("ccb slot 1:0:0.25 |Slot i")));
+  examples.push_back(vw::read_example(*vw, std::string("ccb slot 2:0:0.333333 |Slot j")));
+  for (auto* example : examples) { vw::setup_example(*vw, example); }
 
   for (auto _ : state)
   {

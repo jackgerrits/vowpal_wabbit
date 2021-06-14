@@ -7,13 +7,13 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-namespace VW
+namespace vw
 {
 struct cb_dro_data
 {
@@ -90,10 +90,10 @@ struct cb_dro_data
   }
 
 private:
-  VW::distributionally_robust::ChiSquared chisq;
+  vw::distributionally_robust::ChiSquared chisq;
   std::vector<float> save_weight;
 };
-}  // namespace VW
+}  // namespace vw
 
 template <bool is_learn, bool is_explore>
 void learn_or_predict(cb_dro_data &data, multi_learner &base, multi_ex &examples)
@@ -138,7 +138,7 @@ base_learner *cb_dro_setup(options_i &options, vw &all)
     *(all.trace_message) << "cb_dro_wmax = " << wmax << std::endl;
   }
 
-  auto data = VW::make_unique<cb_dro_data>(alpha, tau, wmax);
+  auto data = vw::make_unique<cb_dro_data>(alpha, tau, wmax);
 
   if (!data->isValid()) { THROW("invalid cb_dro parameter values supplied"); }
 

@@ -6,7 +6,7 @@
 #include <utility>
 #include "future_compat.h"
 
-namespace VW
+namespace vw
 {
 namespace details
 {
@@ -124,7 +124,7 @@ private:
 /// void use_widget(widget& my_widget)
 /// {
 ///   auto new_widget_value = ::get_new_widget_value();
-///   auto guard = VW::swap_guard(my_widget.value, new_widget_value);
+///   auto guard = vw::swap_guard(my_widget.value, new_widget_value);
 ///   do_thing_with_widget(my_widget);
 /// }
 /// \endcode
@@ -156,7 +156,7 @@ inline details::swap_guard_impl<T> swap_guard(T& original_location, T& value_to_
 ///
 /// void use_widget(widget& my_widget)
 /// {
-///   auto guard = VW::swap_guard(my_widget.value, ::get_new_widget_value(););
+///   auto guard = vw::swap_guard(my_widget.value, ::get_new_widget_value(););
 ///   do_thing_with_widget(my_widget);
 /// }
 /// \endcode
@@ -188,7 +188,7 @@ inline details::swap_guard_impl_rvalue<T> swap_guard(T& original_location, T&& v
 ///
 /// void use_widget(widget& my_widget)
 /// {
-///   auto guard = VW::swap_guard(my_widget.value, ::get_new_widget_value(););
+///   auto guard = vw::swap_guard(my_widget.value, ::get_new_widget_value(););
 ///   do_thing_with_widget(my_widget);
 /// }
 /// \endcode
@@ -199,4 +199,4 @@ inline details::swap_guard_impl_rvalue<T> stash_guard(T& original_location) noex
   return details::swap_guard_impl_rvalue<T>(&original_location, std::forward<T>(T()));
 }
 
-}  // namespace VW
+}  // namespace vw

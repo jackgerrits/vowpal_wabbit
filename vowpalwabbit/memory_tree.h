@@ -5,4 +5,4 @@
 #pragma once
 #include "reductions_fwd.h"
 
-VW::LEARNER::base_learner* memory_tree_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* memory_tree_setup(vw::config::options_i& options, workspace& all);

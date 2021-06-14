@@ -13,8 +13,8 @@
 #include "shared_data.h"
 #include "vw_math.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct active_cover
 {
@@ -28,7 +28,7 @@ struct active_cover
   float* lambda_n = nullptr;
   float* lambda_d = nullptr;
 
-  vw* all = nullptr;  // statistics, loss
+  workspace* all = nullptr;  // statistics, loss
   std::shared_ptr<rand_state> _random_state;
 
   ~active_cover()
@@ -38,7 +38,7 @@ struct active_cover
   }
 };
 
-bool dis_test(vw& all, example& ec, single_learner& base, float /* prediction */, float threshold)
+bool dis_test(workspace& all, example& ec, single_learner& base, float /* prediction */, float threshold)
 {
   if (all.sd->t + ec.weight <= 3) { return true; }
 
@@ -88,7 +88,7 @@ float query_decision(active_cover& a, single_learner& l, example& ec, float pred
   for (size_t i = 0; i < a.cover_size; i++)
   {
     l.predict(ec, i + 1);
-    q2 += (static_cast<float>(VW::math::sign(ec.pred.scalar) != VW::math::sign(prediction))) *
+    q2 += (static_cast<float>(vw::math::sign(ec.pred.scalar) != vw::math::sign(prediction))) *
         (a.lambda_n[i] / a.lambda_d[i]);
   }
 
@@ -110,7 +110,7 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
 
   if (is_learn)
   {
-    vw& all = *a.all;
+    workspace& all = *a.all;
 
     float prediction = ec.pred.scalar;
     float t = static_cast<float>(a.all->sd->t);
@@ -126,7 +126,7 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
     // Query (or not)
     if (!in_dis)  // Use predicted label
     {
-      ec.l.simple.label = VW::math::sign(prediction);
+      ec.l.simple.label = vw::math::sign(prediction);
       ec.weight = ec_input_weight;
       base.learn(ec, 0);
     }
@@ -158,7 +158,7 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
     if (in_dis)
     {
       cost = r * (std::fmax(importance, 0.f)) *
-          (static_cast<float>(VW::math::sign(prediction) != VW::math::sign(ec_input_label)));
+          (static_cast<float>(vw::math::sign(prediction) != vw::math::sign(ec_input_label)));
     }
     else
     {
@@ -178,7 +178,7 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
 
       // Choose min-cost label as the label
       // Set importance weight to be the cost difference
-      ec.l.simple.label = -1.f * VW::math::sign(cost_delta) * VW::math::sign(prediction);
+      ec.l.simple.label = -1.f * vw::math::sign(cost_delta) * vw::math::sign(prediction);
       ec.weight = ec_input_weight * std::fabs(cost_delta);
 
       // Update learner
@@ -187,15 +187,15 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
 
       // Update numerator of lambda
       a.lambda_n[i] +=
-          2.f * (static_cast<float>(VW::math::sign(ec.pred.scalar) != VW::math::sign(prediction))) * cost_delta;
+          2.f * (static_cast<float>(vw::math::sign(ec.pred.scalar) != vw::math::sign(prediction))) * cost_delta;
       a.lambda_n[i] = std::fmax(a.lambda_n[i], 0.f);
 
       // Update denominator of lambda
-      a.lambda_d[i] += (static_cast<float>(VW::math::sign(ec.pred.scalar) != VW::math::sign(prediction) && in_dis)) /
+      a.lambda_d[i] += (static_cast<float>(vw::math::sign(ec.pred.scalar) != vw::math::sign(prediction) && in_dis)) /
           static_cast<float>(pow(q2, 1.5));
 
       // Accumulating weights of learners in the cover
-      q2 += (static_cast<float>(VW::math::sign(ec.pred.scalar) != VW::math::sign(prediction))) *
+      q2 += (static_cast<float>(vw::math::sign(ec.pred.scalar) != vw::math::sign(prediction))) *
           (a.lambda_n[i] / a.lambda_d[i]);
     }
 
@@ -206,9 +206,9 @@ void predict_or_learn_active_cover(active_cover& a, single_learner& base, exampl
   }
 }
 
-base_learner* active_cover_setup(options_i& options, vw& all)
+base_learner* active_cover_setup(options_i& options, workspace& all)
 {
-  auto data = VW::make_unique<active_cover>();
+  auto data = vw::make_unique<active_cover>();
   option_group_definition new_options("Active Learning with Cover");
 
   bool active_cover_option = false;
@@ -252,7 +252,7 @@ base_learner* active_cover_setup(options_i& options, vw& all)
   }
 
   const auto cover_size = data->cover_size;
-  auto* l = VW::LEARNER::make_reduction_learner(std::move(data), base, predict_or_learn_active_cover<true>,
+  auto* l = vw::LEARNER::make_reduction_learner(std::move(data), base, predict_or_learn_active_cover<true>,
       predict_or_learn_active_cover<false>, all.get_setupfn_name(active_cover_setup))
                 .set_params_per_weight(cover_size + 1)
                 .set_prediction_type(prediction_type_t::scalar)

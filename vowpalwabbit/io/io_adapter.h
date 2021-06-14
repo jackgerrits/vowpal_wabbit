@@ -17,7 +17,7 @@
 #  include <unistd.h>
 #endif
 
-namespace VW
+namespace vw
 {
 namespace io
 {
@@ -46,7 +46,7 @@ struct reader
 
   /// This function will throw if the reader does not support reseting. Users
   /// should check if this io_adapter is resetable before trying to reset.
-  /// \throw VW::vw_exception if reader does not support resetting.
+  /// \throw vw::vw_exception if reader does not support resetting.
   virtual void reset() { THROW("Reset not supported for this io_adapter"); }
 
   /// \returns true if this reader can be reset, otherwise false
@@ -122,4 +122,4 @@ std::unique_ptr<writer> create_vector_writer(std::shared_ptr<std::vector<char>>&
 std::unique_ptr<reader> create_buffer_view(const char* data, size_t len);
 
 }  // namespace io
-}  // namespace VW
+}  // namespace vw

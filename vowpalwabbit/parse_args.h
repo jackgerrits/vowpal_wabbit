@@ -24,19 +24,19 @@ struct input_options
   bool flatbuffer = false;
 #ifdef BUILD_EXTERNAL_PARSER
   // pointer because it is an incomplete type
-  std::unique_ptr<VW::external::parser_options> ext_opts;
+  std::unique_ptr<vw::external::parser_options> ext_opts;
 #endif
 };
 
 // trace listener + context need to be passed at initialization to capture all messages.
-vw& parse_args(VW::config::options_i& options, trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
-void parse_modules(VW::config::options_i& options, vw& all);
-void parse_sources(VW::config::options_i& options, vw& all, io_buf& model, bool skipModelLoad = false);
+workspace& parse_args(vw::config::options_i& options, trace_message_t trace_listener = nullptr, void* trace_context = nullptr);
+void parse_modules(vw::config::options_i& options, workspace& all);
+void parse_sources(vw::config::options_i& options, workspace& all, io_buf& model, bool skipModelLoad = false);
 
 void merge_options_from_header_strings(const std::vector<std::string>& strings, bool skip_interactions,
-    VW::config::options_i& options, bool& is_ccb_input_model);
+    vw::config::options_i& options, bool& is_ccb_input_model);
 
-VW::LEARNER::base_learner* setup_base(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup_base(vw::config::options_i& options, workspace& all);
 
 std::string spoof_hex_encoded_namespaces(const std::string& arg);
 bool ends_with(const std::string& fullString, const std::string& ending);

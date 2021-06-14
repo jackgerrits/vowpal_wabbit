@@ -10,7 +10,7 @@ JNIEXPORT jlong JNICALL Java_vowpalWabbit_learner_VWLearners_initialize(JNIEnv* 
   jlong vwPtr = 0;
   try
   {
-    vw* vwInstance = VW::initialize(env->GetStringUTFChars(command, NULL));
+    workspace* vwInstance = vw::initialize(env->GetStringUTFChars(command, NULL));
     vwPtr = (jlong)vwInstance;
   }
   catch (...)
@@ -24,14 +24,14 @@ JNIEXPORT void JNICALL Java_vowpalWabbit_learner_VWLearners_performRemainingPass
 {
   try
   {
-    vw* vwInstance = (vw*)vwPtr;
+    workspace* vwInstance = (workspace*)vwPtr;
     if (vwInstance->numpasses > 1)
     {
       adjust_used_index(*vwInstance);
       vwInstance->do_reset_source = true;
-      VW::start_parser(*vwInstance);
-      VW::LEARNER::generic_driver(*vwInstance);
-      VW::end_parser(*vwInstance);
+      vw::start_parser(*vwInstance);
+      vw::LEARNER::generic_driver(*vwInstance);
+      vw::end_parser(*vwInstance);
     }
   }
   catch (...)
@@ -44,8 +44,8 @@ JNIEXPORT void JNICALL Java_vowpalWabbit_learner_VWLearners_closeInstance(JNIEnv
 {
   try
   {
-    vw* vwInstance = (vw*)vwPtr;
-    VW::finish(*vwInstance);
+    workspace* vwInstance = (workspace*)vwPtr;
+    vw::finish(*vwInstance);
   }
   catch (...)
   {
@@ -62,7 +62,7 @@ JNIEXPORT void JNICALL Java_vowpalWabbit_learner_VWLearners_saveModel(
     std::string filenameCpp(utf_string);
     env->ReleaseStringUTFChars(filename, utf_string);
     env->DeleteLocalRef(filename);
-    VW::save_predictor(*(vw*)vwPtr, filenameCpp);
+    vw::save_predictor(*(workspace*)vwPtr, filenameCpp);
   }
   catch (...)
   {
@@ -74,7 +74,7 @@ JNIEXPORT jobject JNICALL Java_vowpalWabbit_learner_VWLearners_getReturnType(JNI
 {
   jclass clVWReturnType = env->FindClass(RETURN_TYPE);
   jfieldID field;
-  vw* vwInstance = (vw*)vwPtr;
+  workspace* vwInstance = (workspace*)vwPtr;
   switch (vwInstance->l->pred_type)
   {
     case prediction_type_t::action_probs:

@@ -26,7 +26,7 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 int open_socket(const char* host)
 {

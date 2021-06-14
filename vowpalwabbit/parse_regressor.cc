@@ -37,7 +37,7 @@ void initialize_weights_as_polar_normal(weight* weights, uint64_t index) { weigh
 // re-scaling to re-picking values outside the truncating boundary.
 // note:- boundary is twice the standard deviation.
 template <class T>
-void truncate(vw& all, T& weights)
+void truncate(workspace& all, T& weights)
 {
   static double sd = calculate_sd(all, weights);
   std::for_each(weights.begin(), weights.end(), [](float& v) {
@@ -46,7 +46,7 @@ void truncate(vw& all, T& weights)
 }
 
 template <class T>
-double calculate_sd(vw& /* all */, T& weights)
+double calculate_sd(workspace& /* all */, T& weights)
 {
   static int my_size = 0;
   std::for_each(weights.begin(), weights.end(), [](float /* v */) { my_size += 1; });
@@ -58,7 +58,7 @@ double calculate_sd(vw& /* all */, T& weights)
   return std::sqrt(sq_sum / my_size);
 }
 template <class T>
-void initialize_regressor(vw& all, T& weights)
+void initialize_regressor(workspace& all, T& weights)
 {
   // Regressor is already initialized.
   if (weights.not_null()) return;
@@ -70,7 +70,7 @@ void initialize_regressor(vw& all, T& weights)
     weights.~T();  // dealloc so that we can realloc, now with a known size
     new (&weights) T(length, ss);
   }
-  catch (const VW::vw_exception&)
+  catch (const vw::vw_exception&)
   {
     THROW(" Failed to allocate weight array with " << all.num_bits << " bits: try decreasing -b <bits>");
   }
@@ -102,7 +102,7 @@ void initialize_regressor(vw& all, T& weights)
   }
 }
 
-void initialize_regressor(vw& all)
+void initialize_regressor(workspace& all)
 {
   if (all.weights.sparse)
     initialize_regressor(all, all.weights.sparse_weights);
@@ -137,7 +137,7 @@ inline void safe_memcpy(char*& __dest, size_t& __dest_size, const void* __src, s
 
 // file_options will be written to when reading
 void save_load_header(
-    vw& all, io_buf& model_file, bool read, bool text, std::string& file_options, VW::config::options_i& options)
+    workspace& all, io_buf& model_file, bool read, bool text, std::string& file_options, vw::config::options_i& options)
 {
   char* buff2 = static_cast<char*>(malloc(default_buf_size));
   size_t buf2_size = default_buf_size;
@@ -148,10 +148,10 @@ void save_load_header(
     {
       size_t bytes_read_write = 0;
 
-      size_t v_length = static_cast<uint32_t>(VW::version.to_string().length()) + 1;
+      size_t v_length = static_cast<uint32_t>(vw::version.to_string().length()) + 1;
       std::stringstream msg;
-      msg << "Version " << VW::version.to_string() << "\n";
-      memcpy(buff2, VW::version.to_string().c_str(), std::min(v_length, buf2_size));
+      msg << "Version " << vw::version.to_string() << "\n";
+      memcpy(buff2, vw::version.to_string().c_str(), std::min(v_length, buf2_size));
       if (read)
       {
         v_length = buf2_size;
@@ -159,7 +159,7 @@ void save_load_header(
       }
       bytes_read_write += bin_text_read_write(model_file, buff2, v_length, "", read, msg, text);
       all.model_file_ver = buff2;  // stored in all to check save_resume fix in gd
-      VW::validate_version(all);
+      vw::validate_version(all);
 
       if (all.model_file_ver >= VERSION_FILE_WITH_HEADER_CHAINED_HASH) model_file.verify_hash(true);
 
@@ -206,12 +206,12 @@ void save_load_header(
         file_options += " " + temp.str();
       }
 
-      VW::validate_default_bits(all, local_num_bits);
+      vw::validate_default_bits(all, local_num_bits);
 
       all.default_bits = false;
       all.num_bits = local_num_bits;
 
-      VW::validate_num_bits(all);
+      vw::validate_num_bits(all);
 
       if (all.model_file_ver < VERSION_FILE_WITH_INTERACTIONS_IN_FO)
       {
@@ -404,7 +404,7 @@ void save_load_header(
       }
       else
       {
-        VW::config::options_serializer_boost_po serializer;
+        vw::config::options_serializer_boost_po serializer;
         for (auto const& option : options.get_all_options())
         {
           if (option->m_keep && options.was_supplied(option->m_name)) { serializer.add(*option); }
@@ -455,7 +455,7 @@ void save_load_header(
   free(buff2);
 }
 
-void dump_regressor(vw& all, io_buf& buf, bool as_text)
+void dump_regressor(workspace& all, io_buf& buf, bool as_text)
 {
   if (buf.num_output_files() == 0) { THROW("Cannot dump regressor with an io buffer that has no output files."); }
   std::string unused;
@@ -466,23 +466,23 @@ void dump_regressor(vw& all, io_buf& buf, bool as_text)
   buf.close_file();
 }
 
-void dump_regressor(vw& all, std::string reg_name, bool as_text)
+void dump_regressor(workspace& all, std::string reg_name, bool as_text)
 {
   if (reg_name == std::string("")) return;
   std::string start_name = reg_name + std::string(".writing");
   io_buf io_temp;
-  io_temp.add_file(VW::io::open_file_writer(start_name));
+  io_temp.add_file(vw::io::open_file_writer(start_name));
 
   dump_regressor(all, io_temp, as_text);
 
   remove(reg_name.c_str());
 
   if (0 != rename(start_name.c_str(), reg_name.c_str()))
-    THROW("WARN: dump_regressor(vw& all, std::string reg_name, bool as_text): cannot rename: "
+    THROW("WARN: dump_regressor(workspace& all, std::string reg_name, bool as_text): cannot rename: "
         << start_name.c_str() << " to " << reg_name.c_str());
 }
 
-void save_predictor(vw& all, std::string reg_name, size_t current_pass)
+void save_predictor(workspace& all, std::string reg_name, size_t current_pass)
 {
   std::stringstream filename;
   filename << reg_name;
@@ -490,7 +490,7 @@ void save_predictor(vw& all, std::string reg_name, size_t current_pass)
   dump_regressor(all, filename.str(), false);
 }
 
-void finalize_regressor(vw& all, std::string reg_name)
+void finalize_regressor(workspace& all, std::string reg_name)
 {
   if (!all.early_terminate)
   {
@@ -510,11 +510,11 @@ void finalize_regressor(vw& all, std::string reg_name)
   }
 }
 
-void read_regressor_file(vw& all, std::vector<std::string> all_intial, io_buf& io_temp)
+void read_regressor_file(workspace& all, std::vector<std::string> all_intial, io_buf& io_temp)
 {
   if (all_intial.size() > 0)
   {
-    io_temp.add_file(VW::io::open_file_reader(all_intial[0]));
+    io_temp.add_file(vw::io::open_file_reader(all_intial[0]));
 
     if (!all.logger.quiet)
     {
@@ -528,7 +528,7 @@ void read_regressor_file(vw& all, std::vector<std::string> all_intial, io_buf& i
   }
 }
 
-void parse_mask_regressor_args(vw& all, std::string feature_mask, std::vector<std::string> initial_regressors)
+void parse_mask_regressor_args(workspace& all, std::string feature_mask, std::vector<std::string> initial_regressors)
 {
   // TODO does this extra check need to be used? I think it is duplicated but there may be some logic I am missing.
   std::string file_options;
@@ -542,7 +542,7 @@ void parse_mask_regressor_args(vw& all, std::string feature_mask, std::vector<st
 
     // all other cases, including from different file, or -i does not exist, need to read in the mask file
     io_buf io_temp_mask;
-    io_temp_mask.add_file(VW::io::open_file_reader(feature_mask));
+    io_temp_mask.add_file(vw::io::open_file_reader(feature_mask));
 
     save_load_header(all, io_temp_mask, true, false, file_options, *all.options);
     all.l->save_load(io_temp_mask, true, false);
@@ -553,7 +553,7 @@ void parse_mask_regressor_args(vw& all, std::string feature_mask, std::vector<st
     {
       // Load original header again.
       io_buf io_temp;
-      io_temp.add_file(VW::io::open_file_reader(initial_regressors[0]));
+      io_temp.add_file(vw::io::open_file_reader(initial_regressors[0]));
 
       save_load_header(all, io_temp, true, false, file_options, *all.options);
       io_temp.close_file();
@@ -570,9 +570,9 @@ void parse_mask_regressor_args(vw& all, std::string feature_mask, std::vector<st
   }
 }
 
-namespace VW
+namespace vw
 {
-void save_predictor(vw& all, std::string reg_name) { dump_regressor(all, reg_name, false); }
+void save_predictor(workspace& all, std::string reg_name) { dump_regressor(all, reg_name, false); }
 
-void save_predictor(vw& all, io_buf& buf) { dump_regressor(all, buf, false); }
-}  // namespace VW
+void save_predictor(workspace& all, io_buf& buf) { dump_regressor(all, buf, false); }
+}  // namespace vw

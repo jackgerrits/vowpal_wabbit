@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <iterator>
 
-using namespace VW::config;
+using namespace vw::config;
 
 namespace INTERACTIONS
 {
@@ -132,7 +132,7 @@ void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector
           if (cnt_ft_value_non_1 == 0)  // number of generated simple combinations is C(n,k)
           {
             n = static_cast<size_t>(
-                VW::math::choose(static_cast<int64_t>(ft_size), static_cast<int64_t>(order_of_inter)));
+                vw::math::choose(static_cast<int64_t>(ft_size), static_cast<int64_t>(order_of_inter)));
           }
           else
           {
@@ -140,10 +140,10 @@ void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector
             for (size_t l = 0; l <= order_of_inter; ++l)
             {
               // C(l+m-1, l) * C(n-m, k-l)
-              size_t num = (l == 0) ? 1 : static_cast<size_t>(VW::math::choose(l + cnt_ft_value_non_1 - 1, l));
+              size_t num = (l == 0) ? 1 : static_cast<size_t>(vw::math::choose(l + cnt_ft_value_non_1 - 1, l));
 
               if (ft_size - cnt_ft_value_non_1 >= order_of_inter - l)
-                num *= static_cast<size_t>(VW::math::choose(ft_size - cnt_ft_value_non_1, order_of_inter - l));
+                num *= static_cast<size_t>(vw::math::choose(ft_size - cnt_ft_value_non_1, order_of_inter - l));
               else
                 num = 0;
 
@@ -326,7 +326,7 @@ std::vector<std::vector<namespace_index>> generate_namespace_combinations_with_r
   // This computation involves factorials and so can only be done with relatively small inputs.
   // Factorial 22 would result in 64 bit overflow.
   if ((namespaces.size() + num_to_pick) <= 21)
-  { result.reserve(VW::math::number_of_combinations_with_repetition(namespaces.size(), num_to_pick)); }
+  { result.reserve(vw::math::number_of_combinations_with_repetition(namespaces.size(), num_to_pick)); }
 
   auto last_index = namespaces.size() - 1;
   // last index is used to signal when done
@@ -357,7 +357,7 @@ std::vector<std::vector<namespace_index>> generate_namespace_permutations_with_r
     const std::set<namespace_index>& namespaces, size_t num_to_pick)
 {
   std::vector<std::vector<namespace_index>> result;
-  result.reserve(VW::math::number_of_permutations_with_repetition(namespaces.size(), num_to_pick));
+  result.reserve(vw::math::number_of_permutations_with_repetition(namespaces.size(), num_to_pick));
 
   std::vector<size_t> one_based_chosen_indices(num_to_pick, 0);
   for (size_t i = 0; i < num_to_pick - 1; i++) { one_based_chosen_indices[i] = 1; }

@@ -5,7 +5,7 @@
 #include "logger.h"
 #include "spdlog/sinks/stdout_sinks.h"
 
-namespace VW
+namespace vw
 {
 namespace io
 {

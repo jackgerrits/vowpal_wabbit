@@ -32,9 +32,9 @@ with the VW learner as the base algorithm.
 
 #define B_SEARCH_MAX_ITER 20
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -57,7 +57,7 @@ private:
   std::vector<float> _min_costs;
   std::vector<float> _max_costs;
 
-  VW::version_struct _model_file_version;
+  vw::version_struct _model_file_version;
 
   // for backing up cb example data when computing sensitivities
   std::vector<ACTION_SCORE::action_scores> _ex_as;
@@ -65,7 +65,7 @@ private:
 
 public:
   cb_explore_adf_squarecb(float gamma_scale, float gamma_exponent, bool elim, float c0, float min_cb_cost,
-      float max_cb_cost, VW::version_struct model_file_version);
+      float max_cb_cost, vw::version_struct model_file_version);
   ~cb_explore_adf_squarecb() = default;
 
   // Should be called through cb_explore_adf_base for pre/post-processing
@@ -82,7 +82,7 @@ private:
 };
 
 cb_explore_adf_squarecb::cb_explore_adf_squarecb(float gamma_scale, float gamma_exponent, bool elim, float c0,
-    float min_cb_cost, float max_cb_cost, VW::version_struct model_file_version)
+    float min_cb_cost, float max_cb_cost, vw::version_struct model_file_version)
     : _counter(0)
     , _gamma_scale(gamma_scale)
     , _gamma_exponent(gamma_exponent)
@@ -300,7 +300,7 @@ void cb_explore_adf_squarecb::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-base_learner* setup(VW::config::options_i& options, vw& all)
+base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -370,7 +370,7 @@ base_learner* setup(VW::config::options_i& options, vw& all)
   bool with_metrics = options.was_supplied("extra_metrics");
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_squarecb>;
-  auto data = VW::make_unique<explore_type>(
+  auto data = vw::make_unique<explore_type>(
       with_metrics, gamma_scale, gamma_exponent, elim, c0, min_cb_cost, max_cb_cost, all.model_file_ver);
   auto* l = make_reduction_learner(
       std::move(data), base, explore_type::learn, explore_type::predict, all.get_setupfn_name(setup) + "-squarecb")
@@ -387,4 +387,4 @@ base_learner* setup(VW::config::options_i& options, vw& all)
 
 }  // namespace squarecb
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

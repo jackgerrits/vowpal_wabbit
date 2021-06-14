@@ -8,7 +8,7 @@
 #include "vw.h"
 #include "vw_exception.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 #define val_namespace 100  // valency and distance feature space
 #define offset_const 344429
@@ -74,7 +74,7 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
       make_option("old_style_labels", data->old_style_labels).keep().help("Use old hack of label information"));
   options.add_and_parse(new_options);
 
-  data->ex = VW::alloc_examples(1);
+  data->ex = vw::alloc_examples(1);
   data->ex->indices.push_back(val_namespace);
   for (size_t i = 1; i < 14; i++) data->ex->indices.push_back(static_cast<unsigned char>(i) + 'A');
   data->ex->indices.push_back(constant_namespace);
@@ -118,7 +118,7 @@ void finish(Search::search &sch)
   data->action_loss.delete_v();
   data->gold_actions.delete_v();
   data->gold_action_temp.delete_v();
-  VW::dealloc_examples(data->ex, 1);
+  vw::dealloc_examples(data->ex, 1);
   for (size_t i = 0; i < 6; i++) data->children[i].delete_v();
   delete data;
 }

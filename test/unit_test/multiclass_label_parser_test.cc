@@ -11,7 +11,7 @@
 #include "global_data.h"
 #include "shared_data.h"
 
-void parse_label(label_parser& lp, parser* p, shared_data* sd, VW::string_view label, polylabel& l)
+void parse_label(label_parser& lp, parser* p, shared_data* sd, vw::string_view label, polylabel& l)
 {
   tokenize(' ', label, p->words);
   lp.default_label(&l);
@@ -27,15 +27,15 @@ BOOST_AUTO_TEST_CASE(multiclass_label_parser)
 
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1,2,3", *plabel), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1,2,3", *plabel), vw::vw_exception);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1a", *plabel), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1a", *plabel), vw::vw_exception);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();
-    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1 2 3", *plabel), VW::vw_exception);
+    BOOST_REQUIRE_THROW(parse_label(lp, &p, &sd, "1 2 3", *plabel), vw::vw_exception);
   }
   {
     auto plabel = scoped_calloc_or_throw<polylabel>();

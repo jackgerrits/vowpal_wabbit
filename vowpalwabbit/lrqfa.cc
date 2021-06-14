@@ -8,12 +8,12 @@
 #include "rand48.h"
 #include "parse_args.h"  // for spoof_hex_encoded_namespaces
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct LRQFAstate
 {
-  vw* all;
+  workspace* all;
   std::string field_name;
   int k;
   int field_id[256];
@@ -32,7 +32,7 @@ constexpr inline bool example_is_test(example& ec) { return ec.l.simple.label ==
 template <bool is_learn>
 void predict_or_learn(LRQFAstate& lrq, single_learner& base, example& ec)
 {
-  vw& all = *lrq.all;
+  workspace& all = *lrq.all;
 
   memset(lrq.orig_size, 0, sizeof(lrq.orig_size));
   for (namespace_index i : ec.indices) lrq.orig_size[i] = ec.feature_space[i].size();
@@ -131,7 +131,7 @@ void predict_or_learn(LRQFAstate& lrq, single_learner& base, example& ec)
   }
 }
 
-VW::LEARNER::base_learner* lrqfa_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* lrqfa_setup(options_i& options, workspace& all)
 {
   std::string lrqfa;
   option_group_definition new_options("Low Rank Quadratics FA");

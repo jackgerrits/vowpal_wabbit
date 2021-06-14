@@ -26,14 +26,14 @@
 #include "network.h"
 #include "reductions.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 struct sender
 {
   io_buf* buf;
-  std::unique_ptr<VW::io::socket> _socket;
-  std::unique_ptr<VW::io::reader> _socket_reader;
-  vw* all;  // loss ring_size others
+  std::unique_ptr<vw::io::socket> _socket;
+  std::unique_ptr<vw::io::reader> _socket_reader;
+  workspace* all;  // loss ring_size others
   example** delay_ring;
   size_t sent_index;
   size_t received_index;
@@ -47,7 +47,7 @@ struct sender
 
 void open_sockets(sender& s, std::string host)
 {
-  s._socket = VW::io::wrap_socket_descriptor(open_socket(host.c_str()));
+  s._socket = vw::io::wrap_socket_descriptor(open_socket(host.c_str()));
   s._socket_reader = s._socket->get_reader();
   s.buf = new io_buf();
   s.buf->add_file(s._socket->get_writer());
@@ -80,7 +80,7 @@ void receive_result(sender& s)
   return_simple_example(*(s.all), nullptr, ec);
 }
 
-void learn(sender& s, VW::LEARNER::single_learner&, example& ec)
+void learn(sender& s, vw::LEARNER::single_learner&, example& ec)
 {
   if (s.received_index + s.all->example_parser->ring_size / 2 - 1 == s.sent_index) receive_result(s);
 
@@ -91,7 +91,7 @@ void learn(sender& s, VW::LEARNER::single_learner&, example& ec)
   s.delay_ring[s.sent_index++ % s.all->example_parser->ring_size] = &ec;
 }
 
-void finish_example(vw&, sender&, example&) {}
+void finish_example(workspace&, sender&, example&) {}
 
 void end_examples(sender& s)
 {
@@ -100,7 +100,7 @@ void end_examples(sender& s)
   s.buf->close_files();
 }
 
-VW::LEARNER::base_learner* sender_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* sender_setup(options_i& options, workspace& all)
 {
   std::string host;
 
@@ -115,7 +115,7 @@ VW::LEARNER::base_learner* sender_setup(options_i& options, vw& all)
   s->all = &all;
   s->delay_ring = calloc_or_throw<example*>(all.example_parser->ring_size);
 
-  VW::LEARNER::learner<sender, example>& l = init_learner(s, learn, learn, 1, all.get_setupfn_name(sender_setup));
+  vw::LEARNER::learner<sender, example>& l = init_learner(s, learn, learn, 1, all.get_setupfn_name(sender_setup));
   l.set_finish_example(finish_example);
   l.set_end_examples(end_examples);
   return make_base(l);

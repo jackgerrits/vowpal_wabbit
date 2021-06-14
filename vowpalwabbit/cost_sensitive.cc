@@ -14,11 +14,11 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace COST_SENSITIVE
 {
-void name_value(VW::string_view& s, std::vector<VW::string_view>& name, float& v)
+void name_value(vw::string_view& s, std::vector<vw::string_view>& name, float& v)
 {
   tokenize(':', s, name);
 
@@ -100,7 +100,7 @@ bool test_label(const label& ld) { return test_label_internal(ld); }
 
 bool test_label(label& ld) { return test_label_internal(ld); }
 
-void parse_label(parser* p, shared_data* sd, label& ld, std::vector<VW::string_view>& words, reduction_features&)
+void parse_label(parser* p, shared_data* sd, label& ld, std::vector<vw::string_view>& words, reduction_features&)
 {
   ld.costs.clear();
 
@@ -170,7 +170,7 @@ label_parser cs_label = {
   // default_label
   [](polylabel* v) { default_label(v->cs); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->cs, words, red_features);
   },
   // cache_label
@@ -185,7 +185,7 @@ label_parser cs_label = {
 };
 // clang-format on
 
-void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, uint32_t prediction)
+void print_update(workspace& all, bool is_test, example& ec, multi_ex* ec_seq, bool action_scores, uint32_t prediction)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -230,7 +230,7 @@ void print_update(vw& all, bool is_test, example& ec, multi_ex* ec_seq, bool act
   }
 }
 
-void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label, uint32_t multiclass_prediction)
+void output_example(workspace& all, example& ec, const COST_SENSITIVE::label& cs_label, uint32_t multiclass_prediction)
 {
   float loss = 0.;
   if (!test_label(cs_label))
@@ -260,7 +260,7 @@ void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label,
     if (!all.sd->ldict) { all.print_by_ref(sink.get(), static_cast<float>(multiclass_prediction), 0, ec.tag); }
     else
     {
-      VW::string_view sv_pred = all.sd->ldict->get(multiclass_prediction);
+      vw::string_view sv_pred = all.sd->ldict->get(multiclass_prediction);
       all.print_text_by_ref(sink.get(), sv_pred.to_string(), ec.tag);
     }
   }
@@ -280,12 +280,12 @@ void output_example(vw& all, example& ec, const COST_SENSITIVE::label& cs_label,
   print_update(all, test_label(cs_label), ec, nullptr, false, multiclass_prediction);
 }
 
-void output_example(vw& all, example& ec) { output_example(all, ec, ec.l.cs, ec.pred.multiclass); }
+void output_example(workspace& all, example& ec) { output_example(all, ec, ec.l.cs, ec.pred.multiclass); }
 
-void finish_example(vw& all, example& ec)
+void finish_example(workspace& all, example& ec)
 {
   output_example(all, ec, ec.l.cs, ec.pred.multiclass);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 bool example_is_test(example& ec)

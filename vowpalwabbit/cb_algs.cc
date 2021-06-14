@@ -14,13 +14,13 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 using namespace CB;
 using namespace GEN_CS;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CB_ALGS
 {
@@ -94,7 +94,7 @@ void learn_eval(cb& data, single_learner&, example& ec)
   ec.pred.multiclass = ec.l.cb_eval.action;
 }
 
-void output_example(vw& all, cb& data, example& ec, CB::label& ld)
+void output_example(workspace& all, cb& data, example& ec, CB::label& ld)
 {
   float loss = 0.;
 
@@ -104,7 +104,7 @@ void output_example(vw& all, cb& data, example& ec, CB::label& ld)
   generic_output_example(all, loss, ec, ld, &c.known_cost);
 }
 
-void generic_output_example(vw& all, float loss, example& ec, const CB::label& ld, CB::cb_class* known_cost)
+void generic_output_example(workspace& all, float loss, example& ec, const CB::label& ld, CB::cb_class* known_cost)
 {
   all.sd->update(ec.test_only, !CB::is_test_label(ld), loss, 1.f, ec.get_num_features());
 
@@ -131,20 +131,20 @@ void generic_output_example(vw& all, float loss, example& ec, const CB::label& l
   }
 }
 
-void finish_example(vw& all, cb& c, example& ec)
+void finish_example(workspace& all, cb& c, example& ec)
 {
   output_example(all, c, ec, ec.l.cb);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-void eval_finish_example(vw& all, cb& c, example& ec)
+void eval_finish_example(workspace& all, cb& c, example& ec)
 {
   output_example(all, c, ec, ec.l.cb_eval.event);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 }  // namespace CB_ALGS
 using namespace CB_ALGS;
-base_learner* cb_algs_setup(options_i& options, vw& all)
+base_learner* cb_algs_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<cb>();
   std::string type_string = "dr";

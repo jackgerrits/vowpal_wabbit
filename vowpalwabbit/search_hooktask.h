@@ -6,7 +6,7 @@
 
 namespace HookTask
 {
-void initialize(Search::search&, size_t&, VW::config::options_i&);
+void initialize(Search::search&, size_t&, vw::config::options_i&);
 void finish(Search::search&);
 void run(Search::search&, multi_ex&);
 void run_setup(Search::search&, multi_ex&);
@@ -27,7 +27,7 @@ struct task_data
   void (*delete_run_object)(
       void*);  // we can't delete run_object on our own because we don't know its size, so provide a hook
   void (*delete_extra_data)(task_data&);  // ditto for extra_data and extra_data2
-  VW::config::options_i* arg;             // so that hook can access command line variables
+  vw::config::options_i* arg;             // so that hook can access command line variables
   const void* extra_data;                 // any extra data that might be needed
   const void* extra_data2;                // any (more) extra data that might be needed
   size_t num_actions;                     // cache for easy access

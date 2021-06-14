@@ -17,7 +17,7 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 char* bufread_simple_label(shared_data* sd, label_data& ld, simple_label_reduction_features& red_features, char* c)
 {
@@ -75,7 +75,7 @@ bool test_label(label_data& ld) { return ld.label == FLT_MAX; }
 // Example: 0 1 0.5 'third_house | price:.53 sqft:.32 age:.87 1924
 // label := 0, weight := 1, initial := 0.5
 void parse_simple_label(
-    parser*, shared_data* sd, label_data& ld, std::vector<VW::string_view>& words, reduction_features& red_features)
+    parser*, shared_data* sd, label_data& ld, std::vector<vw::string_view>& words, reduction_features& red_features)
 {
   auto& simple_red_features = red_features.template get<simple_label_reduction_features>();
   switch (words.size())
@@ -105,7 +105,7 @@ label_parser simple_label_parser = {
   // default_label
   [](polylabel* v) { default_simple_label(v->simple); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     parse_simple_label(p, sd, v->simple, words, red_features);
   },
   // cache_label

@@ -62,13 +62,13 @@ __attribute__((packed))
 #endif
 ;
 
-void VW::write_example_to_cache(io_buf& output, example* ae, label_parser& lbl_parser, uint64_t parse_mask)
+void vw::write_example_to_cache(io_buf& output, example* ae, label_parser& lbl_parser, uint64_t parse_mask)
 {
   lbl_parser.cache_label(&ae->l, ae->_reduction_features, output);
   cache_features(output, ae, parse_mask);
 }
 
-int VW::read_example_from_cache(
+int vw::read_example_from_cache(
     io_buf& input, example* ae, label_parser& lbl_parser, bool sorted_cache, shared_data* shared_dat)
 {
   ae->sorted = sorted_cache;
@@ -92,7 +92,7 @@ int VW::read_example_from_cache(
     unsigned char index = 0;
     if ((temp = input.buf_read(c, sizeof(index) + sizeof(size_t))) < sizeof(index) + sizeof(size_t))
     {
-      VW::io::logger::errlog_error("truncated example! {} {} ", temp, char_size + sizeof(size_t));
+      vw::io::logger::errlog_error("truncated example! {} {} ", temp, char_size + sizeof(size_t));
       return 0;
     }
 
@@ -107,7 +107,7 @@ int VW::read_example_from_cache(
     total += storage;
     if (input.buf_read(c, storage) < storage)
     {
-      VW::io::logger::errlog_error("truncated example! wanted: {} bytes ", storage);
+      vw::io::logger::errlog_error("truncated example! wanted: {} bytes ", storage);
       return 0;
     }
 
@@ -140,9 +140,9 @@ int VW::read_example_from_cache(
   return static_cast<int>(total);
 }
 
-int read_cached_features(vw* all, v_array<example*>& examples)
+int read_cached_features(workspace* all, v_array<example*>& examples)
 {
-  return VW::read_example_from_cache(*all->example_parser->input, examples[0], all->example_parser->lbl_parser,
+  return vw::read_example_from_cache(*all->example_parser->input, examples[0], all->example_parser->lbl_parser,
       all->example_parser->sorted_cache, all->example_parser->_shared_data);
 }
 
@@ -219,7 +219,7 @@ void cache_features(io_buf& cache, example* ae, uint64_t mask)
   for (namespace_index ns : ae->indices) output_features(cache, ns, ae->feature_space[ns], mask);
 }
 
-uint32_t VW::convert(size_t number)
+uint32_t vw::convert(size_t number)
 {
   if (number > UINT32_MAX) { THROW("size_t value is out of bounds of uint32_t.") }
   return static_cast<uint32_t>(number);

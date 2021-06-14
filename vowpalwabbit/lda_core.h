@@ -7,6 +7,6 @@
 
 struct feature;
 
-VW::LEARNER::base_learner* lda_setup(VW::config::options_i&, vw&);
+vw::LEARNER::base_learner* lda_setup(vw::config::options_i&, workspace&);
 
-void get_top_weights(vw* all, int top_words_count, int topic, std::vector<feature>& output);
+void get_top_weights(workspace* all, int top_words_count, int topic, std::vector<feature>& output);

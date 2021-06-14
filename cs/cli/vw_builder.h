@@ -10,9 +10,9 @@
 #include "vowpalwabbit.h"
 #include "vw_label.h"
 
-namespace VW
+namespace vw
 {
-using namespace VW::Labels;
+using namespace vw::Labels;
 
 /// <summary>
 /// Helper class to ease construction of native vowpal wabbit namespace data structure.

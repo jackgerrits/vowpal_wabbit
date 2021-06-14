@@ -14,16 +14,16 @@ typedef enum
   JsonFeatures
 } FeatureInputType;
 
-void substring_to_example(vw* all, example* ae, VW::string_view example);
+void substring_to_example(workspace* all, example* ae, vw::string_view example);
 
-namespace VW
+namespace vw
 {
-example& get_unused_example(vw* all);
-void read_line(vw& all, example* ex, char* line);  // read example from the line.
-void read_lines(vw* all, const char* line, size_t len,
+example& get_unused_example(workspace* all);
+void read_line(workspace& all, example* ex, char* line);  // read example from the line.
+void read_lines(workspace* all, const char* line, size_t len,
     v_array<example*>& examples);  // read examples from the new line separated strings.
 
-}  // namespace VW
+}  // namespace vw
 
-int read_features_string(vw* all, v_array<example*>& examples);
-size_t read_features(vw* all, char*& line, size_t& num_chars);
+int read_features_string(workspace* all, v_array<example*>& examples);
+size_t read_features(workspace* all, char*& line, size_t& num_chars);

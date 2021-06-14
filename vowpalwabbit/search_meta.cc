@@ -9,7 +9,7 @@
 #include "search.h"
 #include "debug_print.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 namespace DebugMT
 {

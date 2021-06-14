@@ -6,8 +6,8 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 #define R_NONE 10      // label for NONE relation
 #define LABEL_SKIP 11  // label for SKIP
@@ -77,7 +77,7 @@ void initialize(Search::search& sch, size_t& /*num_actions*/, options_i& options
   if (my_task_data->search_order != 3 && my_task_data->search_order != 4) { sch.set_options(0); }
   else
   {
-    example* ldf_examples = VW::alloc_examples(NUM_LDF_ENTITY_EXAMPLES);
+    example* ldf_examples = vw::alloc_examples(NUM_LDF_ENTITY_EXAMPLES);
     CS::wclass default_wclass = {0., 0, 0., 0.};
     for (size_t a = 0; a < NUM_LDF_ENTITY_EXAMPLES; a++)
     {
@@ -98,7 +98,7 @@ void finish(Search::search& sch)
   task_data* my_task_data = sch.get_task_data<task_data>();
   my_task_data->y_allowed_entity.delete_v();
   my_task_data->y_allowed_relation.delete_v();
-  if (my_task_data->search_order == 3) { VW::dealloc_examples(my_task_data->ldf_entity, NUM_LDF_ENTITY_EXAMPLES); }
+  if (my_task_data->search_order == 3) { vw::dealloc_examples(my_task_data->ldf_entity, NUM_LDF_ENTITY_EXAMPLES); }
   delete my_task_data;
 }  // if we had task data, we'd want to free it here
 
@@ -158,7 +158,7 @@ size_t predict_entity(
     {
       for (uint32_t a = 0; a < 4; a++)
       {
-        VW::copy_example_data(&my_task_data->ldf_entity[a], ex);
+        vw::copy_example_data(&my_task_data->ldf_entity[a], ex);
         update_example_indicies(true, &my_task_data->ldf_entity[a], 28904713, 4832917 * static_cast<uint64_t>(a + 1));
         CS::label& lab = my_task_data->ldf_entity[a].l.cs;
         lab.costs[0].x = 0.f;
@@ -241,7 +241,7 @@ size_t predict_relation(Search::search& sch, example* ex, v_array<size_t>& predi
       int correct_label = 0;  // if correct label is not in the set, use the first one
       for (size_t a = 0; a < constrained_relation_labels.size(); a++)
       {
-        VW::copy_example_data(&my_task_data->ldf_relation[a], ex);
+        vw::copy_example_data(&my_task_data->ldf_relation[a], ex);
         update_example_indicies(true, &my_task_data->ldf_relation[a], 28904713,
             4832917 * static_cast<uint64_t>(constrained_relation_labels[a]));
         CS::label& lab = my_task_data->ldf_relation[a].l.cs;

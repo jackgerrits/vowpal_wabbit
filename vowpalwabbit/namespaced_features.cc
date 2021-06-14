@@ -5,7 +5,7 @@
 #include "namespaced_features.h"
 #include "vw_exception.h"
 
-using namespace VW;
+using namespace vw;
 
 features* namespaced_features::get_feature_group(uint64_t hash)
 {

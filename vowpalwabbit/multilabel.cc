@@ -14,7 +14,7 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace MULTILABEL
 {
@@ -72,7 +72,7 @@ void default_label(MULTILABEL::labels& ld) { ld.label_v.clear(); }
 bool test_label(MULTILABEL::labels& ld) { return ld.label_v.size() == 0; }
 
 void parse_label(
-    parser* p, shared_data*, MULTILABEL::labels& ld, std::vector<VW::string_view>& words, reduction_features&)
+    parser* p, shared_data*, MULTILABEL::labels& ld, std::vector<vw::string_view>& words, reduction_features&)
 {
   switch (words.size())
   {
@@ -97,7 +97,7 @@ label_parser multilabel = {
   // default_label
   [](polylabel* v) { default_label(v->multilabels); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->multilabels, words, red_features);
   },
   // cache_label
@@ -112,7 +112,7 @@ label_parser multilabel = {
 };
 // clang-format on
 
-void print_update(vw& all, bool is_test, example& ec)
+void print_update(workspace& all, bool is_test, example& ec)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -130,7 +130,7 @@ void print_update(vw& all, bool is_test, example& ec)
   }
 }
 
-void output_example(vw& all, example& ec)
+void output_example(workspace& all, example& ec)
 {
   auto& ld = ec.l.multilabels;
 

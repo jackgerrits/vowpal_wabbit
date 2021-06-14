@@ -7,7 +7,7 @@ JNIEXPORT jlong JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_create(
 {
   try
   {
-    return (jlong) new VW::SpanningTree(port, quiet);
+    return (jlong) new vw::SpanningTree(port, quiet);
   }
   catch (...)
   {
@@ -18,7 +18,7 @@ JNIEXPORT jlong JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_create(
 
 JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_delete(JNIEnv *env, jobject clusterObj)
 {
-  auto tree = (VW::SpanningTree *)get_native_pointer(env, clusterObj);
+  auto tree = (vw::SpanningTree *)get_native_pointer(env, clusterObj);
 
   try
   {
@@ -32,7 +32,7 @@ JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_delete(JN
 
 JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_start(JNIEnv *env, jobject clusterObj)
 {
-  auto tree = (VW::SpanningTree *)get_native_pointer(env, clusterObj);
+  auto tree = (vw::SpanningTree *)get_native_pointer(env, clusterObj);
 
   try
   {
@@ -46,7 +46,7 @@ JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_start(JNI
 
 JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_stop(JNIEnv *env, jobject clusterObj)
 {
-  auto tree = (VW::SpanningTree *)get_native_pointer(env, clusterObj);
+  auto tree = (vw::SpanningTree *)get_native_pointer(env, clusterObj);
 
   try
   {
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_stop(JNIE
 
 JNIEXPORT jint JNICALL Java_org_vowpalwabbit_spark_ClusterSpanningTree_getPort(JNIEnv *env, jobject clusterObj)
 {
-  auto tree = (VW::SpanningTree *)get_native_pointer(env, clusterObj);
+  auto tree = (vw::SpanningTree *)get_native_pointer(env, clusterObj);
 
   try
   {

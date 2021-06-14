@@ -18,7 +18,7 @@ int getpid() { return (int)::GetCurrentProcessId(); }
 #include <iostream>
 #include <fstream>
 
-using namespace VW;
+using namespace vw;
 
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     spanningTree.Run();
   }
-  catch (VW::vw_exception& e)
+  catch (vw::vw_exception& e)
   {
     std::cerr << "spanning tree (" << e.Filename() << ":" << e.LineNumber() << "): " << e.what() << std::endl;
   }

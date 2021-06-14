@@ -18,21 +18,21 @@
 #include "ccb_label.h"
 #include "shared_data.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
-namespace VW
+namespace vw
 {
 namespace slates
 {
 template <bool is_learn>
-void slates_data::learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void slates_data::learn_or_predict(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   _stashed_labels.clear();
   _stashed_labels.reserve(examples.size());
   for (auto& example : examples) { _stashed_labels.push_back(std::move(example->l.slates)); }
 
   const size_t num_slots = std::count_if(examples.begin(), examples.end(),
-      [](const example* example) { return example->l.slates.type == VW::slates::example_type::slot; });
+      [](const example* example) { return example->l.slates.type == vw::slates::example_type::slot; });
 
   float global_cost = 0.f;
   bool global_cost_found = false;
@@ -86,7 +86,7 @@ void slates_data::learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& e
     ccb_label.weight = slates_label.weight;
     examples[i]->l.conditional_contextual_bandit = ccb_label;
   }
-  VW::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
+  vw::LEARNER::multiline_learn_or_predict<is_learn>(base, examples, examples[0]->ft_offset);
 
   // Need to convert decision scores to the original index space. This can be
   // done by going through the prediction for each slots and subtracting the
@@ -105,12 +105,12 @@ void slates_data::learn_or_predict(VW::LEARNER::multi_learner& base, multi_ex& e
   _stashed_labels.clear();
 }
 
-void slates_data::learn(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void slates_data::learn(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   learn_or_predict<true>(base, examples);
 }
 
-void slates_data::predict(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void slates_data::predict(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   learn_or_predict<false>(base, examples);
 }
@@ -149,7 +149,7 @@ std::string generate_slates_label_printout(const std::vector<example*>& slots)
 // distribution. This can be seen in example 4 of the paper.
 // https://arxiv.org/abs/1605.04812
 float get_estimate(
-    const ACTION_SCORE::action_scores& label_probs, float cost, const VW::decision_scores_t& prediction_probs)
+    const ACTION_SCORE::action_scores& label_probs, float cost, const vw::decision_scores_t& prediction_probs)
 {
   assert(!label_probs.empty());
   assert(!prediction_probs.empty());
@@ -164,7 +164,7 @@ float get_estimate(
   return cost * p_over_ps;
 }
 
-void output_example(vw& all, slates_data& /*c*/, multi_ex& ec_seq)
+void output_example(workspace& all, slates_data& /*c*/, multi_ex& ec_seq)
 {
   std::vector<example*> slots;
   size_t num_features = 0;
@@ -204,12 +204,12 @@ void output_example(vw& all, slates_data& /*c*/, multi_ex& ec_seq)
   all.sd->update(holdout_example, is_labelled, loss, ec_seq[SHARED_EX_INDEX]->weight, num_features);
 
   for (auto& sink : all.final_prediction_sink)
-  { VW::print_decision_scores(sink.get(), ec_seq[SHARED_EX_INDEX]->pred.decision_scores); }
+  { vw::print_decision_scores(sink.get(), ec_seq[SHARED_EX_INDEX]->pred.decision_scores); }
 
-  VW::print_update_slates(all, slots, predictions, num_features);
+  vw::print_update_slates(all, slots, predictions, num_features);
 }
 
-void finish_multiline_example(vw& all, slates_data& data, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, slates_data& data, multi_ex& ec_seq)
 {
   if (!ec_seq.empty())
   {
@@ -219,11 +219,11 @@ void finish_multiline_example(vw& all, slates_data& data, multi_ex& ec_seq)
     ec_seq[0]->pred.decision_scores.clear();
   }
 
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 template <bool is_learn>
-void learn_or_predict(slates_data& data, VW::LEARNER::multi_learner& base, multi_ex& examples)
+void learn_or_predict(slates_data& data, vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   if (is_learn) { data.learn(base, examples); }
   else
@@ -232,9 +232,9 @@ void learn_or_predict(slates_data& data, VW::LEARNER::multi_learner& base, multi
   }
 }
 
-VW::LEARNER::base_learner* slates_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* slates_setup(options_i& options, workspace& all)
 {
-  auto data = VW::make_unique<slates_data>();
+  auto data = vw::make_unique<slates_data>();
   bool slates_option = false;
   option_group_definition new_options("Slates");
   new_options.add(make_option("slates", slates_option).keep().necessary().help("EXPERIMENTAL"));
@@ -249,14 +249,14 @@ VW::LEARNER::base_learner* slates_setup(options_i& options, vw& all)
 
   auto* base = as_multiline(setup_base(options, all));
   all.example_parser->lbl_parser = slates_label_parser;
-  auto* l = VW::LEARNER::make_reduction_learner(
+  auto* l = vw::LEARNER::make_reduction_learner(
       std::move(data), base, learn_or_predict<true>, learn_or_predict<false>, all.get_setupfn_name(slates_setup))
                 .set_learn_returns_prediction(base->learn_returns_prediction)
                 .set_prediction_type(prediction_type_t::decision_probs)
                 .set_label_type(label_type_t::slates)
                 .set_finish_example(finish_multiline_example)
                 .build();
-  return VW::LEARNER::make_base(*l);
+  return vw::LEARNER::make_base(*l);
 }
 }  // namespace slates
-}  // namespace VW
+}  // namespace vw

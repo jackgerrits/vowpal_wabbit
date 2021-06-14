@@ -219,7 +219,7 @@ struct search
   const char* task_name;
   const char* metatask_name;
 
-  vw& get_vw_pointer_unsafe();  // although you should rarely need this, some times you need a poiter to the vw data
+  workspace& get_vw_pointer_unsafe();  // although you should rarely need this, some times you need a poiter to the vw data
                                 // structure :(
   void set_force_oracle(bool force);  // if the library wants to force search to use the oracle, set this to true
   search();
@@ -233,7 +233,7 @@ struct search_task
   void (*run)(search&, multi_ex&);
 
   // optional
-  void (*initialize)(search&, size_t&, VW::config::options_i&);
+  void (*initialize)(search&, size_t&, vw::config::options_i&);
   void (*finish)(search&);
   void (*run_setup)(search&, multi_ex&);
   void (*run_takedown)(search&, multi_ex&);
@@ -245,7 +245,7 @@ struct search_metatask
   void (*run)(search&, multi_ex&);
 
   // optional
-  void (*initialize)(search&, size_t&, VW::config::options_i&);
+  void (*initialize)(search&, size_t&, vw::config::options_i&);
   void (*finish)(search&);
   void (*run_setup)(search&, multi_ex&);
   void (*run_takedown)(search&, multi_ex&);
@@ -350,7 +350,7 @@ private:
 };
 
 // some helper functions you might find helpful
-/*template<class T> void check_option(T& ret, vw&all, po::variables_map& vm, const char* opt_name, bool
+/*template<class T> void check_option(T& ret, workspace&all, po::variables_map& vm, const char* opt_name, bool
 default_to_cmdline, bool(*equal)(T,T), const char* mismatch_error_string, const char* required_error_string) { if
 (vm.count(opt_name)) { ret = vm[opt_name].as<T>(); *all.args_n_opts.file_options << " --" << opt_name << " " << ret;
   }
@@ -361,9 +361,9 @@ default_to_cmdline, bool(*equal)(T,T), const char* mismatch_error_string, const 
   }
   }*/
 
-// void check_option(bool& ret, vw&all, po::variables_map& vm, const char* opt_name, bool default_to_cmdline, const
+// void check_option(bool& ret, workspace&all, po::variables_map& vm, const char* opt_name, bool default_to_cmdline, const
 // char* mismatch_error_string);
 
 // our interface within VW
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 }  // namespace Search

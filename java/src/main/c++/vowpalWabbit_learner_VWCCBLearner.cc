@@ -13,7 +13,7 @@ jobject decision_scores_prediction(example *vec, JNIEnv *env)
   jmethodID decision_scores_constructor =
       env->GetMethodID(decision_scores_class, "<init>", "([LvowpalWabbit/responses/ActionScores;)V");
 
-  VW::decision_scores_t decision_scores = vec->pred.decision_scores;
+  vw::decision_scores_t decision_scores = vec->pred.decision_scores;
   size_t num_slots = decision_scores.size();
 
   jobjectArray j_action_scores_array = env->NewObjectArray(num_slots, action_scores_class, 0);

@@ -18,12 +18,12 @@
 #include "array_parameters.h"
 #include "shared_data.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct gdmf
 {
-  vw* all;  // regressor, printing
+  workspace* all;  // regressor, printing
   v_array<float> scalars;
   uint32_t rank;
   size_t no_win_counter;
@@ -33,7 +33,7 @@ struct gdmf
 void mf_print_offset_features(gdmf& d, example& ec, size_t offset)
 {
   // TODO: Where should audit stuff output to?
-  vw& all = *d.all;
+  workspace& all = *d.all;
   parameters& weights = all.weights;
   uint64_t mask = weights.mask();
   for (features& fs : ec)
@@ -95,7 +95,7 @@ void offset_add(pred_offset& res, const float fx, float& fw) { res.p += (&fw)[re
 template <class T>
 float mf_predict(gdmf& d, example& ec, T& weights)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
   const auto& simple_red_features = ec._reduction_features.template get<simple_label_reduction_features>();
   float prediction = simple_red_features.initial;
 
@@ -171,7 +171,7 @@ float mf_predict(gdmf& d, example& ec, T& weights)
 
 float mf_predict(gdmf& d, example& ec)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
   if (all.weights.sparse)
     return mf_predict(d, ec, all.weights.sparse_weights);
   else
@@ -188,7 +188,7 @@ void sd_offset_update(T& weights, features& fs, uint64_t offset, float update, f
 template <class T>
 void mf_train(gdmf& d, example& ec, T& weights)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
   label_data& ld = ec.l.simple;
 
   // use final prediction to get update size
@@ -248,7 +248,7 @@ void initialize_weights(weight* weights, uint64_t index, uint32_t stride)
 
 void save_load(gdmf& d, io_buf& model_file, bool read, bool text)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
   uint64_t length = static_cast<uint64_t>(1) << all.num_bits;
   if (read)
   {
@@ -297,7 +297,7 @@ void save_load(gdmf& d, io_buf& model_file, bool read, bool text)
 
 void end_pass(gdmf& d)
 {
-  vw* all = d.all;
+  workspace* all = d.all;
 
   all->eta *= all->eta_decay_rate;
   if (all->save_per_pass) save_predictor(*all, all->final_regressor_name, all->current_pass);
@@ -315,13 +315,13 @@ void predict(gdmf& d, single_learner&, example& ec) { mf_predict(d, ec); }
 
 void learn(gdmf& d, single_learner&, example& ec)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
 
   mf_predict(d, ec);
   if (all.training && ec.l.simple.label != FLT_MAX) mf_train(d, ec);
 }
 
-base_learner* gd_mf_setup(options_i& options, vw& all)
+base_learner* gd_mf_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<gdmf>();
 

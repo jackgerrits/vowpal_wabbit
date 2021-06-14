@@ -16,7 +16,7 @@
 #include <cmath>
 #include <functional>
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -33,12 +33,12 @@ public:
   ~cb_explore_adf_greedy() = default;
 
   // Should be called through cb_explore_adf_base for pre/post-processing
-  void predict(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
-  void learn(VW::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
+  void predict(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<false>(base, examples); }
+  void learn(vw::LEARNER::multi_learner& base, multi_ex& examples) { predict_or_learn_impl<true>(base, examples); }
 
 private:
   template <bool is_learn>
-  void predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples);
+  void predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples);
   void update_example_prediction(multi_ex& examples);
 };
 
@@ -66,7 +66,7 @@ void cb_explore_adf_greedy::update_example_prediction(multi_ex& examples)
 }
 
 template <bool is_learn>
-void cb_explore_adf_greedy::predict_or_learn_impl(VW::LEARNER::multi_learner& base, multi_ex& examples)
+void cb_explore_adf_greedy::predict_or_learn_impl(vw::LEARNER::multi_learner& base, multi_ex& examples)
 {
   // Explore uniform random an epsilon fraction of the time.
   if (is_learn)
@@ -77,7 +77,7 @@ void cb_explore_adf_greedy::predict_or_learn_impl(VW::LEARNER::multi_learner& ba
   update_example_prediction(examples);
 }
 
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -113,13 +113,13 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
 
   if (!options.was_supplied("epsilon")) epsilon = 0.05f;
 
-  VW::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
+  vw::LEARNER::multi_learner* base = as_multiline(setup_base(options, all));
   all.example_parser->lbl_parser = CB::cb_label;
 
   bool with_metrics = options.was_supplied("extra_metrics");
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_greedy>;
-  auto data = VW::make_unique<explore_type>(with_metrics, epsilon, first_only);
+  auto data = vw::make_unique<explore_type>(with_metrics, epsilon, first_only);
 
   if (epsilon < 0.0 || epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
   auto* l = make_reduction_learner(
@@ -136,4 +136,4 @@ VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all)
 
 }  // namespace greedy
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

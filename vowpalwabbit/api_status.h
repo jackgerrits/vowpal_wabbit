@@ -10,7 +10,7 @@
 // of this will be updated once
 // https://github.com/VowpalWabbit/vowpal_wabbit/pull/2493 is merged.
 
-namespace VW
+namespace vw
 {
 namespace experimental
 {
@@ -59,7 +59,7 @@ private:
   std::string _error_msg;
 };
 }  // namespace experimental
-}  // namespace VW
+}  // namespace vw
 
 /**
  * @brief Error reporting macro that takes a list of parameters
@@ -68,8 +68,8 @@ private:
 #  define RETURN_ERROR(status, code)                                                           \
     do                                                                                         \
     {                                                                                          \
-      VW::experimental::api_status::try_update(                                                \
-          status, VW::experimental::error_code::code, VW::experimental::error_code::code##_s); \
-      return VW::experimental::error_code::code;                                               \
+      vw::experimental::api_status::try_update(                                                \
+          status, vw::experimental::error_code::code, vw::experimental::error_code::code##_s); \
+      return vw::experimental::error_code::code;                                               \
     } while (0);
 #endif

@@ -5,9 +5,9 @@
 #include "reductions_fwd.h"
 #include "cb.h"
 
-VW::LEARNER::base_learner* cb_explore_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* cb_explore_setup(vw::config::options_i& options, workspace& all);
 
 namespace CB_EXPLORE
 {
-void generic_output_example(vw& all, float loss, example& ec, CB::label& ld);
+void generic_output_example(workspace& all, float loss, example& ec, CB::label& ld);
 }

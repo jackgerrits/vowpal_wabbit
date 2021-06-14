@@ -6,9 +6,9 @@
 
 #include "io/io_adapter.h"
 
-VW::LEARNER::base_learner* mwt_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* mwt_setup(vw::config::options_i& options, workspace& all);
 
 namespace MWT
 {
-void print_scalars(VW::io::writer* f, v_array<float>& scalars, v_array<char>& tag);
+void print_scalars(vw::io::writer* f, v_array<float>& scalars, v_array<char>& tag);
 }  // namespace MWT

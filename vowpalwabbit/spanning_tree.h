@@ -41,7 +41,7 @@ typedef int socket_t;
 #  include <future>
 #endif
 
-namespace VW
+namespace vw
 {
 class SpanningTree
 {
@@ -66,4 +66,4 @@ public:
   void Run();
   void Stop();
 };
-}  // namespace VW
+}  // namespace vw

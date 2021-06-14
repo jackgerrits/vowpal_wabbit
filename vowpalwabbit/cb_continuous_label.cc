@@ -15,53 +15,53 @@
 
 using namespace LEARNER;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CB
 {
 template <>
-char* bufcache_label_additional_fields<VW::cb_continuous::continuous_label>(
-    VW::cb_continuous::continuous_label&, char* c)
+char* bufcache_label_additional_fields<vw::cb_continuous::continuous_label>(
+    vw::cb_continuous::continuous_label&, char* c)
 {
   return c;
 }
 
 template <>
-char* bufread_label_additional_fields<VW::cb_continuous::continuous_label>(
-    VW::cb_continuous::continuous_label&, char* c)
+char* bufread_label_additional_fields<vw::cb_continuous::continuous_label>(
+    vw::cb_continuous::continuous_label&, char* c)
 {
   return c;
 }
 
 template <>
-void default_label_additional_fields<VW::cb_continuous::continuous_label>(VW::cb_continuous::continuous_label&)
+void default_label_additional_fields<vw::cb_continuous::continuous_label>(vw::cb_continuous::continuous_label&)
 {
 }
 
 }  // namespace CB
 
 void parse_pdf(
-    const std::vector<VW::string_view>& words, size_t words_index, parser* p, reduction_features& red_features)
+    const std::vector<vw::string_view>& words, size_t words_index, parser* p, reduction_features& red_features)
 {
-  auto& cats_reduction_features = red_features.template get<VW::continuous_actions::reduction_features>();
+  auto& cats_reduction_features = red_features.template get<vw::continuous_actions::reduction_features>();
   for (size_t i = words_index; i < words.size(); i++)
   {
     if (words[i] == CHOSEN_ACTION) { break; /* no more pdf to parse*/ }
     tokenize(':', words[i], p->parse_name);
     if (p->parse_name.empty() || p->parse_name.size() < 3) { continue; }
-    VW::continuous_actions::pdf_segment seg;
+    vw::continuous_actions::pdf_segment seg;
     seg.left = float_of_string(p->parse_name[0]);
     seg.right = float_of_string(p->parse_name[1]);
     seg.pdf_value = float_of_string(p->parse_name[2]);
     cats_reduction_features.pdf.push_back(seg);
   }
-  if (!VW::continuous_actions::is_valid_pdf(cats_reduction_features.pdf)) { cats_reduction_features.pdf.clear(); }
+  if (!vw::continuous_actions::is_valid_pdf(cats_reduction_features.pdf)) { cats_reduction_features.pdf.clear(); }
 }
 
 void parse_chosen_action(
-    const std::vector<VW::string_view>& words, size_t words_index, parser* p, reduction_features& red_features)
+    const std::vector<vw::string_view>& words, size_t words_index, parser* p, reduction_features& red_features)
 {
-  auto& cats_reduction_features = red_features.template get<VW::continuous_actions::reduction_features>();
+  auto& cats_reduction_features = red_features.template get<vw::continuous_actions::reduction_features>();
   for (size_t i = words_index; i < words.size(); i++)
   {
     tokenize(':', words[i], p->parse_name);
@@ -71,13 +71,13 @@ void parse_chosen_action(
   }
 }
 
-namespace VW
+namespace vw
 {
 namespace cb_continuous
 {
 ////////////////////////////////////////////////////
 // Begin: parse a,c,p label format
-void parse_label(parser* p, shared_data*, continuous_label& ld, std::vector<VW::string_view>& words,
+void parse_label(parser* p, shared_data*, continuous_label& ld, std::vector<vw::string_view>& words,
     reduction_features& red_features)
 {
   ld.costs.clear();
@@ -130,7 +130,7 @@ label_parser the_label_parser = {
   // default_label
   [](polylabel* v) { CB::default_label<continuous_label>(v->cb_cont); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, reduction_features& red_features) {
     parse_label(p, sd, v->cb_cont, words, red_features);
   },
   // cache_label
@@ -164,4 +164,4 @@ std::string to_string(const continuous_label& lbl)
   return strstream.str();
 }
 }  // namespace cb_continuous
-}  // namespace VW
+}  // namespace vw

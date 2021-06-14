@@ -13,8 +13,8 @@
 #include "gd.h"
 #include "scope_exit.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct mf
 {
@@ -35,7 +35,7 @@ struct mf
   // array for temp storage of features
   features temp_features;
 
-  vw* all;  // for pairs? and finalize
+  workspace* all;  // for pairs? and finalize
 };
 
 template <bool cache_sub_predictions>
@@ -59,7 +59,7 @@ void predict(mf& data, single_learner& base, example& ec)
   ec.indices.push_back(0);
 
   auto* saved_interactions = ec.interactions;
-  auto restore_guard = VW::scope_exit([saved_interactions, &ec] { ec.interactions = saved_interactions; });
+  auto restore_guard = vw::scope_exit([saved_interactions, &ec] { ec.interactions = saved_interactions; });
 
   std::vector<std::vector<namespace_index>> empty_interactions;
   ec.interactions = &empty_interactions;
@@ -185,7 +185,7 @@ void learn(mf& data, single_learner& base, example& ec)
   ec.interactions = saved_interactions;
 }
 
-base_learner* mf_setup(options_i& options, vw& all)
+base_learner* mf_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<mf>();
   option_group_definition new_options("Matrix Factorization Reduction");

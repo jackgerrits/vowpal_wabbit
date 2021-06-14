@@ -5,10 +5,10 @@
 
 #include "reductions_fwd.h"
 
-namespace VW
+namespace vw
 {
 namespace binary
 {
-VW::LEARNER::base_learner* binary_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* binary_setup(vw::config::options_i& options, workspace& all);
 }
-}  // namespace VW
+}  // namespace vw

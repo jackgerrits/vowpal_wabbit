@@ -14,13 +14,13 @@
 #include "gen_cs_example.h"
 #include "reductions_fwd.h"
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
 namespace cover
 {
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 }  // namespace cover
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

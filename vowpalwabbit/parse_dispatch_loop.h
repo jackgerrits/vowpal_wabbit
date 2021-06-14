@@ -11,9 +11,9 @@
 #include "parse_example.h"
 #include "io/logger.h"
 
-using dispatch_fptr = std::function<void(vw&, const v_array<example*>&)>;
+using dispatch_fptr = std::function<void(workspace&, const v_array<example*>&)>;
 
-inline void parse_dispatch(vw& all, dispatch_fptr dispatch)
+inline void parse_dispatch(workspace& all, dispatch_fptr dispatch)
 {
   v_array<example*> examples;
   size_t example_number = 0;  // for variable-size batch learning algorithms
@@ -22,11 +22,11 @@ inline void parse_dispatch(vw& all, dispatch_fptr dispatch)
   {
     while (!all.example_parser->done)
     {
-      examples.push_back(&VW::get_unused_example(&all));  // need at least 1 example
+      examples.push_back(&vw::get_unused_example(&all));  // need at least 1 example
       if (!all.do_reset_source && example_number != all.pass_length && all.max_examples > example_number &&
           all.example_parser->reader(&all, examples) > 0)
       {
-        VW::setup_examples(all, examples);
+        vw::setup_examples(all, examples);
         example_number += examples.size();
         dispatch(all, examples);
       }
@@ -54,16 +54,16 @@ inline void parse_dispatch(vw& all, dispatch_fptr dispatch)
       examples.clear();
     }
   }
-  catch (VW::vw_exception& e)
+  catch (vw::vw_exception& e)
   {
-    VW::io::logger::errlog_error("vw example #{0}({1}:{2}): {3}", example_number, e.Filename(), e.LineNumber(), e.what());
+    vw::io::logger::errlog_error("vw example #{0}({1}:{2}): {3}", example_number, e.Filename(), e.LineNumber(), e.what());
 
     // Stash the exception so it can be thrown on the main thread.
     all.example_parser->exc_ptr = std::current_exception();
   }
   catch (std::exception& e)
   {
-    VW::io::logger::errlog_error("vw: example #{0}{1}", example_number, e.what());
+    vw::io::logger::errlog_error("vw: example #{0}{1}", example_number, e.what());
 
     // Stash the exception so it can be thrown on the main thread.
     all.example_parser->exc_ptr = std::current_exception();

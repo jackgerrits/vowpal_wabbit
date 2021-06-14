@@ -38,7 +38,7 @@ void ft_cnt(eval_gen_data& dat, const float fx, const uint64_t)
 // function which counts generated features and sums their squared values. We
 // use it to validate the with more fast (?) analytic solution
 template <INTERACTIONS::generate_func_t generate_func, bool leave_duplicate_interactions>
-void eval_count_of_generated_ft_naive(vw& all, example_predict& ec, size_t& new_features_cnt, float& new_features_value)
+void eval_count_of_generated_ft_naive(workspace& all, example_predict& ec, size_t& new_features_cnt, float& new_features_value)
 {
   // Only makes sense to do this when not in permutations mode.
   assert(!all.permutations);
@@ -62,8 +62,8 @@ inline void noop_func(float& unused_dat, const float ft_weight, const uint64_t f
 
 BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_test)
 {
-  auto& vw = *VW::initialize("--quiet -q :: --noconstant", nullptr, false, nullptr, nullptr);
-  auto* ex = VW::read_example(vw, std::string("3 |f a b c |e x y z"));
+  auto& vw = *vw::initialize("--quiet -q :: --noconstant", nullptr, false, nullptr, nullptr);
+  auto* ex = vw::read_example(vw, std::string("3 |f a b c |e x y z"));
 
   size_t naive_features_count;
   float naive_features_value;
@@ -86,15 +86,15 @@ BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_test)
   // Prediction will count the interacted features, so we can compare that too.
   vw.predict(*ex);
   BOOST_CHECK_EQUAL(naive_features_count, ex->num_features_from_interactions);
-  VW::finish_example(vw, *ex);
-  VW::finish(vw);
+  vw::finish_example(vw, *ex);
+  vw::finish(vw);
 }
 
 BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_permuations_test)
 {
-  auto& vw = *VW::initialize(
+  auto& vw = *vw::initialize(
       "--quiet -q :: --leave_duplicate_interactions --permutations --noconstant", nullptr, false, nullptr, nullptr);
-  auto* ex = VW::read_example(vw, std::string("3 |f a b c |e x y z"));
+  auto* ex = vw::read_example(vw, std::string("3 |f a b c |e x y z"));
 
   auto interactions =
       INTERACTIONS::compile_interactions<INTERACTIONS::generate_namespace_permutations_with_repetition, true>(
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE(eval_count_of_generated_ft_permuations_test)
   vw.predict(*ex);
   BOOST_CHECK_EQUAL(fast_features_count, ex->num_features_from_interactions);
 
-  VW::finish_example(vw, *ex);
-  VW::finish(vw);
+  vw::finish_example(vw, *ex);
+  vw::finish(vw);
 }
 
 BOOST_AUTO_TEST_CASE(interaction_generic_expand_wildcard_only)

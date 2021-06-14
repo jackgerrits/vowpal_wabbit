@@ -20,16 +20,16 @@ void remove_slot_features(example* shared, example* slot);
 
 BOOST_AUTO_TEST_CASE(ccb_explicit_included_actions_no_overlap)
 {
-  auto& vw = *VW::initialize("--ccb_explore_adf --quiet");
+  auto& vw = *vw::initialize("--ccb_explore_adf --quiet");
   multi_ex examples;
-  examples.push_back(VW::read_example(vw, std::string("ccb shared |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb action |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb action |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb action |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb action |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb slot 0 |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb slot 3 |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb slot 1 |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb shared |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb action |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb action |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb action |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb action |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb slot 0 |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb slot 3 |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb slot 1 |")));
 
   vw.predict(examples);
 
@@ -49,12 +49,12 @@ BOOST_AUTO_TEST_CASE(ccb_explicit_included_actions_no_overlap)
   BOOST_CHECK_CLOSE(decision_scores[2][0].score, 1.f, FLOAT_TOL);
 
   vw.finish_example(examples);
-  VW::finish(vw);
+  vw::finish(vw);
 }
 
 BOOST_AUTO_TEST_CASE(ccb_exploration_reproducibility_test)
 {
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--ccb_explore_adf --epsilon 0.2 --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
 
   std::vector<uint32_t> previous;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(ccb_exploration_reproducibility_test)
           examples[slot_example_indx]->tag.end(), event_ids[i].begin(), event_ids[i].end());
     }
 
-    for (auto* ex : examples) { VW::setup_example(*vw, ex); }
+    for (auto* ex : examples) { vw::setup_example(*vw, ex); }
 
     vw->predict(examples);
     auto& decision_scores = examples[0]->pred.decision_scores;
@@ -88,24 +88,24 @@ BOOST_AUTO_TEST_CASE(ccb_exploration_reproducibility_test)
     previous = current;
     vw->finish_example(examples);
   }
-  VW::finish(*vw);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(ccb_invalid_example_checks)
 {
-  auto& vw = *VW::initialize("--ccb_explore_adf --quiet");
+  auto& vw = *vw::initialize("--ccb_explore_adf --quiet");
   multi_ex examples;
-  examples.push_back(VW::read_example(vw, std::string("ccb shared |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb action |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb slot 0 |")));
-  examples.push_back(VW::read_example(vw, std::string("ccb slot 3 |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb shared |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb action |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb slot 0 |")));
+  examples.push_back(vw::read_example(vw, std::string("ccb slot 3 |")));
 
-  for (auto* example : examples) { VW::setup_example(vw, example); }
+  for (auto* example : examples) { vw::setup_example(vw, example); }
 
   // Check that number of actions is greater than slots
-  BOOST_REQUIRE_THROW(vw.predict(examples), VW::vw_exception);
-  BOOST_REQUIRE_THROW(vw.learn(examples), VW::vw_exception);
+  BOOST_REQUIRE_THROW(vw.predict(examples), vw::vw_exception);
+  BOOST_REQUIRE_THROW(vw.learn(examples), vw::vw_exception);
 
   vw.finish_example(examples);
-  VW::finish(vw);
+  vw::finish(vw);
 }

@@ -17,12 +17,12 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_underscore_p)
   "_p": [0.4, 0.6]
 }
   )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction interaction;
 
   auto examples = parse_dsjson(*vw, json_text, &interaction);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 
   constexpr float EXPECTED_PDF[2] = {0.4f, 0.6f};
   const size_t num_probabilities = interaction.probabilities.size();
@@ -41,12 +41,12 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_p)
   "p": [0.4, 0.6]
 }
   )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction interaction;
 
   auto examples = parse_dsjson(*vw, json_text, &interaction);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 
   constexpr float EXPECTED_PDF[2] = {0.4f, 0.6f};
   const size_t num_probabilities = interaction.probabilities.size();
@@ -69,12 +69,12 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_p_duplicates)
   "_p": [0.5, 0.5]
 }
   )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction interaction;
 
   auto examples = parse_dsjson(*vw, json_text, &interaction);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 
   // Use the latest "p" or "_p" field provided. The "_p" is ignored when it's inside "c".
   constexpr float EXPECTED_PDF[2] = {0.5f, 0.5f};
@@ -94,12 +94,12 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_pdrop_float)
   "pdrop": 0.1
 }
   )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction interaction;
 
   auto examples = parse_dsjson(*vw, json_text, &interaction);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 
   BOOST_CHECK_CLOSE(0.1f, interaction.probabilityOfDrop, FLOAT_TOL);
 }
@@ -111,12 +111,12 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_pdrop_uint)
   "pdrop": 0
 }
   )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction interaction;
 
   auto examples = parse_dsjson(*vw, json_text, &interaction);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 
   BOOST_CHECK_CLOSE(0.0f, interaction.probabilityOfDrop, FLOAT_TOL);
 }
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb)
   }
 }
 )";
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   BOOST_CHECK_EQUAL(examples.size(), 4);
@@ -203,8 +203,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb)
   BOOST_CHECK_CLOSE(examples[2]->l.cb.costs[0].probability, 0.8166667, FLOAT_TOL);
   BOOST_CHECK_CLOSE(examples[2]->l.cb.costs[0].cost, -1.0, FLOAT_TOL);
   BOOST_CHECK_EQUAL(examples[2]->l.cb.costs[0].action, 2);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cats)
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet", nullptr,
       false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
@@ -251,8 +251,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats)
   BOOST_CHECK_EQUAL(features.size(), space_names.size());
   for (size_t i = 0; i < space_names.size(); i++) { BOOST_CHECK_EQUAL(space_names[i]->second, features[i]); }
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cats_no_label)
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_no_label)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash -t --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet", nullptr,
       false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
@@ -289,8 +289,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_no_label)
   BOOST_CHECK_EQUAL(features.size(), space_names.size());
   for (size_t i = 0; i < space_names.size(); i++) { BOOST_CHECK_EQUAL(space_names[i]->second, features[i]); }
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_valid_pdf)
@@ -317,14 +317,14 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_valid_pdf)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet", nullptr,
       false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   BOOST_CHECK_EQUAL(examples.size(), 1);
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), true);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), false);
@@ -342,8 +342,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_valid_pdf)
   BOOST_CHECK_EQUAL(features.size(), space_names.size());
   for (size_t i = 0; i < space_names.size(); i++) { BOOST_CHECK_EQUAL(space_names[i]->second, features[i]); }
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_invalid_pdf)
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_invalid_pdf)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet", nullptr,
       false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_invalid_pdf)
   BOOST_CHECK_EQUAL(examples.size(), 1);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), false);
   BOOST_CHECK_EQUAL(reduction_features.is_chosen_action_set(), false);
@@ -388,8 +388,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_w_invalid_pdf)
   BOOST_CHECK_EQUAL(features.size(), space_names.size());
   for (size_t i = 0; i < space_names.size(); i++) { BOOST_CHECK_EQUAL(space_names[i]->second, features[i]); }
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cats_chosen_action)
@@ -417,13 +417,13 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_chosen_action)
   }
 }
 )";
-  auto vw = VW::initialize(
+  auto vw = vw::initialize(
       "--dsjson --chain_hash --cats 4 --min_value=185 --max_value=23959 --bandwidth 1 --no_stdin --quiet", nullptr,
       false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   const auto& reduction_features =
-      examples[0]->_reduction_features.template get<VW::continuous_actions::reduction_features>();
+      examples[0]->_reduction_features.template get<vw::continuous_actions::reduction_features>();
 
   BOOST_CHECK_EQUAL(examples.size(), 1);
   BOOST_CHECK_EQUAL(reduction_features.is_pdf_set(), false);
@@ -434,8 +434,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cats_chosen_action)
   BOOST_CHECK_EQUAL(features.size(), space_names.size());
   for (size_t i = 0; i < space_names.size(); i++) { BOOST_CHECK_EQUAL(space_names[i]->second, features[i]); }
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 // TODO: Make unit test dig out and verify features.
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_ccb)
 )";
 
   auto vw =
-      VW::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+      vw::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   BOOST_CHECK_EQUAL(examples.size(), 5);
@@ -518,8 +518,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_ccb)
   BOOST_CHECK_CLOSE(label2.outcome->probabilities[0].score, .75f, .0001f);
   BOOST_CHECK_EQUAL(label2.outcome->probabilities[1].action, 1);
   BOOST_CHECK_CLOSE(label2.outcome->probabilities[1].score, .25f, .0001f);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cb_as_ccb)
@@ -586,7 +586,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb_as_ccb)
 }
 )";
   auto vw =
-      VW::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+      vw::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   BOOST_CHECK_EQUAL(examples.size(), 5);
@@ -602,8 +602,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb_as_ccb)
   BOOST_CHECK_EQUAL(label2.outcome->probabilities.size(), 1);
   BOOST_CHECK_EQUAL(label2.outcome->probabilities[0].action, 1);
   BOOST_CHECK_CLOSE(label2.outcome->probabilities[0].score, 0.8166667f, .0001f);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_cb_with_nan)
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb_with_nan)
 }
 )";
 
-  auto vw = VW::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--dsjson --chain_hash --cb_adf --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto examples = parse_dsjson(*vw, json_text);
 
   BOOST_CHECK_EQUAL(examples.size(), 4);
@@ -669,8 +669,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_cb_with_nan)
   BOOST_CHECK_EQUAL(std::isnan(examples[2]->l.cb.costs[0].probability), true);
   BOOST_CHECK_EQUAL(std::isnan(examples[2]->l.cb.costs[0].cost), true);
   BOOST_CHECK_EQUAL(examples[2]->l.cb.costs[0].action, 2);
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_slates)
@@ -743,19 +743,19 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_slates)
     }
 })";
 
-  auto vw = VW::initialize("--slates --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+  auto vw = vw::initialize("--slates --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   DecisionServiceInteraction ds_interaction;
   auto examples = parse_dsjson(*vw, json_text, &ds_interaction);
 
   BOOST_CHECK_EQUAL(examples.size(), 8);
-  BOOST_CHECK_EQUAL(examples[0]->l.slates.type, VW::slates::example_type::shared);
-  BOOST_CHECK_EQUAL(examples[1]->l.slates.type, VW::slates::example_type::action);
-  BOOST_CHECK_EQUAL(examples[2]->l.slates.type, VW::slates::example_type::action);
-  BOOST_CHECK_EQUAL(examples[3]->l.slates.type, VW::slates::example_type::action);
-  BOOST_CHECK_EQUAL(examples[4]->l.slates.type, VW::slates::example_type::action);
-  BOOST_CHECK_EQUAL(examples[5]->l.slates.type, VW::slates::example_type::action);
-  BOOST_CHECK_EQUAL(examples[6]->l.slates.type, VW::slates::example_type::slot);
-  BOOST_CHECK_EQUAL(examples[7]->l.slates.type, VW::slates::example_type::slot);
+  BOOST_CHECK_EQUAL(examples[0]->l.slates.type, vw::slates::example_type::shared);
+  BOOST_CHECK_EQUAL(examples[1]->l.slates.type, vw::slates::example_type::action);
+  BOOST_CHECK_EQUAL(examples[2]->l.slates.type, vw::slates::example_type::action);
+  BOOST_CHECK_EQUAL(examples[3]->l.slates.type, vw::slates::example_type::action);
+  BOOST_CHECK_EQUAL(examples[4]->l.slates.type, vw::slates::example_type::action);
+  BOOST_CHECK_EQUAL(examples[5]->l.slates.type, vw::slates::example_type::action);
+  BOOST_CHECK_EQUAL(examples[6]->l.slates.type, vw::slates::example_type::slot);
+  BOOST_CHECK_EQUAL(examples[7]->l.slates.type, vw::slates::example_type::slot);
 
   const auto& label0 = examples[0]->l.slates;
   BOOST_CHECK_CLOSE(label0.cost, 1.f, FLOAT_TOL);
@@ -781,8 +781,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_slates)
   check_collections_exact(ds_interaction.actions, std::vector<unsigned int>{1,0});
   check_collections_with_float_tolerance(ds_interaction.probabilities, std::vector<float>{0.8f, 0.6f}, FLOAT_TOL);
 
-  VW::finish_example(*vw, examples);
-  VW::finish(*vw);
+  vw::finish_example(*vw, examples);
+  vw::finish(*vw);
 }
 
 BOOST_AUTO_TEST_CASE(parse_dsjson_slates_dom_parser)
@@ -819,7 +819,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_slates_dom_parser)
 
   // Assert parsed values against what they should be
   auto slates_vw =
-      VW::initialize("--slates --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+      vw::initialize("--slates --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto slates_examples = parse_dsjson(*slates_vw, json_text);
 
   BOOST_CHECK_EQUAL(slates_examples.size(), 1);
@@ -834,7 +834,7 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_slates_dom_parser)
 
   // Compare the DOM parser to parsing the same features with the CCB SAX parser
   auto ccb_vw =
-      VW::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
+      vw::initialize("--ccb_explore_adf --dsjson --chain_hash --no_stdin --quiet", nullptr, false, nullptr, nullptr);
   auto ccb_examples = parse_dsjson(*ccb_vw, json_text);
   BOOST_CHECK_EQUAL(ccb_examples.size(), 1);
   const auto& ccb_ex = *ccb_examples[0];
@@ -852,8 +852,8 @@ BOOST_AUTO_TEST_CASE(parse_dsjson_slates_dom_parser)
   check_collections_with_float_tolerance(slates_ex.feature_space['d'].values, ccb_ex.feature_space['d'].values, FLOAT_TOL);
   check_collections_with_float_tolerance(slates_ex.feature_space['e'].values, ccb_ex.feature_space['e'].values, FLOAT_TOL);
 
-  VW::finish_example(*slates_vw, slates_examples);
-  VW::finish(*slates_vw);
-  VW::finish_example(*ccb_vw, ccb_examples);
-  VW::finish(*ccb_vw);
+  vw::finish_example(*slates_vw, slates_examples);
+  vw::finish(*slates_vw);
+  vw::finish_example(*ccb_vw, ccb_examples);
+  vw::finish(*ccb_vw);
 }

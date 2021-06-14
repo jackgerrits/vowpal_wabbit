@@ -14,15 +14,15 @@ VW_WARNING_STATE_POP
 
 struct ExampleBuilder
 {
-  std::vector<flatbuffers::Offset<VW::parsers::flatbuffer::Namespace>> namespaces;
-  VW::parsers::flatbuffer::Label label_type = VW::parsers::flatbuffer::Label_NONE;
+  std::vector<flatbuffers::Offset<vw::parsers::flatbuffer::Namespace>> namespaces;
+  vw::parsers::flatbuffer::Label label_type = vw::parsers::flatbuffer::Label_NONE;
   flatbuffers::Offset<void> label = 0;
   std::string tag;
   bool is_newline = false;
 
-  flatbuffers::Offset<VW::parsers::flatbuffer::Example> to_flat_example(flatbuffers::FlatBufferBuilder& builder)
+  flatbuffers::Offset<vw::parsers::flatbuffer::Example> to_flat_example(flatbuffers::FlatBufferBuilder& builder)
   {
-    auto ex = VW::parsers::flatbuffer::CreateExampleDirect(
+    auto ex = vw::parsers::flatbuffer::CreateExampleDirect(
         builder, &namespaces, label_type, label, tag.empty() ? nullptr : tag.c_str(), is_newline);
     clear();
     return ex;
@@ -31,7 +31,7 @@ struct ExampleBuilder
   void clear()
   {
     namespaces.clear();
-    label_type = VW::parsers::flatbuffer::Label_NONE;
+    label_type = vw::parsers::flatbuffer::Label_NONE;
     label = 0;
     tag.clear();
   }
@@ -40,16 +40,16 @@ struct ExampleBuilder
 struct MultiExampleBuilder
 {
   std::vector<ExampleBuilder> examples;
-  flatbuffers::Offset<VW::parsers::flatbuffer::MultiExample> to_flat_example(flatbuffers::FlatBufferBuilder& builder)
+  flatbuffers::Offset<vw::parsers::flatbuffer::MultiExample> to_flat_example(flatbuffers::FlatBufferBuilder& builder)
   {
-    std::vector<flatbuffers::Offset<VW::parsers::flatbuffer::Example>> exs;
+    std::vector<flatbuffers::Offset<vw::parsers::flatbuffer::Example>> exs;
     for (auto& ex : examples)
     {
       auto flat_ex = ex.to_flat_example(builder);
       exs.push_back(flat_ex);
     }
     examples.clear();
-    return VW::parsers::flatbuffer::CreateMultiExampleDirect(builder, &exs);
+    return vw::parsers::flatbuffer::CreateMultiExampleDirect(builder, &exs);
   }
 };
 
@@ -59,13 +59,13 @@ public:
   std::string output_flatbuffer_name;
   size_t collection_size = 0;
   bool collection = false;
-  void convert_txt_to_flat(vw& all);
+  void convert_txt_to_flat(workspace& all);
 
 private:
   flatbuffers::FlatBufferBuilder _builder;
-  std::vector<flatbuffers::Offset<VW::parsers::flatbuffer::Example>> _example_collection;
-  std::vector<flatbuffers::Offset<VW::parsers::flatbuffer::MultiExample>> _multi_example_collection;
-  std::map<uint64_t, flatbuffers::Offset<VW::parsers::flatbuffer::Namespace>> _share_examples;
+  std::vector<flatbuffers::Offset<vw::parsers::flatbuffer::Example>> _example_collection;
+  std::vector<flatbuffers::Offset<vw::parsers::flatbuffer::MultiExample>> _multi_example_collection;
+  std::map<uint64_t, flatbuffers::Offset<vw::parsers::flatbuffer::Namespace>> _share_examples;
   size_t _collection_count = 0;
   uint32_t _multi_ex_index = 0;
   int _examples = 0;
@@ -74,7 +74,7 @@ private:
   void create_cb_label(example* v, ExampleBuilder& ex_builder);
   void create_ccb_label(example* v, ExampleBuilder& ex_builder);
   void create_cb_eval_label(example* v, ExampleBuilder& ex_builder);
-  void create_mc_label(VW::named_labels* ldict, example* v, ExampleBuilder& ex_builder);
+  void create_mc_label(vw::named_labels* ldict, example* v, ExampleBuilder& ex_builder);
   void create_multi_label(example* v, ExampleBuilder& ex_builder);
   void create_slates_label(example* v, ExampleBuilder& ex_builder);
   void create_cs_label(example* v, ExampleBuilder& ex_builder);

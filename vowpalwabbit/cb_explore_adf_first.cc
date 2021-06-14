@@ -20,9 +20,9 @@
 #include <algorithm>
 #include <cmath>
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -34,10 +34,10 @@ private:
   size_t _tau;
   float _epsilon;
 
-  VW::version_struct _model_file_version;
+  vw::version_struct _model_file_version;
 
 public:
-  cb_explore_adf_first(size_t tau, float epsilon, VW::version_struct model_file_version);
+  cb_explore_adf_first(size_t tau, float epsilon, vw::version_struct model_file_version);
   ~cb_explore_adf_first() = default;
 
   // Should be called through cb_explore_adf_base for pre/post-processing
@@ -50,7 +50,7 @@ private:
   void predict_or_learn_impl(multi_learner& base, multi_ex& examples);
 };
 
-cb_explore_adf_first::cb_explore_adf_first(size_t tau, float epsilon, VW::version_struct model_file_version)
+cb_explore_adf_first::cb_explore_adf_first(size_t tau, float epsilon, vw::version_struct model_file_version)
     : _tau(tau), _epsilon(epsilon), _model_file_version(std::move(model_file_version))
 {
 }
@@ -93,7 +93,7 @@ void cb_explore_adf_first::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-base_learner* setup(config::options_i& options, vw& all)
+base_learner* setup(config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -121,7 +121,7 @@ base_learner* setup(config::options_i& options, vw& all)
   bool with_metrics = options.was_supplied("extra_metrics");
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_first>;
-  auto data = VW::make_unique<explore_type>(with_metrics, tau, epsilon, all.model_file_ver);
+  auto data = vw::make_unique<explore_type>(with_metrics, tau, epsilon, all.model_file_ver);
 
   if (epsilon < 0.0 || epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
   auto* l = make_reduction_learner(
@@ -139,4 +139,4 @@ base_learner* setup(config::options_i& options, vw& all)
 
 }  // namespace first
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

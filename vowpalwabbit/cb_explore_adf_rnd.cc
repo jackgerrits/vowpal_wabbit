@@ -29,9 +29,9 @@
 // this is a randomized algorithm for approximating the linucb bonus.
 // Hopefully it works well when the expected reward is realizable.  YMMV.
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -46,7 +46,7 @@ private:
   uint32_t numrnd;
 
   size_t increment;
-  vw* all;
+  workspace* all;
 
   std::vector<float> bonuses;
   std::vector<float> initials;
@@ -73,7 +73,7 @@ private:
   void base_learn_or_predict(multi_learner&, multi_ex&, uint32_t);
 
 public:
-  cb_explore_adf_rnd(float _epsilon, float _alpha, float _invlambda, uint32_t _numrnd, size_t _increment, vw* _all)
+  cb_explore_adf_rnd(float _epsilon, float _alpha, float _invlambda, uint32_t _numrnd, size_t _increment, workspace* _all)
       : epsilon(_epsilon)
       , alpha(_alpha)
       , sqrtinvlambda(std::sqrt(_invlambda))
@@ -228,7 +228,7 @@ void cb_explore_adf_rnd::predict_or_learn_impl(multi_learner& base, multi_ex& ex
   save_labels<is_learn>(examples);
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([this, &examples] { this->restore_labels<is_learn>(examples); });
+  auto restore_guard = vw::scope_exit([this, &examples] { this->restore_labels<is_learn>(examples); });
 
   zero_bonuses(examples);
   for (uint32_t id = 0; id < numrnd; ++id)
@@ -252,7 +252,7 @@ void cb_explore_adf_rnd::predict_or_learn_impl(multi_learner& base, multi_ex& ex
   exploration::enforce_minimum_probability(epsilon, true, begin_scores(preds), end_scores(preds));
 }
 
-base_learner* setup(VW::config::options_i& options, vw& all)
+base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -298,7 +298,7 @@ base_learner* setup(VW::config::options_i& options, vw& all)
   bool with_metrics = options.was_supplied("extra_metrics");
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_rnd>;
-  auto data = VW::make_unique<explore_type>(
+  auto data = vw::make_unique<explore_type>(
       with_metrics, epsilon, alpha, invlambda, numrnd, base->increment * problem_multiplier, &all);
 
   if (epsilon < 0.0 || epsilon > 1.0) { THROW("The value of epsilon must be in [0,1]"); }
@@ -315,4 +315,4 @@ base_learner* setup(VW::config::options_i& options, vw& all)
 }
 }  // namespace rnd
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

@@ -21,8 +21,8 @@ public:
 class ezexample
 {
 private:
-  vw* vw_ref;
-  vw* vw_par_ref;  // an extra parser if we're multithreaded
+  workspace* vw_ref;
+  workspace* vw_par_ref;  // an extra parser if we're multithreaded
   bool is_multiline;
 
   char str[2];
@@ -42,7 +42,7 @@ private:
 
   example* get_new_example()
   {
-    example* new_ec = VW::new_unused_example(*vw_par_ref);
+    example* new_ec = vw::new_unused_example(*vw_par_ref);
     vw_par_ref->example_parser->lbl_parser.default_label(&new_ec->l);
     new_ec->tag.clear();
     new_ec->indices.clear();
@@ -59,7 +59,7 @@ private:
     return new_ec;
   }
 
-  void setup_new_ezexample(vw* this_vw, bool multiline, vw* this_vw_parser)
+  void setup_new_ezexample(workspace* this_vw, bool multiline, workspace* this_vw_parser)
   {
     vw_ref = this_vw;
     vw_par_ref = (this_vw_parser == nullptr) ? this_vw : this_vw_parser;
@@ -77,7 +77,7 @@ private:
 
   void setup_for_predict()
   {
-    static example* empty_example = is_multiline ? VW::read_example(*vw_par_ref, (char*)"") : nullptr;
+    static example* empty_example = is_multiline ? vw::read_example(*vw_par_ref, (char*)"") : nullptr;
     if (example_changed_since_prediction)
     {
       mini_setup_example();
@@ -90,20 +90,20 @@ private:
 public:
   // REAL FUNCTIONALITY
   // create a new ezexample by asking the vw parser for an example
-  ezexample(vw* this_vw, bool multiline = false, vw* this_vw_parser = nullptr)
+  ezexample(workspace* this_vw, bool multiline = false, workspace* this_vw_parser = nullptr)
   {
     setup_new_ezexample(this_vw, multiline, this_vw_parser);
     example_copies = v_init<example*>();
     ec = get_new_example();
     we_create_ec = true;
 
-    if (vw_ref->add_constant) VW::add_constant_feature(*vw_ref, ec);
+    if (vw_ref->add_constant) vw::add_constant_feature(*vw_ref, ec);
   }
 
   // create a new ezexample by wrapping around an already existing example
   // we do NOT copy your data, therefore, WARNING:
   //   do NOT touch the underlying example unless you really know what you're done)
-  ezexample(vw* this_vw, example* this_ec, bool multiline = false, vw* this_vw_parser = nullptr)
+  ezexample(workspace* this_vw, example* this_ec, bool multiline = false, workspace* this_vw_parser = nullptr)
   {
     setup_new_ezexample(this_vw, multiline, this_vw_parser);
 
@@ -114,15 +114,15 @@ public:
     if (current_ns != 0)
     {
       str[0] = current_ns;
-      current_seed = static_cast<fid>(VW::hash_space(*vw_ref, str));
+      current_seed = static_cast<fid>(vw::hash_space(*vw_ref, str));
     }
   }
 
   ~ezexample()  // calls finish_example *only* if we created our own example!
   {
-    if (VW::is_ring_example(*vw_par_ref, ec)) VW::finish_example(*vw_par_ref, *ec);
+    if (vw::is_ring_example(*vw_par_ref, ec)) vw::finish_example(*vw_par_ref, *ec);
     for (auto ecc : example_copies)
-      if (VW::is_ring_example(*vw_par_ref, ec)) VW::finish_example(*vw_par_ref, *ecc);
+      if (vw::is_ring_example(*vw_par_ref, ec)) vw::finish_example(*vw_par_ref, *ecc);
     example_copies.clear();
     free(example_copies.begin());
   }
@@ -144,7 +144,7 @@ public:
     past_seeds.push_back(current_seed);
     current_ns = c;
     str[0] = c;
-    current_seed = static_cast<fid>(VW::hash_space(*vw_ref, str));
+    current_seed = static_cast<fid>(vw::hash_space(*vw_ref, str));
   }
 
   void remns()
@@ -210,7 +210,7 @@ public:
 
   inline ezexample& set_label(std::string label)
   {
-    VW::parse_example_label(*vw_par_ref, *ec, label);
+    vw::parse_example_label(*vw_par_ref, *ec, label);
     example_changed_since_prediction = true;
     return *this;
   }
@@ -258,7 +258,7 @@ public:
     else  // is multiline
     {     // we need to make a copy
       example* copy = get_new_example();
-      VW::copy_example_data_with_label(copy, ec);
+      vw::copy_example_data_with_label(copy, ec);
       vw_ref->learn(*copy);
       example_copies.push_back(copy);
     }
@@ -275,28 +275,28 @@ public:
 
   void finish()
   {
-    static example* empty_example = is_multiline ? VW::read_example(*vw_par_ref, (char*)"") : nullptr;
+    static example* empty_example = is_multiline ? vw::read_example(*vw_par_ref, (char*)"") : nullptr;
     if (is_multiline)
     {
       vw_ref->learn(*empty_example);
-      for (auto ecc : example_copies) VW::finish_example(*vw_par_ref, *ecc);
+      for (auto ecc : example_copies) vw::finish_example(*vw_par_ref, *ecc);
       example_copies.clear();
     }
   }
 
   // HELPER FUNCTIONALITY
 
-  inline fid hash(std::string fstr) { return static_cast<fid>(VW::hash_feature(*vw_ref, fstr, current_seed)); }
-  inline fid hash(char* fstr) { return static_cast<fid>(VW::hash_feature_cstr(*vw_ref, fstr, current_seed)); }
+  inline fid hash(std::string fstr) { return static_cast<fid>(vw::hash_feature(*vw_ref, fstr, current_seed)); }
+  inline fid hash(char* fstr) { return static_cast<fid>(vw::hash_feature_cstr(*vw_ref, fstr, current_seed)); }
   inline fid hash(char c, std::string fstr)
   {
     str[0] = c;
-    return static_cast<fid>(VW::hash_feature(*vw_ref, fstr, VW::hash_space(*vw_ref, str)));
+    return static_cast<fid>(vw::hash_feature(*vw_ref, fstr, vw::hash_space(*vw_ref, str)));
   }
   inline fid hash(char c, char* fstr)
   {
     str[0] = c;
-    return static_cast<fid>(VW::hash_feature_cstr(*vw_ref, fstr, VW::hash_space(*vw_ref, str)));
+    return static_cast<fid>(vw::hash_feature_cstr(*vw_ref, fstr, vw::hash_space(*vw_ref, str)));
   }
 
   inline fid addf(fid fint) { return addf(fint, 1.0); }

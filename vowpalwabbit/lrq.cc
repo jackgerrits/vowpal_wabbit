@@ -8,12 +8,12 @@
 #include "vw_exception.h"
 #include "parse_args.h"  // for spoof_hex_encoded_namespaces
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 struct LRQstate
 {
-  vw* all;  // feature creation, audit, hash_inv
+  workspace* all;  // feature creation, audit, hash_inv
   bool lrindices[256];
   size_t orig_size[256];
   std::set<std::string> lrpairs;
@@ -51,7 +51,7 @@ void reset_seed(LRQstate& lrq)
 template <bool is_learn>
 void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
 {
-  vw& all = *lrq.all;
+  workspace& all = *lrq.all;
 
   // Remember original features
 
@@ -162,7 +162,7 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
   }  // end for(max_iter)
 }
 
-base_learner* lrq_setup(options_i& options, vw& all)
+base_learner* lrq_setup(options_i& options, workspace& all)
 {
   auto lrq = scoped_calloc_or_throw<LRQstate>();
   std::vector<std::string> lrq_names;

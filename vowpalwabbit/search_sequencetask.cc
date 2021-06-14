@@ -4,7 +4,7 @@
 #include "search_sequencetask.h"
 #include "vw.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 namespace SequenceTask
 {
@@ -374,7 +374,7 @@ void initialize(Search::search& sch, size_t& num_actions, options_i& /*options*/
 {
   CS::wclass default_wclass = {0., 0, 0., 0.};
 
-  example* ldf_examples = VW::alloc_examples(num_actions);
+  example* ldf_examples = vw::alloc_examples(num_actions);
   for (size_t a = 0; a < num_actions; a++)
   {
     CS::label& lab = ldf_examples[a].l.cs;
@@ -396,7 +396,7 @@ void initialize(Search::search& sch, size_t& num_actions, options_i& /*options*/
 void finish(Search::search& sch)
 {
   task_data* data = sch.get_task_data<task_data>();
-  VW::dealloc_examples(data->ldf_examples, data->num_actions);
+  vw::dealloc_examples(data->ldf_examples, data->num_actions);
   free(data);
 }
 
@@ -419,7 +419,7 @@ void run(Search::search& sch, multi_ex& ec)
     {
       if (sch.predictNeedsExample())  // we can skip this work if `predict` won't actually use the example data
       {
-        VW::copy_example_data(&data->ldf_examples[a], ec[i]);  // copy but leave label alone!
+        vw::copy_example_data(&data->ldf_examples[a], ec[i]);  // copy but leave label alone!
         // now, offset it appropriately for the action id
         my_update_example_indicies(sch, true, &data->ldf_examples[a], 28904713, 4832917 * static_cast<uint64_t>(a));
       }

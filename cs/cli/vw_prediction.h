@@ -6,7 +6,7 @@
 
 #include "vw_clr.h"
 
-namespace VW
+namespace vw
 {
 ref class VowpalWabbitExample;
 ref class VowpalWabbit;
@@ -25,7 +25,7 @@ public:
   /// </summary>
   /// <returns>A prediction result.</returns>
   /// <remarks>Implementation must be thread-safe.</remarks>
-  T Create(vw* vw, example* ex);
+  T Create(workspace* vw, example* ex);
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -44,7 +44,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual System::Object^ Create(vw* vw, example* ex) sealed;
+  virtual System::Object^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -65,7 +65,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual float Create(vw* vw, example* ex) sealed;
+  virtual float Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -94,7 +94,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual VowpalWabbitScalar Create(vw* vw, example* ex) sealed;
+  virtual VowpalWabbitScalar Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -115,7 +115,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual cli::array<float>^ Create(vw* vw, example* ex) sealed;
+  virtual cli::array<float>^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -136,7 +136,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual float Create(vw* vw, example* ex) sealed;
+  virtual float Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -157,7 +157,7 @@ public:
   /// <summary>
   /// Extracts cost sensitive prediction results from example.
   /// </summary>
-  virtual float Create(vw* vw, example* ex) sealed;
+  virtual float Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -178,7 +178,7 @@ public:
   /// <summary>
   /// Extracts cost sensitive prediction results from example.
   /// </summary>
-  virtual uint32_t Create(vw* vw, example* ex) sealed;
+  virtual uint32_t Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -200,7 +200,7 @@ public:
   /// <summary>
   /// Extracts cost sensitive prediction results from example, including confidence score.
   /// </summary>
-  virtual Dictionary<int, float>^ Create(vw* vw, example* ex) sealed;
+  virtual Dictionary<int, float>^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -221,7 +221,7 @@ public:
   /// <summary>
   /// Extracts multilabel prediction results from example.
   /// </summary>
-  virtual cli::array<int>^ Create(vw* vw, example* ex) sealed;
+  virtual cli::array<int>^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -252,7 +252,7 @@ public:
   /// <summary>
   /// Extracts multilabel prediction results from example.
   /// </summary>
-  virtual cli::array<ActionScore>^ Create(vw* vw, example* ex) sealed;
+  virtual cli::array<ActionScore>^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -305,7 +305,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example. The predicted topics.
   /// </summary>
-  virtual cli::array<float>^ Create(vw* vw, example* ex) sealed;
+  virtual cli::array<float>^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.
@@ -333,7 +333,7 @@ public:
   /// <summary>
   /// Extracts prediction results from example.
   /// </summary>
-  virtual VowpalWabbitActiveMulticlass ^ Create(vw* vw, example* ex) sealed;
+  virtual VowpalWabbitActiveMulticlass ^ Create(workspace* vw, example* ex) sealed;
 
   /// <summary>
   /// Returns the supported prediction type.

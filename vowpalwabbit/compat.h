@@ -2,5 +2,5 @@
 
 #include "learner.h"
 
-// Deprecated. Use VW::LEARNER directly.
-namespace LEARNER = VW::LEARNER;
+// Deprecated. Use vw::LEARNER directly.
+namespace LEARNER = vw::LEARNER;

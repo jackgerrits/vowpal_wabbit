@@ -13,11 +13,11 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace CB_ALGS;
-using namespace VW::config;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace MWT
 {
@@ -40,7 +40,7 @@ struct mwt
 
   v_array<namespace_index> indices;  // excluded namespaces
   features feature_space[256];
-  vw* all;
+  workspace* all;
 };
 
 void value_policy(mwt& c, float val, uint64_t index)  // estimate the value of a single feature.
@@ -134,7 +134,7 @@ void predict_or_learn(mwt& c, single_learner& base, example& ec)
   ec.pred.scalars = preds;
 }
 
-void print_scalars(VW::io::writer* f, v_array<float>& scalars, v_array<char>& tag)
+void print_scalars(vw::io::writer* f, v_array<float>& scalars, v_array<char>& tag)
 {
   if (f != nullptr)
   {
@@ -153,11 +153,11 @@ void print_scalars(VW::io::writer* f, v_array<float>& scalars, v_array<char>& ta
     ss << '\n';
     ssize_t len = ss.str().size();
     ssize_t t = f->write(ss.str().c_str(), static_cast<unsigned int>(len));
-    if (t != len) logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
+    if (t != len) logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
   }
 }
 
-void finish_example(vw& all, mwt& c, example& ec)
+void finish_example(workspace& all, mwt& c, example& ec)
 {
   float loss = 0.;
   if (c.learn)
@@ -174,7 +174,7 @@ void finish_example(vw& all, mwt& c, example& ec)
     CB::print_update(all, c.optional_observation.first, ec, nullptr, false, nullptr);
     ec.pred.scalars = temp;
   }
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void save_load(mwt& c, io_buf& model_file, bool read, bool text)
@@ -215,7 +215,7 @@ void save_load(mwt& c, io_buf& model_file, bool read, bool text)
 }  // namespace MWT
 using namespace MWT;
 
-base_learner* mwt_setup(options_i& options, vw& all)
+base_learner* mwt_setup(options_i& options, workspace& all)
 {
   auto c = scoped_calloc_or_throw<mwt>();
   std::string s;

@@ -15,10 +15,10 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 float get_active_coin_bias(float k, float avg_loss, float g, float c0)
 {
@@ -58,7 +58,7 @@ void predict_or_learn_simulation(active& a, single_learner& base, example& ec)
 
   if (is_learn)
   {
-    vw& all = *a.all;
+    workspace& all = *a.all;
 
     float k = static_cast<float>(all.sd->t);
     float threshold = 0.f;
@@ -95,7 +95,7 @@ void predict_or_learn_active(active& a, single_learner& base, example& ec)
   }
 }
 
-void active_print_result(VW::io::writer* f, float res, float weight, v_array<char> tag)
+void active_print_result(vw::io::writer* f, float res, float weight, v_array<char> tag)
 {
   if (f == nullptr) { return; }
 
@@ -109,11 +109,11 @@ void active_print_result(VW::io::writer* f, float res, float weight, v_array<cha
   ssize_t len = ss_str.size();
   ssize_t t = f->write(ss_str.c_str(), static_cast<unsigned int>(len));
   if (t != len) {
-    logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
+    logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
   }
 }
 
-void output_and_account_example(vw& all, active& a, example& ec)
+void output_and_account_example(workspace& all, active& a, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -131,13 +131,13 @@ void output_and_account_example(vw& all, active& a, example& ec)
   print_update(all, ec);
 }
 
-void return_active_example(vw& all, active& a, example& ec)
+void return_active_example(workspace& all, active& a, example& ec)
 {
   output_and_account_example(all, a, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-base_learner* active_setup(options_i& options, vw& all)
+base_learner* active_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<active>();
 

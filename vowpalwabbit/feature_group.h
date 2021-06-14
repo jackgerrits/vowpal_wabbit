@@ -320,8 +320,8 @@ struct features
   inline const_iterator cbegin() const { return {values.cbegin(), indicies.cbegin()}; }
   inline const_iterator cend() const { return {values.cend(), indicies.cend()}; }
 
-  inline VW::generic_range<audit_iterator> audit_range() { return {audit_begin(), audit_end()}; }
-  inline VW::generic_range<const_audit_iterator> audit_range() const { return {audit_cbegin(), audit_cend()}; }
+  inline vw::generic_range<audit_iterator> audit_range() { return {audit_begin(), audit_end()}; }
+  inline vw::generic_range<const_audit_iterator> audit_range() const { return {audit_cbegin(), audit_cend()}; }
 
   inline audit_iterator audit_begin() { return {values.begin(), indicies.begin(), space_names.data()}; }
   inline const_audit_iterator audit_begin() const { return {values.begin(), indicies.begin(), space_names.data()}; }

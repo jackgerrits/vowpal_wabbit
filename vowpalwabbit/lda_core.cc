@@ -36,9 +36,9 @@
 #  include <boost/align/is_aligned.hpp>
 #endif
 
-using namespace VW::config;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 enum lda_math_mode
 {
@@ -815,7 +815,7 @@ void return_example(vw &all, example &ec)
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet)
     all.sd->print_update(*all.trace_message, all.holdout_set_off, all.current_pass, "none", 0, ec.get_num_features(),
         all.progress_add, all.progress_arg);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void learn_batch(lda &l)
@@ -963,7 +963,7 @@ void learn_batch(lda &l)
   l.doc_lengths.clear();
 }
 
-void learn(lda &l, VW::LEARNER::single_learner &, example &ec)
+void learn(lda &l, vw::LEARNER::single_learner &, example &ec)
 {
   uint32_t num_ex = static_cast<uint32_t>(l.examples.size());
   l.examples.push_back(&ec);
@@ -980,7 +980,7 @@ void learn(lda &l, VW::LEARNER::single_learner &, example &ec)
   if (++num_ex == l.minibatch) learn_batch(l);
 }
 
-void learn_with_metrics(lda &l, VW::LEARNER::single_learner &base, example &ec)
+void learn_with_metrics(lda &l, vw::LEARNER::single_learner &base, example &ec)
 {
   if (l.all->passes_complete == 0)
   {
@@ -1003,8 +1003,8 @@ void learn_with_metrics(lda &l, VW::LEARNER::single_learner &base, example &ec)
 }
 
 // placeholder
-void predict(lda &l, VW::LEARNER::single_learner &base, example &ec) { learn(l, base, ec); }
-void predict_with_metrics(lda &l, VW::LEARNER::single_learner &base, example &ec) { learn_with_metrics(l, base, ec); }
+void predict(lda &l, vw::LEARNER::single_learner &base, example &ec) { learn(l, base, ec); }
+void predict_with_metrics(lda &l, vw::LEARNER::single_learner &base, example &ec) { learn_with_metrics(l, base, ec); }
 
 struct word_doc_frequency
 {
@@ -1269,11 +1269,11 @@ std::istream &operator>>(std::istream &in, lda_math_mode &mmode)
   else if (token == "fast-approx" || token == "approx")
     mmode = USE_FAST_APPROX;
   else
-    THROW_EX(VW::vw_unrecognised_option_exception, token);
+    THROW_EX(vw::vw_unrecognised_option_exception, token);
   return in;
 }
 
-VW::LEARNER::base_learner *lda_setup(options_i &options, vw &all)
+vw::LEARNER::base_learner *lda_setup(options_i &options, vw &all)
 {
   auto ld = scoped_calloc_or_throw<lda>();
   option_group_definition new_options("Latent Dirichlet Allocation");
@@ -1338,7 +1338,7 @@ VW::LEARNER::base_learner *lda_setup(options_i &options, vw &all)
 
   all.example_parser->lbl_parser = no_label::no_label_parser;
 
-  VW::LEARNER::learner<lda, example> &l = init_learner(ld, ld->compute_coherence_metrics ? learn_with_metrics : learn,
+  vw::LEARNER::learner<lda, example> &l = init_learner(ld, ld->compute_coherence_metrics ? learn_with_metrics : learn,
       ld->compute_coherence_metrics ? predict_with_metrics : predict, UINT64_ONE << all.weights.stride_shift(),
       prediction_type_t::scalars, all.get_setupfn_name(lda_setup), true);
 

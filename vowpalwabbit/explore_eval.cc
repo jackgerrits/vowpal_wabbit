@@ -16,16 +16,16 @@
 // input = contextual bandit label
 // output = chosen ranking
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace CB_ALGS;
-using namespace VW::config;
+using namespace vw::config;
 
 namespace EXPLORE_EVAL
 {
 struct explore_eval
 {
   CB::cb_class known_cost;
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
   uint64_t offset;
   CB::label action_label;
@@ -53,7 +53,7 @@ void finish(explore_eval& data)
 // are specified. We print the first action and probability, based on
 // ordering by scores in the final output.
 
-void output_example(vw& all, explore_eval& c, example& ec, multi_ex* ec_seq)
+void output_example(workspace& all, explore_eval& c, example& ec, multi_ex* ec_seq)
 {
   if (example_is_newline_not_header(ec)) return;
 
@@ -101,7 +101,7 @@ void output_example(vw& all, explore_eval& c, example& ec, multi_ex* ec_seq)
   CB::print_update(all, !labeled_example, ec, ec_seq, true, nullptr);
 }
 
-void output_example_seq(vw& all, explore_eval& data, multi_ex& ec_seq)
+void output_example_seq(workspace& all, explore_eval& data, multi_ex& ec_seq)
 {
   if (ec_seq.size() > 0)
   {
@@ -110,14 +110,14 @@ void output_example_seq(vw& all, explore_eval& data, multi_ex& ec_seq)
   }
 }
 
-void finish_multiline_example(vw& all, explore_eval& data, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, explore_eval& data, multi_ex& ec_seq)
 {
   if (ec_seq.size() > 0)
   {
     output_example_seq(all, data, ec_seq);
     CB_ADF::global_print_newline(all.final_prediction_sink);
   }
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 template <bool is_learn>
@@ -184,7 +184,7 @@ void do_actual_learning(explore_eval& data, multi_learner& base, multi_ex& ec_se
 
 using namespace EXPLORE_EVAL;
 
-base_learner* explore_eval_setup(options_i& options, vw& all)
+base_learner* explore_eval_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<explore_eval>();
   bool explore_eval_option = false;

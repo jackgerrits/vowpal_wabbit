@@ -10,9 +10,9 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
 using namespace System::Threading::Tasks;
-using namespace VW::Serializer;
+using namespace vw::Serializer;
 
-namespace VW
+namespace vw
 {
 ref class VowpalWabbit;
 ref class VowpalWabbitModel;
@@ -121,9 +121,9 @@ public:
   /// </summary>
   property bool EnableStringFloatCompact;
 
-  property VW::Serializer::Schema^ Schema;
+  property vw::Serializer::Schema^ Schema;
 
-  property VW::Serializer::Schema^ ActionDependentSchema;
+  property vw::Serializer::Schema^ ActionDependentSchema;
 
   property List<Type^>^ CustomFeaturizer;
 

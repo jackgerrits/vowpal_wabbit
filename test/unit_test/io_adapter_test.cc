@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(io_adapter_vector_writer)
   auto buffer = std::make_shared<std::vector<char>>();
   BOOST_CHECK_EQUAL(buffer.use_count(), 1);
   {
-    auto vector_writer = VW::io::create_vector_writer(buffer);
+    auto vector_writer = vw::io::create_vector_writer(buffer);
     BOOST_CHECK_EQUAL(buffer.use_count(), 2);
     BOOST_CHECK_EQUAL(buffer->size(), 0);
     BOOST_CHECK(*buffer == std::vector<char>{});
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(io_adapter_vector_writer)
 BOOST_AUTO_TEST_CASE(io_adapter_buffer_view)
 {
   constexpr std::array<const char, 13> buffer = {"test another"};
-  auto buffer_reader = VW::io::create_buffer_view(buffer.data(), buffer.size());
+  auto buffer_reader = vw::io::create_buffer_view(buffer.data(), buffer.size());
 
   {
     char read_buffer[5];

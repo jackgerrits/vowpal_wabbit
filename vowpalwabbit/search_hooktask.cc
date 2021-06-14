@@ -5,8 +5,8 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 // this is used for the C++ library and python library hook; hopefully
 // it can be used for any foreign library too!

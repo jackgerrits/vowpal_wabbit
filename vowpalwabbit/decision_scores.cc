@@ -15,10 +15,10 @@
 
 #include <iostream>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 template <typename LabelPrintFunc>
-void print_update(vw& all, const std::vector<example*>& slots, const VW::decision_scores_t& decision_scores,
+void print_update(workspace& all, const std::vector<example*>& slots, const vw::decision_scores_t& decision_scores,
     size_t num_features, LabelPrintFunc label_print_func)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
@@ -51,9 +51,9 @@ void print_update(vw& all, const std::vector<example*>& slots, const VW::decisio
   }
 }
 
-namespace VW
+namespace vw
 {
-void print_decision_scores(VW::io::writer* f, const VW::decision_scores_t& decision_scores)
+void print_decision_scores(vw::io::writer* f, const vw::decision_scores_t& decision_scores)
 {
   if (f != nullptr)
   {
@@ -71,19 +71,19 @@ void print_decision_scores(VW::io::writer* f, const VW::decision_scores_t& decis
     const auto str = ss.str();
     ssize_t len = str.size();
     ssize_t t = f->write(str.c_str(), static_cast<unsigned int>(len));
-    if (t != len) { logger::errlog_error("write error: {}", VW::strerror_to_string(errno)); }
+    if (t != len) { logger::errlog_error("write error: {}", vw::strerror_to_string(errno)); }
   }
 }
 
 void print_update_ccb(
-    vw& all, std::vector<example*>& slots, const VW::decision_scores_t& decision_scores, size_t num_features)
+    workspace& all, std::vector<example*>& slots, const vw::decision_scores_t& decision_scores, size_t num_features)
 {
   print_update(all, slots, decision_scores, num_features, CCB::generate_ccb_label_printout);
 }
 
 void print_update_slates(
-    vw& all, std::vector<example*>& slots, const VW::decision_scores_t& decision_scores, size_t num_features)
+    workspace& all, std::vector<example*>& slots, const vw::decision_scores_t& decision_scores, size_t num_features)
 {
   print_update(all, slots, decision_scores, num_features, slates::generate_slates_label_printout);
 }
-}  // namespace VW
+}  // namespace vw

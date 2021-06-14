@@ -9,8 +9,8 @@
 
 #include "reductions.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 // TODO: This file makes extensive use of cout and partial line logging.
 //       Will require some investigation on how to proceed
@@ -349,7 +349,7 @@ void save_node_stats(log_multi& d)
   uint32_t total;
   log_multi* b = &d;
 
-  VW::file_open(&fp, "atxm_debug.csv", "wt");
+  vw::file_open(&fp, "atxm_debug.csv", "wt");
 
   for (i = 0; i < b->nodes.size(); i++)
   {
@@ -495,7 +495,7 @@ void save_load_tree(log_multi& b, io_buf& model_file, bool read, bool text)
   }
 }
 
-base_learner* log_multi_setup(options_i& options, vw& all)  // learner setup
+base_learner* log_multi_setup(options_i& options, workspace& all)  // learner setup
 {
   auto data = scoped_calloc_or_throw<log_multi>();
   option_group_definition new_options("Logarithmic Time Multiclass Tree");

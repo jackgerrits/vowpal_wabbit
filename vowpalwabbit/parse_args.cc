@@ -117,9 +117,9 @@
 
 using std::cout;
 using std::endl;
-using namespace VW::config;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 //
 // Does std::string end with a certain substring?
@@ -134,7 +134,7 @@ bool ends_with(std::string const& fullString, std::string const& ending)
   }
 }
 
-uint64_t hash_file_contents(VW::io::reader* f)
+uint64_t hash_file_contents(vw::io::reader* f)
 {
   uint64_t v = 5289374183516789128;
   char buf[1024];
@@ -178,14 +178,14 @@ std::string find_in_path(std::vector<std::string> paths, std::string fname)
   return "";
 }
 
-void parse_dictionary_argument(vw& all, const std::string& str)
+void parse_dictionary_argument(workspace& all, const std::string& str)
 {
   if (str.length() == 0) return;
   // expecting 'namespace:file', for instance 'w:foo.txt'
   // in the case of just 'foo.txt' it's applied to the default namespace
 
   char ns = ' ';
-  VW::string_view s(str);
+  vw::string_view s(str);
   if ((str.length() > 2) && (str[1] == ':'))
   {
     ns = str[0];
@@ -196,10 +196,10 @@ void parse_dictionary_argument(vw& all, const std::string& str)
   if (fname == "") THROW("error: cannot find dictionary '" << s << "' in path; try adding --dictionary_path");
 
   bool is_gzip = ends_with(fname, ".gz");
-  std::unique_ptr<VW::io::reader> file_adapter;
+  std::unique_ptr<vw::io::reader> file_adapter;
   try
   {
-    file_adapter = is_gzip ? VW::io::open_compressed_file_reader(fname) : VW::io::open_file_reader(fname);
+    file_adapter = is_gzip ? vw::io::open_compressed_file_reader(fname) : vw::io::open_file_reader(fname);
   }
   catch (...)
   {
@@ -223,10 +223,10 @@ void parse_dictionary_argument(vw& all, const std::string& str)
     }
   }
 
-  std::unique_ptr<VW::io::reader> fd;
+  std::unique_ptr<vw::io::reader> fd;
   try
   {
-    fd = VW::io::open_file_reader(fname);
+    fd = vw::io::open_file_reader(fname);
   }
   catch (...)
   {
@@ -236,7 +236,7 @@ void parse_dictionary_argument(vw& all, const std::string& str)
   // mimicing old v_hashmap behavior for load factor.
   // A smaller factor will generally use more memory but have faster access
   map->max_load_factor(0.25);
-  example* ec = VW::alloc_examples(1);
+  example* ec = vw::alloc_examples(1);
 
   size_t def = static_cast<size_t>(' ');
 
@@ -257,7 +257,7 @@ void parse_dictionary_argument(vw& all, const std::string& str)
         if (new_buffer == nullptr)
         {
           free(buffer);
-          VW::dealloc_examples(ec, 1);
+          vw::dealloc_examples(ec, 1);
           THROW("error: memory allocation failed in reading dictionary");
         }
         else
@@ -278,10 +278,10 @@ void parse_dictionary_argument(vw& all, const std::string& str)
     { continue; }
     d--;
     *d = '|';  // set up for parser::read_line
-    VW::read_line(all, ec, d);
+    vw::read_line(all, ec, d);
     // now we just need to grab stuff from the default namespace of ec!
     if (ec->feature_space[def].size() == 0) { continue; }
-    map->emplace(word, VW::make_unique<features>(ec->feature_space[def]));
+    map->emplace(word, vw::make_unique<features>(ec->feature_space[def]));
 
     // clear up ec
     ec->tag.clear();
@@ -289,7 +289,7 @@ void parse_dictionary_argument(vw& all, const std::string& str)
     for (size_t i = 0; i < 256; i++) { ec->feature_space[i].clear(); }
   } while ((rc != EOF) && (nread > 0));
   free(buffer);
-  VW::dealloc_examples(ec, 1);
+  vw::dealloc_examples(ec, 1);
 
   if (!all.logger.quiet)
     *(all.trace_message) << "dictionary " << s << " contains " << map->size() << " item"
@@ -300,11 +300,11 @@ void parse_dictionary_argument(vw& all, const std::string& str)
   all.loaded_dictionaries.push_back(info);
 }
 
-void parse_affix_argument(vw& all, std::string str)
+void parse_affix_argument(workspace& all, std::string str)
 {
   if (str.length() == 0) return;
   char* cstr = calloc_or_throw<char>(str.length() + 1);
-  VW::string_cpy(cstr, (str.length() + 1), str.c_str());
+  vw::string_cpy(cstr, (str.length() + 1), str.c_str());
 
   char* next_token;
   char* p = strtok_s(cstr, ",", &next_token);
@@ -351,7 +351,7 @@ void parse_affix_argument(vw& all, std::string str)
   free(cstr);
 }
 
-void parse_diagnostics(options_i& options, vw& all)
+void parse_diagnostics(options_i& options, workspace& all)
 {
   bool version_arg = false;
   bool help = false;
@@ -385,7 +385,7 @@ void parse_diagnostics(options_i& options, vw& all)
   // Upon direct query for version -- spit it out directly to stdout
   if (version_arg)
   {
-    std::cout << VW::version.to_string() << " (git commit: " << VW::git_commit << ")\n";
+    std::cout << vw::version.to_string() << " (git commit: " << vw::git_commit << ")\n";
     exit(0);
   }
 
@@ -426,7 +426,7 @@ void parse_diagnostics(options_i& options, vw& all)
   }
 }
 
-input_options parse_source(vw& all, options_i& options)
+input_options parse_source(workspace& all, options_i& options)
 {
   input_options parsed_options;
 
@@ -463,7 +463,7 @@ input_options parse_source(vw& all, options_i& options)
       .add(make_option("flatbuffer", parsed_options.flatbuffer)
                .help("data file will be interpreted as a flatbuffer file"));
 #ifdef BUILD_EXTERNAL_PARSER
-  VW::external::parser::set_parse_args(input_options, parsed_options);
+  vw::external::parser::set_parse_args(input_options, parsed_options);
 #endif
 
   options.add_and_parse(input_options);
@@ -503,9 +503,9 @@ input_options parse_source(vw& all, options_i& options)
   return parsed_options;
 }
 
-namespace VW
+namespace vw
 {
-const char* are_features_compatible(vw& vw1, vw& vw2)
+const char* are_features_compatible(workspace& vw1, workspace& vw2)
 {
   if (vw1.example_parser->hasher != vw2.example_parser->hasher) return "hasher";
 
@@ -569,7 +569,7 @@ const char* are_features_compatible(vw& vw1, vw& vw2)
   return nullptr;
 }
 
-}  // namespace VW
+}  // namespace vw
 
 // Return a copy of std::string replacing \x00 sequences in it
 std::string spoof_hex_encoded_namespaces(const std::string& arg)
@@ -615,7 +615,7 @@ std::string spoof_hex_encoded_namespaces(const std::string& arg)
 }
 
 void parse_feature_tweaks(
-    options_i& options, vw& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
+    options_i& options, workspace& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
 {
   std::string hash_function("strings");
   uint32_t new_bits;
@@ -733,8 +733,8 @@ void parse_feature_tweaks(
     std::transform(skip_strings.begin(), skip_strings.end(), std::back_inserter(hex_decoded_skip_strings),
         [](const std::string& arg) { return spoof_hex_encoded_namespaces(arg); });
 
-    all.skip_gram_transformer = VW::make_unique<VW::kskip_ngram_transformer>(
-        VW::kskip_ngram_transformer::build(hex_decoded_ngram_strings, hex_decoded_skip_strings, all.logger.quiet));
+    all.skip_gram_transformer = vw::make_unique<vw::kskip_ngram_transformer>(
+        vw::kskip_ngram_transformer::build(hex_decoded_ngram_strings, hex_decoded_skip_strings, all.logger.quiet));
   }
 
   if (options.was_supplied("feature_limit")) compile_limits(all.limit_strings, all.limit, all.logger.quiet);
@@ -748,7 +748,7 @@ void parse_feature_tweaks(
     all.default_bits = false;
     all.num_bits = new_bits;
 
-    VW::validate_num_bits(all);
+    vw::validate_num_bits(all);
   }
 
   // prepare namespace interactions
@@ -1036,7 +1036,7 @@ void parse_feature_tweaks(
   if (noconstant) all.add_constant = false;
 }
 
-void parse_example_tweaks(options_i& options, vw& all)
+void parse_example_tweaks(options_i& options, workspace& all)
 {
   std::string named_labels;
   std::string loss_function;
@@ -1098,7 +1098,7 @@ void parse_example_tweaks(options_i& options, vw& all)
 
   if (options.was_supplied("named_labels"))
   {
-    all.sd->ldict = VW::make_unique<VW::named_labels>(named_labels);
+    all.sd->ldict = vw::make_unique<vw::named_labels>(named_labels);
     if (!all.logger.quiet) *(all.trace_message) << "parsed " << all.sd->ldict->getK() << " named labels" << endl;
   }
 
@@ -1124,7 +1124,7 @@ void parse_example_tweaks(options_i& options, vw& all)
   }
 }
 
-void parse_output_preds(options_i& options, vw& all)
+void parse_output_preds(options_i& options, workspace& all)
 {
   std::string predictions;
   std::string raw_predictions;
@@ -1142,13 +1142,13 @@ void parse_output_preds(options_i& options, vw& all)
 
     if (predictions == "stdout")
     {
-      all.final_prediction_sink.push_back(VW::io::open_stdout());  // stdout
+      all.final_prediction_sink.push_back(vw::io::open_stdout());  // stdout
     }
     else
     {
       try
       {
-        all.final_prediction_sink.push_back(VW::io::open_file_writer(predictions));
+        all.final_prediction_sink.push_back(vw::io::open_file_writer(predictions));
       }
       catch (...)
       {
@@ -1166,15 +1166,15 @@ void parse_output_preds(options_i& options, vw& all)
         *(all.trace_message)
             << "Warning: --raw_predictions has no defined value when --binary specified, expect no output" << endl;
     }
-    if (raw_predictions == "stdout") { all.raw_prediction = VW::io::open_stdout(); }
+    if (raw_predictions == "stdout") { all.raw_prediction = vw::io::open_stdout(); }
     else
     {
-      all.raw_prediction = VW::io::open_file_writer(raw_predictions);
+      all.raw_prediction = vw::io::open_file_writer(raw_predictions);
     }
   }
 }
 
-void parse_output_model(options_i& options, vw& all)
+void parse_output_model(options_i& options, workspace& all)
 {
   option_group_definition output_model_options("Output model");
   output_model_options
@@ -1208,7 +1208,7 @@ void parse_output_model(options_i& options, vw& all)
   // }
 }
 
-void load_input_model(vw& all, io_buf& io_temp)
+void load_input_model(workspace& all, io_buf& io_temp)
 {
   // Need to see if we have to load feature mask first or second.
   // -i and -mask are from same file, load -i file first so mask can use it
@@ -1230,7 +1230,7 @@ void load_input_model(vw& all, io_buf& io_temp)
   }
 }
 
-VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
+vw::LEARNER::base_learner* setup_base(options_i& options, workspace& all)
 {
   auto func_map = all.reduction_stack.back();
   reduction_setup_fn setup_func = std::get<1>(func_map);
@@ -1253,13 +1253,13 @@ VW::LEARNER::base_learner* setup_base(options_i& options, vw& all)
   }
 }
 
-void register_reductions(vw& all, std::vector<reduction_setup_fn>& reductions)
+void register_reductions(workspace& all, std::vector<reduction_setup_fn>& reductions)
 {
   std::map<reduction_setup_fn, std::string> allowlist = {{GD::setup, "gd"}, {ftrl_setup, "ftrl"},
       {scorer_setup, "scorer"}, {CSOAA::csldf_setup, "csoaa_ldf"},
-      {VW::cb_explore_adf::greedy::setup, "cb_explore_adf_greedy"},
-      {VW::cb_explore_adf::regcb::setup, "cb_explore_adf_regcb"},
-      {VW::shared_feature_merger::shared_feature_merger_setup, "shared_feature_merger"},
+      {vw::cb_explore_adf::greedy::setup, "cb_explore_adf_greedy"},
+      {vw::cb_explore_adf::regcb::setup, "cb_explore_adf_regcb"},
+      {vw::shared_feature_merger::shared_feature_merger_setup, "shared_feature_merger"},
       {generate_interactions_setup, "generate_interactions"}};
 
   auto name_extractor = options_name_extractor();
@@ -1283,7 +1283,7 @@ void register_reductions(vw& all, std::vector<reduction_setup_fn>& reductions)
   all.build_setupfn_name_dict();
 }
 
-void parse_reductions(options_i& options, vw& all)
+void parse_reductions(options_i& options, workspace& all)
 {
   std::vector<reduction_setup_fn> reductions;
 
@@ -1318,11 +1318,11 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(lrqfa_setup);
   reductions.push_back(stagewise_poly_setup);
   reductions.push_back(scorer_setup);
-  reductions.push_back(VW::cbzo::setup);
+  reductions.push_back(vw::cbzo::setup);
 
   // Reductions
   reductions.push_back(bs_setup);
-  reductions.push_back(VW::binary::binary_setup);
+  reductions.push_back(vw::binary::binary_setup);
 
   reductions.push_back(ExpReplay::expreplay_setup<'m', MULTICLASS::mc_label>);
   reductions.push_back(topk_setup);
@@ -1343,39 +1343,39 @@ void parse_reductions(options_i& options, vw& all)
   reductions.push_back(cb_algs_setup);
   reductions.push_back(cb_adf_setup);
   reductions.push_back(mwt_setup);
-  reductions.push_back(VW::cats_tree::setup);
+  reductions.push_back(vw::cats_tree::setup);
   reductions.push_back(cb_explore_setup);
-  reductions.push_back(VW::cb_explore_adf::greedy::setup);
-  reductions.push_back(VW::cb_explore_adf::softmax::setup);
-  reductions.push_back(VW::cb_explore_adf::rnd::setup);
-  reductions.push_back(VW::cb_explore_adf::regcb::setup);
-  reductions.push_back(VW::cb_explore_adf::squarecb::setup);
-  reductions.push_back(VW::cb_explore_adf::synthcover::setup);
-  reductions.push_back(VW::cb_explore_adf::first::setup);
-  reductions.push_back(VW::cb_explore_adf::cover::setup);
-  reductions.push_back(VW::cb_explore_adf::bag::setup);
+  reductions.push_back(vw::cb_explore_adf::greedy::setup);
+  reductions.push_back(vw::cb_explore_adf::softmax::setup);
+  reductions.push_back(vw::cb_explore_adf::rnd::setup);
+  reductions.push_back(vw::cb_explore_adf::regcb::setup);
+  reductions.push_back(vw::cb_explore_adf::squarecb::setup);
+  reductions.push_back(vw::cb_explore_adf::synthcover::setup);
+  reductions.push_back(vw::cb_explore_adf::first::setup);
+  reductions.push_back(vw::cb_explore_adf::cover::setup);
+  reductions.push_back(vw::cb_explore_adf::bag::setup);
   reductions.push_back(cb_dro_setup);
   reductions.push_back(cb_sample_setup);
   reductions.push_back(explore_eval_setup);
-  reductions.push_back(VW::shared_feature_merger::shared_feature_merger_setup);
+  reductions.push_back(vw::shared_feature_merger::shared_feature_merger_setup);
   reductions.push_back(CCB::ccb_explore_adf_setup);
-  reductions.push_back(VW::slates::slates_setup);
+  reductions.push_back(vw::slates::slates_setup);
   // cbify/warm_cb can generate multi-examples. Merge shared features after them
   reductions.push_back(warm_cb_setup);
-  reductions.push_back(VW::continuous_action::get_pmf_setup);
-  reductions.push_back(VW::pmf_to_pdf::setup);
-  reductions.push_back(VW::continuous_action::cb_explore_pdf_setup);
-  reductions.push_back(VW::continuous_action::cats_pdf::setup);
-  reductions.push_back(VW::continuous_action::sample_pdf_setup);
-  reductions.push_back(VW::continuous_action::cats::setup);
+  reductions.push_back(vw::continuous_action::get_pmf_setup);
+  reductions.push_back(vw::pmf_to_pdf::setup);
+  reductions.push_back(vw::continuous_action::cb_explore_pdf_setup);
+  reductions.push_back(vw::continuous_action::cats_pdf::setup);
+  reductions.push_back(vw::continuous_action::sample_pdf_setup);
+  reductions.push_back(vw::continuous_action::cats::setup);
   reductions.push_back(cbify_setup);
   reductions.push_back(cbifyldf_setup);
   reductions.push_back(cb_to_cb_adf_setup);
-  reductions.push_back(VW::offset_tree::setup);
+  reductions.push_back(vw::offset_tree::setup);
   reductions.push_back(ExpReplay::expreplay_setup<'c', COST_SENSITIVE::cs_label>);
   reductions.push_back(Search::setup);
   reductions.push_back(audit_regressor_setup);
-  reductions.push_back(VW::metrics::metrics_setup);
+  reductions.push_back(vw::metrics::metrics_setup);
 
   register_reductions(all, reductions);
   all.l = setup_base(options, all);
@@ -1389,10 +1389,10 @@ ssize_t trace_message_wrapper_adapter(void* context, const char* buffer, size_t 
   return static_cast<ssize_t>(num_bytes);
 }
 
-vw& parse_args(
+workspace& parse_args(
     std::unique_ptr<options_i, options_deleter_type> options, trace_message_t trace_listener, void* trace_context)
 {
-  vw& all = *(new vw());
+  workspace& all = *(new vw());
   all.options = std::move(options);
 
   if (trace_listener)
@@ -1400,8 +1400,8 @@ vw& parse_args(
     // Since the trace_message_t interface uses a string and the writer interface uses a buffer we unfortunately
     // need to adapt between them here.
     all.trace_message_wrapper_context = std::make_shared<trace_message_wrapper>(trace_context, trace_listener);
-    all.trace_message = VW::make_unique<VW::io::owning_ostream>(VW::make_unique<VW::io::writer_stream_buf>(
-        VW::io::create_custom_writer(all.trace_message_wrapper_context.get(), trace_message_wrapper_adapter)));
+    all.trace_message = vw::make_unique<vw::io::owning_ostream>(vw::make_unique<vw::io::writer_stream_buf>(
+        vw::io::create_custom_writer(all.trace_message_wrapper_context.get(), trace_message_wrapper_adapter)));
   }
 
   try
@@ -1484,7 +1484,7 @@ vw& parse_args(
   }
   catch (...)
   {
-    VW::finish(all);
+    vw::finish(all);
     throw;
   }
 }
@@ -1506,7 +1506,7 @@ bool check_interaction_settings_collision(options_i& options, std::string file_o
 }
 
 void merge_options_from_header_strings(const std::vector<std::string>& strings, bool skip_interactions,
-    VW::config::options_i& options, bool& is_ccb_input_model)
+    vw::config::options_i& options, bool& is_ccb_input_model)
 {
   po::options_description desc("");
 
@@ -1593,7 +1593,7 @@ void merge_options_from_header_strings(const std::vector<std::string>& strings, 
   if (count == 0 && saved_key != "") { options.insert(saved_key, ""); }
 }
 
-options_i& load_header_merge_options(options_i& options, vw& all, io_buf& model, bool& interactions_settings_duplicated)
+options_i& load_header_merge_options(options_i& options, workspace& all, io_buf& model, bool& interactions_settings_duplicated)
 {
   std::string file_options;
   save_load_header(all, model, true, false, file_options, options);
@@ -1610,7 +1610,7 @@ options_i& load_header_merge_options(options_i& options, vw& all, io_buf& model,
 }
 
 void parse_modules(
-    options_i& options, vw& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
+    options_i& options, workspace& all, bool interactions_settings_duplicated, std::vector<std::string>& dictionary_nses)
 {
   option_group_definition rand_options("Randomization options");
   rand_options.add(make_option("random_seed", all.random_seed).help("seed random number generator"));
@@ -1637,7 +1637,7 @@ void parse_modules(
   }
 }
 
-void parse_sources(options_i& options, vw& all, io_buf& model, bool skipModelLoad)
+void parse_sources(options_i& options, workspace& all, io_buf& model, bool skipModelLoad)
 {
   if (!skipModelLoad)
     load_input_model(all, model);
@@ -1654,7 +1654,7 @@ void parse_sources(options_i& options, vw& all, io_buf& model, bool skipModelLoa
   all.wpp = (1 << i) >> all.weights.stride_shift();
 }
 
-namespace VW
+namespace vw
 {
 void cmd_string_replace_value(std::stringstream*& ss, std::string flag_to_replace, std::string new_value)
 {
@@ -1710,8 +1710,8 @@ char** to_argv_escaped(std::string const& s, int& argc)
 
 char** to_argv(std::string const& s, int& argc)
 {
-  VW::string_view strview(s);
-  std::vector<VW::string_view> foo;
+  vw::string_view strview(s);
+  std::vector<vw::string_view> foo;
   tokenize(' ', strview, foo);
 
   char** argv = calloc_or_throw<char*>(foo.size() + 1);
@@ -1742,7 +1742,7 @@ void free_args(int argc, char* argv[])
   free(argv);
 }
 
-void print_enabled_reductions(vw& all)
+void print_enabled_reductions(workspace& all)
 {
   // output list of enabled reductions
   if (!all.logger.quiet && !all.options->was_supplied("audit_regressor") && !all.enabled_reductions.empty())
@@ -1756,20 +1756,20 @@ void print_enabled_reductions(vw& all)
   }
 }
 
-vw* initialize(
+workspace* initialize(
     config::options_i& options, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
 {
-  std::unique_ptr<options_i, options_deleter_type> opts(&options, [](VW::config::options_i*) {});
+  std::unique_ptr<options_i, options_deleter_type> opts(&options, [](vw::config::options_i*) {});
 
   return initialize(std::move(opts), model, skipModelLoad, trace_listener, trace_context);
 }
 
-vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf* model, bool skipModelLoad,
+workspace* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf* model, bool skipModelLoad,
     trace_message_t trace_listener, void* trace_context)
 {
   // Set up logger as early as possible
   logger::initialize_logger();
-  vw& all = parse_args(std::move(options), trace_listener, trace_context);
+  workspace& all = parse_args(std::move(options), trace_listener, trace_context);
 
   try
   {
@@ -1828,11 +1828,11 @@ vw* initialize(std::unique_ptr<options_i, options_deleter_type> options, io_buf*
   }
 }
 
-vw* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
+workspace* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
 {
   int argc = 0;
   char** argv = to_argv(s, argc);
-  vw* ret = nullptr;
+  workspace* ret = nullptr;
 
   try
   {
@@ -1848,12 +1848,12 @@ vw* initialize(std::string s, io_buf* model, bool skipModelLoad, trace_message_t
   return ret;
 }
 
-vw* initialize_escaped(
+workspace* initialize_escaped(
     std::string const& s, io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
 {
   int argc = 0;
   char** argv = to_argv_escaped(s, argc);
-  vw* ret = nullptr;
+  workspace* ret = nullptr;
 
   try
   {
@@ -1869,17 +1869,17 @@ vw* initialize_escaped(
   return ret;
 }
 
-vw* initialize(
+workspace* initialize(
     int argc, char* argv[], io_buf* model, bool skipModelLoad, trace_message_t trace_listener, void* trace_context)
 {
   std::unique_ptr<options_i, options_deleter_type> options(
-      new config::options_boost_po(argc, argv), [](VW::config::options_i* ptr) { delete ptr; });
+      new config::options_boost_po(argc, argv), [](vw::config::options_i* ptr) { delete ptr; });
   return initialize(std::move(options), model, skipModelLoad, trace_listener, trace_context);
 }
 
 // Create a new VW instance while sharing the model with another instance
 // The extra arguments will be appended to those of the other VW instance
-vw* seed_vw_model(vw* vw_model, const std::string extra_args, trace_message_t trace_listener, void* trace_context)
+workspace* seed_vw_model(workspace* vw_model, const std::string extra_args, trace_message_t trace_listener, void* trace_context)
 {
   options_serializer_boost_po serializer;
   for (auto const& option : vw_model->options->get_all_options())
@@ -1897,8 +1897,8 @@ vw* seed_vw_model(vw* vw_model, const std::string extra_args, trace_message_t tr
   auto serialized_options = serializer.str();
   serialized_options = serialized_options + " " + extra_args;
 
-  vw* new_model =
-      VW::initialize(serialized_options.c_str(), nullptr, true /* skipModelLoad */, trace_listener, trace_context);
+  workspace* new_model =
+      vw::initialize(serialized_options.c_str(), nullptr, true /* skipModelLoad */, trace_listener, trace_context);
   free_it(new_model->sd);
 
   // reference model states stored in the specified VW instance
@@ -1909,7 +1909,7 @@ vw* seed_vw_model(vw* vw_model, const std::string extra_args, trace_message_t tr
   return new_model;
 }
 
-void sync_stats(vw& all)
+void sync_stats(workspace& all)
 {
   if (all.all_reduce != nullptr)
   {
@@ -1928,7 +1928,7 @@ void sync_stats(vw& all)
   }
 }
 
-void finish(vw& all, bool delete_all)
+void finish(workspace& all, bool delete_all)
 {
   // also update VowpalWabbit::PerformanceStatistics::get() (vowpalwabbit.cpp)
   if (!all.logger.quiet && !all.options->was_supplied("audit_regressor"))
@@ -2003,4 +2003,4 @@ void finish(vw& all, bool delete_all)
 
   if (finalize_regressor_exception_thrown) throw finalize_regressor_exception;
 }
-}  // namespace VW
+}  // namespace vw

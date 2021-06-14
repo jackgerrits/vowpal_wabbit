@@ -11,7 +11,7 @@
 
 BOOST_AUTO_TEST_CASE(namespaced_features_test)
 {
-  VW::namespaced_features feature_groups;
+  vw::namespaced_features feature_groups;
   BOOST_CHECK(feature_groups.empty());
 
   auto begin_end = feature_groups.get_namespace_index_groups('a');
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(namespaced_features_test)
   begin_end = feature_groups.get_namespace_index_groups('a');
   BOOST_CHECK(begin_end.second - begin_end.first == 2);
 
-  BOOST_REQUIRE_THROW(feature_groups[1], VW::vw_exception);
+  BOOST_REQUIRE_THROW(feature_groups[1], vw::vw_exception);
   BOOST_REQUIRE_NO_THROW(feature_groups[123]);
 
   check_collections_exact(feature_groups.get_indices(), std::set<namespace_index>{'a'});

@@ -21,7 +21,7 @@
 // this lookup table at compiletime that adheres to the systems defined bounds
 // for float precision (see FLT_MIN_10_EXP and FLT_MAX_10_EXP)
 
-namespace VW
+namespace vw
 {
 namespace details
 {
@@ -99,4 +99,4 @@ VW_STD14_CONSTEXPR inline float fast_pow10(int8_t exponent)
                                 static_cast<std::size_t>(details::VALUES_BELOW_ZERO)];
 }
 
-}  // namespace VW
+}  // namespace vw

@@ -14,7 +14,7 @@
 #include <cfloat>
 
 // TODO: extend to handle CSOAA_LDF and WAP_LDF
-VW::LEARNER::base_learner* cb_algs_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* cb_algs_setup(vw::config::options_i& options, workspace& all);
 
 #define CB_TYPE_DR 0
 #define CB_TYPE_DM 1
@@ -26,7 +26,7 @@ namespace CB_ALGS
 {
 template <bool is_learn>
 float get_cost_pred(
-    VW::LEARNER::single_learner* scorer, const CB::cb_class& known_cost, example& ec, uint32_t index, uint32_t base)
+    vw::LEARNER::single_learner* scorer, const CB::cb_class& known_cost, example& ec, uint32_t index, uint32_t base)
 {
   VW_DBG(ec) << "get_cost_pred:" << is_learn << std::endl;
   CB::label ld = ec.l.cb;
@@ -93,6 +93,6 @@ inline bool example_is_newline_not_header(example const& ec)
   return (example_is_newline(ec) && !CB::ec_is_example_header(ec));
 }
 
-void generic_output_example(vw& all, float loss, example& ec, const CB::label& ld, CB::cb_class* known_cost);
+void generic_output_example(workspace& all, float loss, example& ec, const CB::label& ld, CB::cb_class* known_cost);
 
 }  // namespace CB_ALGS

@@ -17,7 +17,7 @@ struct wt
 class SequenceLabelerTask : public SearchTask<std::vector<wt>, std::vector<uint32_t> >
 {
 public:
-  SequenceLabelerTask(vw& vw_obj)
+  SequenceLabelerTask(workspace& vw_obj)
     : SearchTask<std::vector<wt>, std::vector<uint32_t> >(vw_obj)    // must run parent constructor!
   { sch.set_options( Search::AUTO_HAMMING_LOSS | Search::AUTO_CONDITION_FEATURES );
     HookTask::task_data* d = sch.get_task_data<HookTask::task_data>();
@@ -29,9 +29,9 @@ public:
   { output.clear();
     //ptag currently uint32_t
     for (ptag i=0; i<input_example.size(); i++)
-    { example* ex = VW::read_example(vw_obj, std::string("1 |w ") + input_example[i].word);
+    { example* ex = vw::read_example(vw_obj, std::string("1 |w ") + input_example[i].word);
       action p  = Search::predictor(sch, i+1).set_input(*ex).set_oracle(input_example[i].tag).set_condition(i, 'p').predict();
-      VW::finish_example(vw_obj, *ex);
+      vw::finish_example(vw_obj, *ex);
       output.push_back(p);
     }
   }
@@ -50,9 +50,9 @@ public:
 
 };
 
-void run(vw& vw_obj)
+void run(workspace& vw_obj)
 { // we put this in its own scope so that its destructor on
-  // SequenceLabelerTask gets called *before* VW::finish gets called;
+  // SequenceLabelerTask gets called *before* vw::finish gets called;
   // otherwise we'll get a segfault :(. i'm not sure what to do about
   // this :(.
   SequenceLabelerTask task(vw_obj);
@@ -79,16 +79,16 @@ void run(vw& vw_obj)
 void train()
 { // initialize VW as usual, but use 'hook' as the search_task
   cerr << endl << endl << "##### train() #####" << endl << endl;
-  vw& vw_obj = *VW::initialize("--search 4 --quiet --search_task hook --ring_size 1024 -f my_model");
+  workspace& vw_obj = *vw::initialize("--search 4 --quiet --search_task hook --ring_size 1024 -f my_model");
   run(vw_obj);
-  VW::finish(vw_obj);
+  vw::finish(vw_obj);
 }
 
 void predict()
 { cerr << endl << endl << "##### predict() #####" << endl << endl;
-  vw& vw_obj = *VW::initialize("--quiet -t --ring_size 1024 -i my_model");
+  workspace& vw_obj = *vw::initialize("--quiet -t --ring_size 1024 -i my_model");
   run(vw_obj);
-  VW::finish(vw_obj);
+  vw::finish(vw_obj);
 }
 
 void test_buildin_task()
@@ -99,15 +99,15 @@ void test_buildin_task()
 
   // now, load that model using the BuiltInTask library
   cerr << endl << endl << "##### test BuiltInTask #####" << endl << endl;
-  vw& vw_obj = *VW::initialize("-t -i sequence.model --search_task hook");
+  workspace& vw_obj = *vw::initialize("-t -i sequence.model --search_task hook");
   { // create a new scope for the task object
     BuiltInTask task(vw_obj, &SequenceTask::task);
     multi_ex V;
-    V.push_back( VW::read_example(vw_obj, (char*)"1 | a") );
-    V.push_back( VW::read_example(vw_obj, (char*)"1 | a") );
-    V.push_back( VW::read_example(vw_obj, (char*)"1 | a") );
-    V.push_back( VW::read_example(vw_obj, (char*)"1 | a") );
-    V.push_back( VW::read_example(vw_obj, (char*)"1 | a") );
+    V.push_back( vw::read_example(vw_obj, (char*)"1 | a") );
+    V.push_back( vw::read_example(vw_obj, (char*)"1 | a") );
+    V.push_back( vw::read_example(vw_obj, (char*)"1 | a") );
+    V.push_back( vw::read_example(vw_obj, (char*)"1 | a") );
+    V.push_back( vw::read_example(vw_obj, (char*)"1 | a") );
     std::vector<action> out;
     task.predict(V, out);
     cerr << "out (should be 1 2 3 4 3) =";
@@ -115,10 +115,10 @@ void test_buildin_task()
       cerr << " " << out[i];
     cerr << endl;
     for (size_t i=0; i<V.size(); i++)
-      VW::finish_example(vw_obj, *V[i]);
+      vw::finish_example(vw_obj, *V[i]);
   }
 
-  VW::finish(vw_obj);
+  vw::finish(vw_obj);
 }
 
 int main(int argc, char *argv[])

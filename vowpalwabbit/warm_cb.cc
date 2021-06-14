@@ -19,12 +19,12 @@
 #include <vector>
 #include <memory>
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace exploration;
 using namespace ACTION_SCORE;
-using namespace VW::config;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 #define WARM_START 1
 #define INTERACTION 2
@@ -49,7 +49,7 @@ struct warm_cb
   action_scores a_s;
   // used as the seed
   size_t example_counter;
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
   multi_ex ecs;
   float loss0;
@@ -91,9 +91,9 @@ struct warm_cb
 
   ~warm_cb()
   {
-    for (size_t a = 0; a < num_actions; ++a) { VW::dealloc_examples(ecs[a], 1); }
+    for (size_t a = 0; a < num_actions; ++a) { vw::dealloc_examples(ecs[a], 1); }
 
-    for (auto* ex : ws_vali) { VW::dealloc_examples(ex, 1); }
+    for (auto* ex : ws_vali) { vw::dealloc_examples(ex, 1); }
   }
 };
 
@@ -162,7 +162,7 @@ void copy_example_to_adf(warm_cb& data, example& ec)
     CB::default_label(lab);
 
     // copy data
-    VW::copy_example_data(&eca, &ec);
+    vw::copy_example_data(&eca, &ec);
 
     // offset indicies for given action
     for (features& fs : eca)
@@ -304,8 +304,8 @@ template <bool use_cs>
 void add_to_vali(warm_cb& data, example& ec)
 {
   // TODO: set the first parameter properly
-  example* ec_copy = VW::alloc_examples(1);
-  VW::copy_example_data_with_label(ec_copy, &ec);
+  example* ec_copy = vw::alloc_examples(1);
+  vw::copy_example_data_with_label(ec_copy, &ec);
   data.ws_vali.push_back(ec_copy);
 }
 
@@ -394,7 +394,7 @@ void learn_bandit_adf(warm_cb& data, multi_learner& base, example& ec, int ec_ty
   for (size_t a = 0; a < data.num_actions; ++a) old_weights.push_back(data.ecs[a]->weight);
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([&old_weights, &data] {
+  auto restore_guard = vw::scope_exit([&old_weights, &data] {
     for (size_t a = 0; a < data.num_actions; ++a) { data.ecs[a]->weight = old_weights[a]; }
   });
 
@@ -496,7 +496,7 @@ void init_adf_data(warm_cb& data, const uint32_t num_actions)
   data.ecs.resize(num_actions);
   for (size_t a = 0; a < num_actions; ++a)
   {
-    data.ecs[a] = VW::alloc_examples(1);
+    data.ecs[a] = vw::alloc_examples(1);
     auto& lab = data.ecs[a]->l.cb;
     CB::default_label(lab);
   }
@@ -521,7 +521,7 @@ void init_adf_data(warm_cb& data, const uint32_t num_actions)
   data.cumu_var = 0.f;
 }
 
-base_learner* warm_cb_setup(options_i& options, vw& all)
+base_learner* warm_cb_setup(options_i& options, workspace& all)
 {
   uint32_t num_actions = 0;
   auto data = scoped_calloc_or_throw<warm_cb>();

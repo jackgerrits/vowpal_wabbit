@@ -6,7 +6,7 @@
 #include "gd.h"
 #include "vw_exception.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 /*
 example format:
@@ -328,7 +328,7 @@ void add_edge_features(Search::search& sch, task_data& D, size_t n, multi_ex& ec
   ec[n]->reset_total_sum_feat_sq();
   ec[n]->num_features += ec[n]->feature_space[neighbor_namespace].size();
 
-  vw& all = sch.get_vw_pointer_unsafe();
+  workspace& all = sch.get_vw_pointer_unsafe();
   for (const auto& i : all.interactions)
   {
     if (i.size() != 2) continue;

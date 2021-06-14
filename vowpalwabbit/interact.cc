@@ -8,20 +8,20 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 struct interact
 {
   unsigned char n1, n2;  // namespaces to interact
   features feat_store;
-  vw* all;
+  workspace* all;
   float n1_feat_sq;
   size_t num_features;
 };
 
-bool contains_valid_namespaces(vw& all, features& f_src1, features& f_src2, interact& in)
+bool contains_valid_namespaces(workspace& all, features& f_src1, features& f_src2, interact& in)
 {
   // first feature must be 1 so we're sure that the anchor feature is present
   if (f_src1.size() == 0 || f_src2.size() == 0) return false;
@@ -47,7 +47,7 @@ void multiply(features& f_dest, features& f_src2, interact& in)
 {
   f_dest.clear();
   features& f_src1 = in.feat_store;
-  vw* all = in.all;
+  workspace* all = in.all;
   uint64_t weight_mask = all->weights.mask();
   uint64_t base_id1 = f_src1.indicies[0] & weight_mask;
   uint64_t base_id2 = f_src2.indicies[0] & weight_mask;
@@ -92,7 +92,7 @@ void multiply(features& f_dest, features& f_src2, interact& in)
 }
 
 template <bool is_learn, bool print_all>
-void predict_or_learn(interact& in, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn(interact& in, vw::LEARNER::single_learner& base, example& ec)
 {
   features& f1 = ec.feature_space[in.n1];
   features& f2 = ec.feature_space[in.n2];
@@ -139,7 +139,7 @@ void predict_or_learn(interact& in, VW::LEARNER::single_learner& base, example& 
   ec.num_features = in.num_features;
 }
 
-VW::LEARNER::base_learner* interact_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* interact_setup(options_i& options, workspace& all)
 {
   std::string s;
   option_group_definition new_options("Interact via elementwise multiplication");
@@ -163,8 +163,8 @@ VW::LEARNER::base_learner* interact_setup(options_i& options, vw& all)
   logger::errlog_info("Interacting namespaces {0:c} and {1:c}", data->n1, data->n2);
   data->all = &all;
 
-  VW::LEARNER::learner<interact, example>* l;
-  l = &VW::LEARNER::init_learner(data, as_singleline(setup_base(options, all)), predict_or_learn<true, true>,
+  vw::LEARNER::learner<interact, example>* l;
+  l = &vw::LEARNER::init_learner(data, as_singleline(setup_base(options, all)), predict_or_learn<true, true>,
       predict_or_learn<false, true>, 1, all.get_setupfn_name(interact_setup));
 
   return make_base(*l);

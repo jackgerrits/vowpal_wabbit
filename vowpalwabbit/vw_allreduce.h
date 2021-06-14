@@ -10,7 +10,7 @@
 #include "global_data.h"
 
 template <class T, void (*f)(T&, const T&)>
-void all_reduce(vw& all, T* buffer, const size_t n)
+void all_reduce(workspace& all, T* buffer, const size_t n)
 {
   switch (all.all_reduce_type)
   {

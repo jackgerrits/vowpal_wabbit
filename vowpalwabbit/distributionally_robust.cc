@@ -5,7 +5,7 @@
 
 #include "distributionally_robust.h"
 
-namespace VW
+namespace vw
 {
 namespace distributionally_robust
 {
@@ -164,4 +164,4 @@ ChiSquared::Duals ChiSquared::recompute_duals()
 
 }  // namespace distributionally_robust
 
-}  // namespace VW
+}  // namespace vw

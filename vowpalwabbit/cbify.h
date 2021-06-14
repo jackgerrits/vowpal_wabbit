@@ -23,5 +23,5 @@ struct cbify_adf_data
   ~cbify_adf_data();
 };
 
-VW::LEARNER::base_learner* cbify_setup(VW::config::options_i& options, vw& all);
-VW::LEARNER::base_learner* cbifyldf_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* cbify_setup(vw::config::options_i& options, workspace& all);
+vw::LEARNER::base_learner* cbifyldf_setup(vw::config::options_i& options, workspace& all);

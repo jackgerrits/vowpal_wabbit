@@ -7,9 +7,9 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
-void VW::named_labels::initialize_maps_from_input_string()
+void vw::named_labels::initialize_maps_from_input_string()
 {
   tokenize(',', m_label_list, m_id2name);
 
@@ -19,24 +19,24 @@ void VW::named_labels::initialize_maps_from_input_string()
 
   for (uint32_t k = 0; k < m_K; k++)
   {
-    const VW::string_view& l = m_id2name[static_cast<size_t>(k)];
+    const vw::string_view& l = m_id2name[static_cast<size_t>(k)];
     auto iter = m_name2id.find(l);
     if (iter != m_name2id.end()) THROW("error: label dictionary initialized with multiple occurances of: " << l);
     m_name2id.emplace(l, k + 1);
   }
 }
 
-VW::named_labels::named_labels(std::string label_list) : m_label_list(std::move(label_list))
+vw::named_labels::named_labels(std::string label_list) : m_label_list(std::move(label_list))
 {
   initialize_maps_from_input_string();
 }
 
-VW::named_labels::named_labels(const named_labels& other) : m_label_list(other.m_label_list)
+vw::named_labels::named_labels(const named_labels& other) : m_label_list(other.m_label_list)
 {
   initialize_maps_from_input_string();
 }
 
-VW::named_labels& VW::named_labels::operator=(const VW::named_labels& other)
+vw::named_labels& vw::named_labels::operator=(const vw::named_labels& other)
 {
   if (this != &other)
   {
@@ -47,7 +47,7 @@ VW::named_labels& VW::named_labels::operator=(const VW::named_labels& other)
   return *this;
 }
 
-uint32_t VW::named_labels::get(VW::string_view s) const
+uint32_t vw::named_labels::get(vw::string_view s) const
 {
   auto iter = m_name2id.find(s);
   if (iter == m_name2id.end())
@@ -58,12 +58,12 @@ uint32_t VW::named_labels::get(VW::string_view s) const
   return iter->second;
 }
 
-uint32_t VW::named_labels::getK() const { return m_K; }
+uint32_t vw::named_labels::getK() const { return m_K; }
 
-VW::string_view VW::named_labels::get(uint32_t v) const
+vw::string_view vw::named_labels::get(uint32_t v) const
 {
   static_assert(sizeof(size_t) >= sizeof(uint32_t), "size_t is smaller than 32-bits. Potential overflow issues.");
-  if ((v == 0) || (v > m_K)) { return VW::string_view(); }
+  if ((v == 0) || (v > m_K)) { return vw::string_view(); }
 
   return m_id2name[static_cast<size_t>(v - 1)];
 }

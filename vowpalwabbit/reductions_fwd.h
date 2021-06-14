@@ -14,7 +14,7 @@ using multi_ex = std::vector<example*>;
 struct random_state;
 struct vw;
 
-namespace VW
+namespace vw
 {
 namespace LEARNER
 {
@@ -28,4 +28,4 @@ namespace config
 {
 struct options_i;
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

@@ -13,13 +13,13 @@
 
 #include "io/logger.h"
 
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 struct oaa
 {
   uint64_t k;
-  vw* all;                    // for raw
+  workspace* all;                    // for raw
   polyprediction* pred;       // for multipredict
   uint64_t num_subsample;     // for randomized subsampling, how many negatives to draw?
   uint32_t* subsample_order;  // for randomized subsampling, in what order should we touch classes
@@ -32,7 +32,7 @@ struct oaa
   }
 };
 
-void learn_randomized(oaa& o, VW::LEARNER::single_learner& base, example& ec)
+void learn_randomized(oaa& o, vw::LEARNER::single_learner& base, example& ec)
 {
   MULTICLASS::label_t ld = ec.l.multi;
   if (ld.label == 0 || (ld.label > o.k && ld.label != static_cast<uint32_t>(-1)))
@@ -71,7 +71,7 @@ void learn_randomized(oaa& o, VW::LEARNER::single_learner& base, example& ec)
 }
 
 template <bool print_all, bool scores, bool probabilities>
-void learn(oaa& o, VW::LEARNER::single_learner& base, example& ec)
+void learn(oaa& o, vw::LEARNER::single_learner& base, example& ec)
 {
   // Save label
   MULTICLASS::label_t mc_label_data = ec.l.multi;
@@ -157,7 +157,7 @@ void predict(oaa& o, LEARNER::single_learner& base, example& ec)
 
 // TODO: partial code duplication with multiclass.cc:finish_example
 template <bool probabilities>
-void finish_example_scores(vw& all, oaa& o, example& ec)
+void finish_example_scores(workspace& all, oaa& o, example& ec)
 {
   // === Compute multiclass_log_loss
   // TODO:
@@ -215,10 +215,10 @@ void finish_example_scores(vw& all, oaa& o, example& ec)
     MULTICLASS::print_update_with_probability(all, ec, prediction);
   else
     MULTICLASS::print_update_with_score(all, ec, prediction);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-VW::LEARNER::base_learner* oaa_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* oaa_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<oaa>();
   bool probabilities = false;
@@ -262,7 +262,7 @@ VW::LEARNER::base_learner* oaa_setup(options_i& options, vw& all)
   }
 
   oaa* data_ptr = data.get();
-  VW::LEARNER::learner<oaa, example>* l;
+  vw::LEARNER::learner<oaa, example>* l;
   auto base = as_singleline(setup_base(options, all));
   if (probabilities || scores)
   {
@@ -281,7 +281,7 @@ VW::LEARNER::base_learner* oaa_setup(options_i& options, vw& all)
     }
     else
     {
-      l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, true, false>, predict<false, true, false>,
+      l = &vw::LEARNER::init_multiclass_learner(data, base, learn<false, true, false>, predict<false, true, false>,
           all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-scores", prediction_type_t::scalars);
       all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
       l->set_finish_example(finish_example_scores<false>);
@@ -289,13 +289,13 @@ VW::LEARNER::base_learner* oaa_setup(options_i& options, vw& all)
   }
   else if (all.raw_prediction != nullptr)
   {
-    l = &VW::LEARNER::init_multiclass_learner(data, base, learn<true, false, false>, predict<true, false, false>,
+    l = &vw::LEARNER::init_multiclass_learner(data, base, learn<true, false, false>, predict<true, false, false>,
         all.example_parser, data->k, all.get_setupfn_name(oaa_setup) + "-raw", prediction_type_t::multiclass);
     all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   }
   else
   {
-    l = &VW::LEARNER::init_multiclass_learner(data, base, learn<false, false, false>, predict<false, false, false>,
+    l = &vw::LEARNER::init_multiclass_learner(data, base, learn<false, false, false>, predict<false, false, false>,
         all.example_parser, data->k, all.get_setupfn_name(oaa_setup), prediction_type_t::multiclass);
     all.example_parser->lbl_parser.label_type = label_type_t::multiclass;
   }

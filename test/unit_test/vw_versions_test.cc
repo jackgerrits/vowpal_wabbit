@@ -9,7 +9,7 @@
 #include "vw_versions.h"
 #include "global_data.h"
 
-using namespace VW;
+using namespace vw;
 
 BOOST_AUTO_TEST_CASE(verify_vw_versions)
 {

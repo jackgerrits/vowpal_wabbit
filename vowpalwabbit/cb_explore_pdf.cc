@@ -10,16 +10,16 @@
 
 // Aliases
 using std::endl;
-using VW::config::make_option;
-using VW::config::option_group_definition;
-using VW::config::options_i;
-using VW::LEARNER::single_learner;
+using vw::config::make_option;
+using vw::config::option_group_definition;
+using vw::config::options_i;
+using vw::LEARNER::single_learner;
 
 // Enable/Disable indented debug statements
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cb_explore_pdf
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
@@ -44,24 +44,24 @@ private:
 int cb_explore_pdf::learn(example& ec, experimental::api_status*)
 {
   _base->learn(ec);
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
 int cb_explore_pdf::predict(example& ec, experimental::api_status*)
 {
-  const auto& reduction_features = ec._reduction_features.template get<VW::continuous_actions::reduction_features>();
+  const auto& reduction_features = ec._reduction_features.template get<vw::continuous_actions::reduction_features>();
   if (first_only && !reduction_features.is_pdf_set() && !reduction_features.is_chosen_action_set())
   {
     // uniform random
     ec.pred.pdf.push_back(
-        VW::continuous_actions::pdf_segment{min_value, max_value, static_cast<float>(1. / (max_value - min_value))});
-    return VW::experimental::error_code::success;
+        vw::continuous_actions::pdf_segment{min_value, max_value, static_cast<float>(1. / (max_value - min_value))});
+    return vw::experimental::error_code::success;
   }
   else if (first_only && reduction_features.is_pdf_set())
   {
     // pdf provided
     ec.pred.pdf = reduction_features.pdf;
-    return VW::experimental::error_code::success;
+    return vw::experimental::error_code::success;
   }
 
   _base->predict(ec);
@@ -69,7 +69,7 @@ int cb_explore_pdf::predict(example& ec, experimental::api_status*)
   continuous_actions::probability_density_function& _pred_pdf = ec.pred.pdf;
   for (uint32_t i = 0; i < _pred_pdf.size(); i++)
   { _pred_pdf[i].pdf_value = _pred_pdf[i].pdf_value * (1 - epsilon) + epsilon / (max_value - min_value); }
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
 void cb_explore_pdf::init(single_learner* p_base) { _base = p_base; }
@@ -84,7 +84,7 @@ void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
   else
     reduction.predict(ec, &status);
 
-  if (status.get_error_code() != VW::experimental::error_code::success)
+  if (status.get_error_code() != vw::experimental::error_code::success)
   { VW_DBG(ec) << status.get_error_msg() << endl; }
 }
 
@@ -92,7 +92,7 @@ void predict_or_learn(cb_explore_pdf& reduction, single_learner&, example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, vw& all)
+LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, workspace& all)
 {
   option_group_definition new_options("Continuous actions - cb_explore_pdf");
   bool invoked = false;
@@ -124,7 +124,7 @@ LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, vw& all)
     THROW("error: min and max values must be supplied with cb_explore_pdf");
 
   LEARNER::base_learner* p_base = setup_base(options, all);
-  auto p_reduction = VW::make_unique<cb_explore_pdf>();
+  auto p_reduction = vw::make_unique<cb_explore_pdf>();
   p_reduction->init(as_singleline(p_base));
   p_reduction->epsilon = epsilon;
   p_reduction->min_value = min;
@@ -139,4 +139,4 @@ LEARNER::base_learner* cb_explore_pdf_setup(config::options_i& options, vw& all)
   return make_base(*l);
 }
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

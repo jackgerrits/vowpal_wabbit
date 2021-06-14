@@ -12,10 +12,10 @@ BOOST_AUTO_TEST_CASE(predict_modifying_state)
 {
   float prediction_one;
   {
-    auto& vw = *VW::initialize("--quiet --sgd --noconstant --learning_rate 0.1");
-    auto& pre_learn_predict_example = *VW::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
-    auto& learn_example = *VW::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
-    auto& predict_example = *VW::read_example(vw, std::string("| 1:1.0"));
+    auto& vw = *vw::initialize("--quiet --sgd --noconstant --learning_rate 0.1");
+    auto& pre_learn_predict_example = *vw::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
+    auto& learn_example = *vw::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
+    auto& predict_example = *vw::read_example(vw, std::string("| 1:1.0"));
 
     vw.predict(pre_learn_predict_example);
     vw.finish_example(pre_learn_predict_example);
@@ -24,22 +24,22 @@ BOOST_AUTO_TEST_CASE(predict_modifying_state)
     vw.predict(predict_example);
     prediction_one = predict_example.pred.scalar;
     vw.finish_example(predict_example);
-    VW::finish(vw);
+    vw::finish(vw);
   }
 
   float prediction_two;
   {
-    auto& vw = *VW::initialize("--quiet --sgd --noconstant --learning_rate 0.1");
+    auto& vw = *vw::initialize("--quiet --sgd --noconstant --learning_rate 0.1");
 
-    auto& learn_example = *VW::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
-    auto& predict_example = *VW::read_example(vw, std::string("| 1:1.0"));
+    auto& learn_example = *vw::read_example(vw, std::string("0.19574759682114784 | 1:1.430"));
+    auto& predict_example = *vw::read_example(vw, std::string("| 1:1.0"));
 
     vw.learn(learn_example);
     vw.finish_example(learn_example);
     vw.predict(predict_example);
     prediction_two = predict_example.pred.scalar;
     vw.finish_example(predict_example);
-    VW::finish(vw);
+    vw::finish(vw);
   }
 
   BOOST_CHECK_EQUAL(prediction_one, prediction_two);

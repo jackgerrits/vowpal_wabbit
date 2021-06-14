@@ -3,7 +3,7 @@
 #include "../vowpalwabbit/vw.h"
 #include "../vowpalwabbit/ezexample.h"
 
-void run(vw*vw)
+void run(workspace*vw)
 { ezexample ex(vw, true);   // we're doing csoaa_ldf so we need multiline examples
 
   /// BEGIN FIRST MULTILINE EXAMPLE
@@ -59,11 +59,11 @@ void run(vw*vw)
 
 int main(int argc, char *argv[])
 { // INITIALIZE WITH WHATEVER YOU WOULD PUT ON THE VW COMMAND LINE -- THIS WILL STORE A MODEL TO train.ezw
-  vw* vw = VW::initialize("--hash all -q st --noconstant -f train.w --quiet --csoaa_ldf m");
+  workspace* vw = vw::initialize("--hash all -q st --noconstant -f train.w --quiet --csoaa_ldf m");
 
   run(vw);
 
   // AND FINISH UP
   std::cerr << "ezexample_train finish"<< std::endl;
-  VW::finish(*vw);
+  vw::finish(*vw);
 }

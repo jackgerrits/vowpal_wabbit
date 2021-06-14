@@ -5,4 +5,4 @@
 #pragma once
 #include "reductions_fwd.h"
 
-VW::LEARNER::base_learner* kernel_svm_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* kernel_svm_setup(vw::config::options_i& options, workspace& all);

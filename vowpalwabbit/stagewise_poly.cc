@@ -16,8 +16,8 @@
 // TODO: This file makes extensive use of #ifdef DEBUG for printing
 //       leave this alone for now
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 static constexpr uint32_t parent_bit = 1;
 static constexpr uint32_t cycle_bit = 2;
@@ -632,7 +632,7 @@ void finish_example(vw &all, stagewise_poly &poly, example &ec)
   ec.num_features = poly.synth_ec.get_num_features();
   output_and_account_example(all, ec);
   ec.num_features = temp_num_features;
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void save_load(stagewise_poly &poly, io_buf &model_file, bool read, bool text)

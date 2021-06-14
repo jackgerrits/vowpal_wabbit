@@ -144,21 +144,21 @@ int main(int argc, char* argv[])
   FILE* fU;
   FILE* fI;
 
-  if (VW::file_open(&fB, blacklistfilename.c_str(), "r") != 0)
+  if (vw::file_open(&fB, blacklistfilename.c_str(), "r") != 0)
   {
-    fprintf(stderr, "can't open %s: %s\n", blacklistfilename.c_str(), VW::strerror_to_string(errno).c_str());
+    fprintf(stderr, "can't open %s: %s\n", blacklistfilename.c_str(), vw::strerror_to_string(errno).c_str());
     cerr << desc << endl;
     exit(2);
   }
-  if (VW::file_open(&fU, userfilename.c_str(), "r") != 0)
+  if (vw::file_open(&fU, userfilename.c_str(), "r") != 0)
   {
-    fprintf(stderr, "can't open %s: %s\n", userfilename.c_str(), VW::strerror_to_string(errno).c_str());
+    fprintf(stderr, "can't open %s: %s\n", userfilename.c_str(), vw::strerror_to_string(errno).c_str());
     cerr << desc << endl;
     exit(2);
   }
-  if (VW::file_open(&fI, itemfilename.c_str(), "r") != 0)
+  if (vw::file_open(&fI, itemfilename.c_str(), "r") != 0)
   {
-    fprintf(stderr, "can't open %s: %s\n", itemfilename.c_str(), VW::strerror_to_string(errno).c_str());
+    fprintf(stderr, "can't open %s: %s\n", itemfilename.c_str(), vw::strerror_to_string(errno).c_str());
     cerr << desc << endl;
     exit(2);
   }
@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
   // INITIALIZE WITH WHATEVER YOU WOULD PUT ON THE VW COMMAND LINE
   if (verbose > 0)
     fprintf(stderr, "initializing vw...\n");
-  vw* model = VW::initialize(vwparams);
+  workspace* model = vw::initialize(vwparams);
 
   char* estr = NULL;
 
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
 
       if (!bf_hit(bf, estr))
       {
-        example* ex = VW::read_example(*model, estr);
+        example* ex = vw::read_example(*model, estr);
         model->learn(*ex);
 
         const std::string str(estr);
@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
           pr_queue.push(std::make_pair(ex->pred.scalar, str));
         }
 
-        VW::finish_example(*model, *ex);
+        vw::finish_example(*model, *ex);
       }
       else
       {
@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
     progress();
   }
 
-  VW::finish(*model);
+  vw::finish(*model);
   fclose(fI);
   fclose(fU);
   return 0;

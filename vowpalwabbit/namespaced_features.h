@@ -15,7 +15,7 @@
 
 typedef unsigned char namespace_index;
 
-namespace VW
+namespace vw
 {
 /// Insertion or removal will result in this value in invalidated.
 template <typename FeaturesT, typename IndexT, typename HashT>
@@ -216,4 +216,4 @@ features& namespaced_features::merge_feature_group(FeaturesT&& ftrs, uint64_t ha
   return *existing_group;
 }
 
-}  // namespace VW
+}  // namespace vw

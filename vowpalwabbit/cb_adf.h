@@ -11,19 +11,19 @@ namespace CB
 struct cb_class;
 }
 
-namespace VW
+namespace vw
 {
 namespace io
 {
 struct writer;
 }
-}  // namespace VW
+}  // namespace vw
 
-VW::LEARNER::base_learner* cb_adf_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* cb_adf_setup(vw::config::options_i& options, workspace& all);
 
 namespace CB_ADF
 {
-void global_print_newline(const std::vector<std::unique_ptr<VW::io::writer>>& final_prediction_sink);
+void global_print_newline(const std::vector<std::unique_ptr<vw::io::writer>>& final_prediction_sink);
 example* test_adf_sequence(multi_ex& ec_seq);
 CB::cb_class get_observed_cost_or_default_cb_adf(const multi_ex& examples);
 }  // namespace CB_ADF

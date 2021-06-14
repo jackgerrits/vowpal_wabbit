@@ -13,7 +13,7 @@ using namespace System;
 using namespace System::Text;
 using namespace System::Collections::Generic;
 
-namespace VW
+namespace vw
 {
 /// <summary>
 /// command line arguments extracted from native C++.
@@ -33,7 +33,7 @@ private:
   float m_power_t;
 
 internal:
-  VowpalWabbitArguments(vw* vw) :
+  VowpalWabbitArguments(workspace* vw) :
     m_data(gcnew String(vw->data_filename.c_str())),
     m_finalRegressor(gcnew String(vw->final_regressor_name.c_str())),
     m_testonly(!vw->training),
@@ -48,7 +48,7 @@ internal:
         m_regressors->Add(gcnew String(r.c_str()));
     }
 
-    VW::config::options_serializer_boost_po serializer;
+    vw::config::options_serializer_boost_po serializer;
     for (auto const& option : options->get_all_options())
     {
       if (options->was_supplied(option->m_name))

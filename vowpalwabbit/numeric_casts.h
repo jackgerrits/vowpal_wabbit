@@ -5,7 +5,7 @@
 
 #include "vw_exception.h"
 
-namespace VW
+namespace vw
 {
 template <typename RetType, typename InputType>
 RetType cast_to_smaller_type(InputType input)
@@ -55,4 +55,4 @@ RetType cast_signed_to_unsigned(InputType input)
   return cast_to_smaller_type<RetType>(unsigned_input);
 }
 
-}  // namespace VW
+}  // namespace vw

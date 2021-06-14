@@ -20,9 +20,9 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::LEARNER;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 // TODO: This file has several cout print statements. It looks like
 //       they should be using trace_message, but its difficult to tell
@@ -53,7 +53,7 @@ void copy_example_data(example* dst, example* src, bool oas = false)  // copy ex
   {
     dst->l.multilabels.label_v = src->l.multilabels.label_v;
   }
-  VW::copy_example_data(dst, src);
+  vw::copy_example_data(dst, src);
 }
 
 ////Implement kronecker_product between two examples:
@@ -168,7 +168,7 @@ struct node
 // memory_tree
 struct memory_tree
 {
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
 
   std::vector<node> nodes;  // array of nodes.
@@ -231,8 +231,8 @@ struct memory_tree
   ~memory_tree()
   {
     // nodes.delete_v();
-    for (auto* ex : examples) { ::VW::dealloc_examples(ex, 1); }
-    if (kprod_ec) { ::VW::dealloc_examples(kprod_ec, 1); }
+    for (auto* ex : examples) { ::vw::dealloc_examples(ex, 1); }
+    if (kprod_ec) { ::vw::dealloc_examples(kprod_ec, 1); }
   }
 };
 
@@ -294,7 +294,7 @@ void init_tree(memory_tree& b)
   b.nodes[0].internal = -1;  // mark the root as leaf
   b.nodes[0].base_router = (b.routers_used++);
 
-  b.kprod_ec = ::VW::alloc_examples(1);  // allocate space for kronecker product example
+  b.kprod_ec = ::vw::alloc_examples(1);  // allocate space for kronecker product example
 
   b.total_num_queries = 0;
   b.max_routers = b.max_nodes;
@@ -1044,7 +1044,7 @@ void learn(memory_tree& b, single_learner& base, example& ec)
 
     if (b.current_pass < 1)
     {  // in the first pass, we need to store the memory:
-      example* new_ec = VW::alloc_examples(1);
+      example* new_ec = vw::alloc_examples(1);
       copy_example_data(new_ec, &ec, b.oas);
       b.examples.push_back(new_ec);
       if (b.online == true)
@@ -1203,7 +1203,7 @@ void save_load_memory_tree(memory_tree& b, io_buf& model_file, bool read, bool t
       b.examples.clear();
       for (uint32_t i = 0; i < n_examples; i++)
       {
-        example* new_ec = VW::alloc_examples(1);
+        example* new_ec = vw::alloc_examples(1);
         b.examples.push_back(new_ec);
       }
     }
@@ -1218,7 +1218,7 @@ void save_load_memory_tree(memory_tree& b, io_buf& model_file, bool read, bool t
 //////////////////////////////End of Save & Load///////////////////////////////
 }  // namespace memory_tree_ns
 
-base_learner* memory_tree_setup(options_i& options, vw& all)
+base_learner* memory_tree_setup(options_i& options, workspace& all)
 {
   using namespace memory_tree_ns;
   auto tree = scoped_calloc_or_throw<memory_tree>();

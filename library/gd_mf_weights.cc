@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
   }
 
   // initialize model
-  vw* model = VW::initialize(vwparams);
+  workspace* model = vw::initialize(vwparams);
   model->audit = true;
 
   string target("--rank ");
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   dense_parameters& weights = model->weights.dense_weights;
 
   FILE* file;
-  VW::file_open(&file, infile.c_str(), "r");
+  vw::file_open(&file, infile.c_str(), "r");
   char* line = NULL;
   size_t len = 0;
   ssize_t read;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
   while ((read = getline(&line, &len, file)) != -1)
   { line[strlen(line)-1] = 0; // chop
 
-    ec = VW::read_example(*model, line);
+    ec = vw::read_example(*model, line);
 
     // write out features for left namespace
     features& left = ec->feature_space[left_ns];
@@ -120,13 +120,13 @@ int main(int argc, char *argv[])
     right_linear << std::endl;
     right_quadratic << std::endl;
 
-    VW::finish_example(*model, *ec);
+    vw::finish_example(*model, *ec);
   }
 
   // write constant
   constant << weights[ec->feature_space[constant_namespace].indicies[0]] << std::endl;
 
   // clean up
-  VW::finish(*model);
+  vw::finish(*model);
   fclose(file);
 }

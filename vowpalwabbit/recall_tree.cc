@@ -11,8 +11,8 @@
 #include "reductions.h"
 #include "rand48.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 namespace recall_tree_ns
 {
@@ -61,7 +61,7 @@ struct node
 
 struct recall_tree
 {
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
   uint32_t k;
   bool node_only;
@@ -211,7 +211,7 @@ void insert_example_at_node(recall_tree& b, uint32_t cn, example& ec)
 
 void add_node_id_feature(recall_tree& b, uint32_t cn, example& ec)
 {
-  vw* all = b.all;
+  workspace* all = b.all;
   uint64_t mask = all->weights.mask();
   size_t ss = all->weights.stride_shift();
 
@@ -486,7 +486,7 @@ void save_load_tree(recall_tree& b, io_buf& model_file, bool read, bool text)
 
 using namespace recall_tree_ns;
 
-base_learner* recall_tree_setup(options_i& options, vw& all)
+base_learner* recall_tree_setup(options_i& options, workspace& all)
 {
   auto tree = scoped_calloc_or_throw<recall_tree>();
   option_group_definition new_options("Recall Tree");

@@ -25,14 +25,14 @@
 
 #include "io/logger.h"
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 #define SVM_KER_LIN 0
 #define SVM_KER_RBF 1
 #define SVM_KER_POLY 2
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
 using std::endl;
 
@@ -110,7 +110,7 @@ struct svm_params
 
   float loss_sum;
 
-  vw* all;  // flatten, parallel
+  workspace* all;  // flatten, parallel
   std::shared_ptr<rand_state> _random_state;
 
   ~svm_params()
@@ -582,7 +582,7 @@ void add_size_t(size_t& t1, const size_t& t2) noexcept { t1 += t2; }
 
 void add_double(double& t1, const double& t2) noexcept { t1 += t2; }
 
-void sync_queries(vw& all, svm_params& params, bool* train_pool)
+void sync_queries(workspace& all, svm_params& params, bool* train_pool)
 {
   io_buf* b = new io_buf();
 
@@ -795,7 +795,7 @@ void learn(svm_params& params, single_learner&, example& ec)
   }
 }
 
-VW::LEARNER::base_learner* kernel_svm_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* kernel_svm_setup(options_i& options, workspace& all)
 {
   auto params = scoped_calloc_or_throw<svm_params>();
   std::string kernel_type;

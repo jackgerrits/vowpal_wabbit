@@ -13,10 +13,10 @@
 #include "shared_data.h"
 
 using namespace LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw;
+using namespace vw::config;
 
-namespace VW
+namespace vw
 {
 namespace pmf_to_pdf
 {
@@ -110,9 +110,9 @@ reduction::~reduction()
 
 void reduction::predict(example& ec)
 {
-  auto swap_label = VW::swap_guard(ec.l.cb, temp_lbl_cb);
+  auto swap_label = vw::swap_guard(ec.l.cb, temp_lbl_cb);
 
-  const auto& reduction_features = ec._reduction_features.template get<VW::continuous_actions::reduction_features>();
+  const auto& reduction_features = ec._reduction_features.template get<vw::continuous_actions::reduction_features>();
   if (first_only && reduction_features.is_chosen_action_set())
   {
     float chosen_action = reduction_features.chosen_action;
@@ -129,7 +129,7 @@ void reduction::predict(example& ec)
   else
   {
     // scope for saving / restoring prediction
-    auto save_prediction = VW::swap_guard(ec.pred.a_s, temp_pred_a_s);
+    auto save_prediction = vw::swap_guard(ec.pred.a_s, temp_pred_a_s);
     _p_base->predict(ec);
   }
   transform_prediction(ec);
@@ -160,7 +160,7 @@ void reduction::learn(example& ec)
   const uint32_t local_min_value = std::max(0, action_segment_index - static_cast<int>(b) + 1);
   const uint32_t local_max_value = std::min(num_actions - 1 - b, action_segment_index + b);
 
-  auto swap_label = VW::swap_guard(ec.l.cb, temp_lbl_cb);
+  auto swap_label = vw::swap_guard(ec.l.cb, temp_lbl_cb);
 
   ec.l.cb.costs.clear();
 
@@ -171,7 +171,7 @@ void reduction::learn(example& ec)
   ec.l.cb.costs.push_back(
       CB::cb_class(cost, local_max_value + 1, pdf_value * actual_bandwidth * continuous_range / num_actions));
 
-  auto swap_prediction = VW::swap_guard(ec.pred.a_s, temp_pred_a_s);
+  auto swap_prediction = vw::swap_guard(ec.pred.a_s, temp_pred_a_s);
 
   _p_base->learn(ec);
 }
@@ -180,7 +180,7 @@ void predict(pmf_to_pdf::reduction& data, single_learner&, example& ec) { data.p
 
 void learn(pmf_to_pdf::reduction& data, single_learner&, example& ec) { data.learn(ec); }
 
-void print_update(vw& all, bool is_test, example& ec, std::stringstream& pred_string)
+void print_update(workspace& all, bool is_test, example& ec, std::stringstream& pred_string)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -197,7 +197,7 @@ void print_update(vw& all, bool is_test, example& ec, std::stringstream& pred_st
   }
 }
 
-void output_example(vw& all, reduction&, example& ec, CB::label& ld)
+void output_example(workspace& all, reduction&, example& ec, CB::label& ld)
 {
   float loss = 0.;
   auto optional_cost = get_observed_cost_cb(ec.l.cb);
@@ -232,13 +232,13 @@ void output_example(vw& all, reduction&, example& ec, CB::label& ld)
   print_update(all, CB::is_test_label(ld), ec, sso);
 }
 
-void finish_example(vw& all, reduction& c, example& ec)
+void finish_example(workspace& all, reduction& c, example& ec)
 {
   output_example(all, c, ec, ec.l.cb);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-base_learner* setup(options_i& options, vw& all)
+base_learner* setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<pmf_to_pdf::reduction>();
 
@@ -309,4 +309,4 @@ base_learner* setup(options_i& options, vw& all)
 }
 
 }  // namespace pmf_to_pdf
-}  // namespace VW
+}  // namespace vw

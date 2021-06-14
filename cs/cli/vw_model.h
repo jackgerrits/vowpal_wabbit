@@ -7,7 +7,7 @@
 #include "vw_clr.h"
 #include "vw_base.h"
 
-namespace VW
+namespace vw
 {
 /// <summary>
 /// VowpalWabbit model wrapper used in multi-threaded scenarios.

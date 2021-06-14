@@ -16,7 +16,7 @@
 
 namespace INTERACTIONS
 {
-VW::LEARNER::base_learner* generate_interactions_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* generate_interactions_setup(vw::config::options_i& options, workspace& all);
 
 constexpr bool feature_self_interactions = true;
 // must return logical expression

@@ -19,7 +19,7 @@ public:
   { }
 
   void operator()()
-  { m_vw_parser = VW::initialize(vw_init_string);
+  { m_vw_parser = vw::initialize(vw_init_string);
     if (m_vw_parser == NULL)
     { cerr << "cannot initialize vw parser" << endl;
       exit(-1);
@@ -41,7 +41,7 @@ public:
       ex.set_label("1");
       if (*it != ex()) { cerr << "fail!" << endl; ++errorCount; }
       //if (*it != pred) { cerr << "fail!" << endl; ++errorCount; }
-      //VW::finish_example(m_vw, vec2);
+      //vw::finish_example(m_vw, vec2);
       ++it;
 
       --ex;   // remove the most recent namespace
@@ -65,7 +65,7 @@ public:
       //cout << ".";std::cout.flush();
     }
     cerr << "error count = " << errorCount << endl;
-    VW::finish(*m_vw_parser);
+    vw::finish(*m_vw_parser);
     m_vw_parser = NULL;
   }
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
   // INITIALIZE WITH WHATEVER YOU WOULD PUT ON THE VW COMMAND LINE -- THIS READS IN A MODEL FROM train.w
   std::string vw_init_string_all    = "-t --ldf_override s --quiet -q st --noconstant --hash all -i train.w";
   std::string vw_init_string_parser = "-t --ldf_override s --quiet -q st --noconstant --hash all --noop";   // this needs to have enough arguments to get the parser right
-  vw* vw = VW::initialize(vw_init_string_all);
+  workspace* vw = vw::initialize(vw_init_string_all);
   std::vector<double> results;
 
   // HAL'S SPIFFY INTERFACE USING C++ CRAZINESS
@@ -144,5 +144,5 @@ int main(int argc, char *argv[])
 
 
   // AND FINISH UP
-  VW::finish(*vw);
+  vw::finish(*vw);
 }

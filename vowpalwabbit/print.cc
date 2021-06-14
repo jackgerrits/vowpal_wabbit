@@ -5,25 +5,25 @@
 #include <cfloat>
 #include "reductions.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 using std::cout;
 
 // TODO: This file should probably(?) use trace_message
 struct print
 {
-  print(vw* all) : all(all) {}
-  vw* all;
+  print(workspace* all) : all(all) {}
+  workspace* all;
 };  // regressor, feature loop
 
-void print_feature(vw& /* all */, float value, uint64_t index)
+void print_feature(workspace& /* all */, float value, uint64_t index)
 {
   cout << index;
   if (value != 1.) cout << ":" << value;
   cout << " ";
 }
 
-void learn(print& p, VW::LEARNER::base_learner&, example& ec)
+void learn(print& p, vw::LEARNER::base_learner&, example& ec)
 {
   if (ec.l.simple.label != FLT_MAX)
   {
@@ -45,7 +45,7 @@ void learn(print& p, VW::LEARNER::base_learner&, example& ec)
   cout << std::endl;
 }
 
-VW::LEARNER::base_learner* print_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* print_setup(options_i& options, workspace& all)
 {
   bool print_option = false;
   option_group_definition new_options("Print psuedolearner");
@@ -54,8 +54,8 @@ VW::LEARNER::base_learner* print_setup(options_i& options, vw& all)
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
   all.weights.stride_shift(0);
-  auto* learner = VW::LEARNER::make_base_learner(VW::make_unique<print>(&all), learn, learn,
+  auto* learner = vw::LEARNER::make_base_learner(vw::make_unique<print>(&all), learn, learn,
       all.get_setupfn_name(print_setup), prediction_type_t::scalar, label_type_t::simple)
                       .build();
-  return VW::LEARNER::make_base(*learner);
+  return vw::LEARNER::make_base(*learner);
 }

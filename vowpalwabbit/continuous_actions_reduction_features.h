@@ -10,7 +10,7 @@
 #include <cmath>
 #include <limits>
 
-namespace VW
+namespace vw
 {
 namespace continuous_actions
 {
@@ -34,4 +34,4 @@ struct reduction_features
 };
 
 }  // namespace continuous_actions
-}  // namespace VW
+}  // namespace vw

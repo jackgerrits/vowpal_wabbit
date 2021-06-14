@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   std::cerr << "initializing with: '" << init_string << "'" << std::endl;
 
   // INITIALIZE WITH WHATEVER YOU WOULD PUT ON THE VW COMMAND LINE -- THIS READS IN A MODEL FROM train.w
-  vw* vw = VW::initialize(init_string); // "-t -q st --hash all --noconstant --ldf_override s -i train.w");
+  workspace* vw = vw::initialize(init_string); // "-t -q st --hash all --noconstant --ldf_override s -i train.w");
 
   { // HAL'S SPIFFY INTERFACE USING C++ CRAZINESS
     ezexample ex(vw, false);  // don't need multiline
@@ -47,5 +47,5 @@ int main(int argc, char *argv[])
   }
 
   // AND FINISH UP
-  VW::finish(*vw);
+  vw::finish(*vw);
 }

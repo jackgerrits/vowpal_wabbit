@@ -10,7 +10,7 @@ license as described in the file LICENSE.
 #include <limits>
 #include "vw_exception.h"
 
-namespace VW
+namespace vw
 {
 namespace distributionally_robust
 {
@@ -121,4 +121,4 @@ public:
 };
 
 }  // namespace distributionally_robust
-}  // namespace VW
+}  // namespace vw

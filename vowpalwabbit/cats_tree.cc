@@ -16,8 +16,8 @@
 #include "guard.h"
 #include "label_parser.h"
 
-using namespace VW::config;
-using namespace VW::LEARNER;
+using namespace vw::config;
+using namespace vw::LEARNER;
 
 using CB::cb_class;
 using std::vector;
@@ -25,7 +25,7 @@ using std::vector;
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cats_tree
 
-namespace VW
+namespace vw
 {
 namespace cats_tree
 {
@@ -336,7 +336,7 @@ void learn(cats_tree& tree, single_learner& base, example& ec)
   VW_DBG(ec) << "tree_c: after tree.learn() " << cb_label_to_string(ec) << features_to_string(ec) << std::endl;
 }
 
-base_learner* setup(options_i& options, vw& all)
+base_learner* setup(options_i& options, workspace& all)
 {
   option_group_definition new_options("CATS Tree Options");
   uint32_t num_actions;  // = K = 2^D
@@ -361,7 +361,7 @@ base_learner* setup(options_i& options, vw& all)
     options.replace("link", "glf1");
   }
 
-  auto tree = VW::make_unique<cats_tree>();
+  auto tree = vw::make_unique<cats_tree>();
   tree->init(num_actions, bandwidth);
   tree->set_trace_message(all.trace_message.get(), all.logger.quiet);
 
@@ -376,4 +376,4 @@ base_learner* setup(options_i& options, vw& all)
 }
 
 }  // namespace cats_tree
-}  // namespace VW
+}  // namespace vw

@@ -28,12 +28,12 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 namespace CS = COST_SENSITIVE;
 namespace MC = MULTICLASS;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 using std::endl;
 
@@ -167,7 +167,7 @@ private:
 public:
   using cache_map = std::unordered_map<byte_array, scored_action, cached_item_hash, cached_item_equivalent>;
 
-  vw* all;
+  workspace* all;
   std::shared_ptr<rand_state> _random_state;
 
   uint64_t offset;
@@ -289,7 +289,7 @@ public:
   bool active_csoaa;
   float active_csoaa_verify;
 
-  VW::LEARNER::base_learner* base_learner;
+  vw::LEARNER::base_learner* base_learner;
   clock_t start_clock_time;
 
   CS::label empty_cs_label;
@@ -449,7 +449,7 @@ int select_learner(search_private& priv, int policy, size_t learner_id, bool is_
   }
 }
 
-bool should_print_update(vw& all, bool hit_new_pass = false)
+bool should_print_update(workspace& all, bool hit_new_pass = false)
 {
   // uncomment to print out final loss after all examples processed
   // commented for now so that outputs matches make test
@@ -460,7 +460,7 @@ bool should_print_update(vw& all, bool hit_new_pass = false)
   return (all.sd->weighted_examples() >= all.sd->dump_interval) && !all.logger.quiet && !all.bfgs;
 }
 
-bool might_print_update(vw& all)
+bool might_print_update(workspace& all)
 {
   // basically do should_print_update but check me and the next
   // example because of off-by-ones
@@ -470,7 +470,7 @@ bool might_print_update(vw& all)
   return (all.sd->weighted_examples() + 1. >= all.sd->dump_interval) && !all.logger.quiet && !all.bfgs;
 }
 
-bool must_run_test(vw& all, multi_ex& ec, bool is_test_ex)
+bool must_run_test(workspace& all, multi_ex& ec, bool is_test_ex)
 {
   return (all.final_prediction_sink.size() > 0) ||  // if we have to produce output, we need to run this
       might_print_update(all) ||                    // if we have to print and update to stderr
@@ -529,7 +529,7 @@ void print_update(search_private& priv)
   // TODO: This function should be outputting to trace_message(?), but is mixing ostream and printf formats
   //       Currently there is no way to convert an ostream to FILE*, so the lines will need to be converted
   //       to ostream format
-  vw& all = *priv.all;
+  workspace& all = *priv.all;
   if (!priv.printed_output_header && !all.logger.quiet)
   {
     const char* header_fmt = "%-10s %-10s %8s%24s %22s %5s %5s  %7s  %7s  %7s  %-8s\n";
@@ -1122,7 +1122,7 @@ action single_prediction_notLDF(search_private& priv, example& ec, int policy, c
     action override_action)  // if override_action != -1, then we return it as the action and a_cost is set to the
                              // appropriate cost for that action
 {
-  vw& all = *priv.all;
+  workspace& all = *priv.all;
   polylabel old_label = ec.l;
   bool need_partial_predictions = need_memo_foreach_action(priv) ||
       (priv.metaoverride && priv.metaoverride->_foreach_action) || (override_action != static_cast<action>(-1)) ||
@@ -1653,7 +1653,7 @@ action search_predict(search_private& priv, example* ecs, size_t ec_cnt, ptag my
       else
       {
         priv.learn_ec_copy.resize(ec_cnt);
-        for (size_t i = 0; i < ec_cnt; i++) { VW::copy_example_data_with_label(&priv.learn_ec_copy[i], ecs + i); }
+        for (size_t i = 0; i < ec_cnt; i++) { vw::copy_example_data_with_label(&priv.learn_ec_copy[i], ecs + i); }
 
         priv.learn_ec_ref = priv.learn_ec_copy.data();
       }
@@ -1683,7 +1683,7 @@ action search_predict(search_private& priv, example* ecs, size_t ec_cnt, ptag my
         else
         {
           ensure_size(priv.learn_condition_on_names, strlen(condition_on_names) + 1);
-          VW::string_cpy(priv.learn_condition_on_names.begin(), (strlen(condition_on_names) + 1), condition_on_names);
+          vw::string_cpy(priv.learn_condition_on_names.begin(), (strlen(condition_on_names) + 1), condition_on_names);
         }
       }
 
@@ -2081,7 +2081,7 @@ template <bool is_learn>
 void train_single_example(search& sch, bool is_test_ex, bool is_holdout_ex, multi_ex& ec_seq)
 {
   search_private& priv = *sch.priv;
-  vw& all = *priv.all;
+  workspace& all = *priv.all;
   bool ran_test = false;  // we must keep track so that even if we skip test, we still update # of examples seen
 
   // if (! priv.no_caching)
@@ -2330,7 +2330,7 @@ void do_actual_learning(search& sch, base_learner& base, multi_ex& ec_seq)
 void end_pass(search& sch)
 {
   search_private& priv = *sch.priv;
-  vw* all = priv.all;
+  workspace* all = priv.all;
   priv.hit_new_pass = true;
   priv.read_example_last_pass++;
   priv.passes_since_new_policy++;
@@ -2351,16 +2351,16 @@ void end_pass(search& sch)
   }
 }
 
-void finish_multiline_example(vw& all, search& sch, multi_ex& ec_seq)
+void finish_multiline_example(workspace& all, search& sch, multi_ex& ec_seq)
 {
   print_update(*sch.priv);
-  VW::finish_example(all, ec_seq);
+  vw::finish_example(all, ec_seq);
 }
 
 void end_examples(search& sch)
 {
   search_private& priv = *sch.priv;
-  vw* all = priv.all;
+  workspace* all = priv.all;
 
   if (all->training)
   {
@@ -2379,7 +2379,7 @@ void end_examples(search& sch)
 
 bool mc_label_is_test(polylabel& lab) { return MC::test_label(lab.multi); }
 
-void search_initialize(vw* all, search& sch)
+void search_initialize(workspace* all, search& sch)
 {
   search_private& priv = *sch.priv;  // priv is zero initialized by default
   priv.all = all;
@@ -2435,7 +2435,7 @@ void ensure_param(float& v, float lo, float hi, float def, const char* str)
   }
 }
 
-void handle_condition_options(vw& all, auto_condition_settings& acset)
+void handle_condition_options(workspace& all, auto_condition_settings& acset)
 {
   option_group_definition new_options("Search Auto-conditioning Options");
   new_options.add(make_option("search_max_bias_ngram_length", acset.max_bias_ngram_length)
@@ -2471,8 +2471,8 @@ void search_finish(search& sch)
 std::vector<CS::label> read_allowed_transitions(action A, const char* filename)
 {
   FILE* f;
-  if (VW::file_open(&f, filename, "r") != 0)
-    THROW("error: could not read file " << filename << " (" << VW::strerror_to_string(errno)
+  if (vw::file_open(&f, filename, "r") != 0)
+    THROW("error: could not read file " << filename << " (" << vw::strerror_to_string(errno)
                                         << "); assuming all transitions are valid");
 
   bool* bg = calloc_or_throw<bool>((static_cast<size_t>(A + 1)) * (A + 1));
@@ -2517,21 +2517,21 @@ std::vector<CS::label> read_allowed_transitions(action A, const char* filename)
   return allowed;
 }
 
-void parse_neighbor_features(VW::string_view nf_strview, search& sch)
+void parse_neighbor_features(vw::string_view nf_strview, search& sch)
 {
   search_private& priv = *sch.priv;
   priv.neighbor_features.clear();
   if (nf_strview.empty()) return;
 
-  std::vector<VW::string_view> cmd;
+  std::vector<vw::string_view> cmd;
   size_t end_idx = 0;
   bool reached_end = false;
   while (!reached_end)
   {
     end_idx = nf_strview.find(',');
-    VW::string_view strview = nf_strview.substr(0, end_idx);
+    vw::string_view strview = nf_strview.substr(0, end_idx);
     // If we haven't reached the end yet, slice off the piece we're currently parsing
-    if (end_idx != VW::string_view::npos) { nf_strview.remove_prefix(end_idx + 1); }
+    if (end_idx != vw::string_view::npos) { nf_strview.remove_prefix(end_idx + 1); }
     else
     {
       reached_end = true;
@@ -2560,7 +2560,7 @@ void parse_neighbor_features(VW::string_view nf_strview, search& sch)
   }
 }
 
-base_learner* setup(options_i& options, vw& all)
+base_learner* setup(options_i& options, workspace& all)
 {
   free_ptr<search> sch = scoped_calloc_or_throw<search>();
   search_private& priv = *sch->priv;
@@ -2985,7 +2985,7 @@ std::string search::pretty_label(action a)
   }
 }
 
-vw& search::get_vw_pointer_unsafe() { return *this->priv->all; }
+workspace& search::get_vw_pointer_unsafe() { return *this->priv->all; }
 void search::set_force_oracle(bool force) { this->priv->force_oracle = force; }
 
 // predictor implementation
@@ -3010,10 +3010,10 @@ void predictor::free_ec()
 {
   if (ec_alloced)
   {
-    if (is_ldf) { VW::dealloc_examples(ec, ec_cnt); }
+    if (is_ldf) { vw::dealloc_examples(ec, ec_cnt); }
     else
     {
-      VW::dealloc_examples(ec, 1);
+      vw::dealloc_examples(ec, 1);
     }
   }
 }
@@ -3066,7 +3066,7 @@ void predictor::set_input_length(size_t input_length)
       THROW("realloc failed in search.cc");
   }
   else
-    ec = VW::alloc_examples(input_length);
+    ec = vw::alloc_examples(input_length);
   ec_cnt = input_length;
   ec_alloced = true;
 }
@@ -3077,7 +3077,7 @@ void predictor::set_input_at(size_t posn, example& ex)
   if (posn >= ec_cnt)
     THROW("call to set_input_at with too large a position: posn (" << posn << ") >= ec_cnt(" << ec_cnt << ")");
 
-  VW::copy_example_data_with_label(ec + posn, &ex);
+  vw::copy_example_data_with_label(ec + posn, &ex);
 }
 
 predictor& predictor::erase_oracles()

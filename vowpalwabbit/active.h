@@ -11,8 +11,8 @@
 struct active
 {
   float active_c0;
-  vw* all;  // statistics, loss
+  workspace* all;  // statistics, loss
   std::shared_ptr<rand_state> _random_state;
 };
 
-VW::LEARNER::base_learner* active_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* active_setup(vw::config::options_i& options, workspace& all);

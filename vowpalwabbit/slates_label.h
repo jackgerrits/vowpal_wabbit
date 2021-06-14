@@ -8,7 +8,7 @@
 
 #include "label_parser.h"
 #include "action_score.h"
-namespace VW
+namespace vw
 {
 namespace slates
 {
@@ -54,12 +54,12 @@ struct label
   }
 };
 
-void default_label(VW::slates::label& v);
+void default_label(vw::slates::label& v);
 void parse_label(
-    parser* p, shared_data* /*sd*/, VW::slates::label& ld, std::vector<VW::string_view>& words, reduction_features&);
-void cache_label(VW::slates::label& ld, io_buf& cache);
-size_t read_cached_label(shared_data* /*sd*/, VW::slates::label& ld, io_buf& cache);
+    parser* p, shared_data* /*sd*/, vw::slates::label& ld, std::vector<vw::string_view>& words, reduction_features&);
+void cache_label(vw::slates::label& ld, io_buf& cache);
+size_t read_cached_label(shared_data* /*sd*/, vw::slates::label& ld, io_buf& cache);
 
 extern label_parser slates_label_parser;
 }  // namespace slates
-}  // namespace VW
+}  // namespace vw

@@ -18,11 +18,11 @@
 // needed for printing ranges of objects (eg: all elements of a vector)
 #include <fmt/ranges.h>
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace no_label
 {
-void parse_no_label(const std::vector<VW::string_view>& words)
+void parse_no_label(const std::vector<vw::string_view>& words)
 {
   switch (words.size())
   {
@@ -39,7 +39,7 @@ label_parser no_label_parser = {
   // default_label
   [](polylabel*) {},
   // parse_label
-  [](parser*, shared_data*, polylabel*, std::vector<VW::string_view>& words, reduction_features&) {
+  [](parser*, shared_data*, polylabel*, std::vector<vw::string_view>& words, reduction_features&) {
     parse_no_label(words);
   },
   // cache_label
@@ -54,7 +54,7 @@ label_parser no_label_parser = {
 };
 // clang-format on
 
-void print_no_label_update(vw& all, example& ec)
+void print_no_label_update(workspace& all, example& ec)
 {
   if (all.sd->weighted_labeled_examples + all.sd->weighted_unlabeled_examples >= all.sd->dump_interval &&
       !all.logger.quiet && !all.bfgs)
@@ -64,7 +64,7 @@ void print_no_label_update(vw& all, example& ec)
   }
 }
 
-void output_and_account_no_label_example(vw& all, example& ec)
+void output_and_account_no_label_example(workspace& all, example& ec)
 {
   all.sd->update(ec.test_only, false, ec.loss, ec.weight, ec.get_num_features());
 
@@ -74,9 +74,9 @@ void output_and_account_no_label_example(vw& all, example& ec)
   print_no_label_update(all, ec);
 }
 
-void return_no_label_example(vw& all, void*, example& ec)
+void return_no_label_example(workspace& all, void*, example& ec)
 {
   output_and_account_example(all, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 }  // namespace no_label

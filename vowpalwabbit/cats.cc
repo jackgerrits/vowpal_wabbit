@@ -12,24 +12,24 @@
 #include <cmath>
 // Aliases
 using std::endl;
-using VW::cb_continuous::continuous_label;
-using VW::cb_continuous::continuous_label_elm;
-using VW::config::make_option;
-using VW::config::option_group_definition;
-using VW::config::options_i;
-using VW::LEARNER::single_learner;
+using vw::cb_continuous::continuous_label;
+using vw::cb_continuous::continuous_label_elm;
+using vw::config::make_option;
+using vw::config::option_group_definition;
+using vw::config::options_i;
+using vw::LEARNER::single_learner;
 
 // Enable/Disable indented debug statements
 #undef VW_DEBUG_LOG
 #define VW_DEBUG_LOG vw_dbg::cats
 
 // Forward declarations
-namespace VW
+namespace vw
 {
-void finish_example(vw& all, example& ec);
+void finish_example(workspace& all, example& ec);
 }
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
@@ -42,7 +42,7 @@ int cats::predict(example& ec, experimental::api_status*)
 {
   VW_DBG(ec) << "cats::predict(), " << features_to_string(ec) << endl;
   _base->predict(ec);
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
 // Pass through
@@ -52,10 +52,10 @@ int cats::learn(example& ec, experimental::api_status* status = nullptr)
   predict(ec, status);
   VW_DBG(ec) << "cats::learn(), " << to_string(ec.l.cb_cont) << features_to_string(ec) << endl;
   _base->learn(ec);
-  return VW::experimental::error_code::success;
+  return vw::experimental::error_code::success;
 }
 
-float cats::get_loss(const VW::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const
+float cats::get_loss(const vw::cb_continuous::continuous_label& cb_cont_costs, float predicted_action) const
 {
   float loss = 0.f;
   if (!cb_cont_costs.costs.empty())
@@ -93,7 +93,7 @@ void predict_or_learn(cats& reduction, single_learner&, example& ec)
   else
     reduction.predict(ec, &status);
 
-  if (status.get_error_code() != VW::experimental::error_code::success)
+  if (status.get_error_code() != vw::experimental::error_code::success)
   { VW_DBG(ec) << status.get_error_msg() << endl; }
 }
 
@@ -105,25 +105,25 @@ void predict_or_learn(cats& reduction, single_learner&, example& ec)
 class reduction_output
 {
 public:
-  static void report_progress(vw& all, const cats&, const example& ec);
-  static void output_predictions(std::vector<std::unique_ptr<VW::io::writer>>& predict_file_descriptors,
+  static void report_progress(workspace& all, const cats&, const example& ec);
+  static void output_predictions(std::vector<std::unique_ptr<vw::io::writer>>& predict_file_descriptors,
       const continuous_actions::probability_density_function_value& prediction);
 
 private:
   static inline bool does_example_have_label(const example& ec);
-  static void print_update_cb_cont(vw& all, const example& ec);
+  static void print_update_cb_cont(workspace& all, const example& ec);
 };
 
 // Free function to tie function pointers to output class methods
-void finish_example(vw& all, cats& data, example& ec)
+void finish_example(workspace& all, cats& data, example& ec)
 {
   // add output example
   reduction_output::report_progress(all, data, ec);
   reduction_output::output_predictions(all.final_prediction_sink, ec.pred.pdf_value);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-void reduction_output::output_predictions(std::vector<std::unique_ptr<VW::io::writer>>& predict_file_descriptors,
+void reduction_output::output_predictions(std::vector<std::unique_ptr<vw::io::writer>>& predict_file_descriptors,
     const continuous_actions::probability_density_function_value& prediction)
 {
   // output to the prediction to all files
@@ -131,7 +131,7 @@ void reduction_output::output_predictions(std::vector<std::unique_ptr<VW::io::wr
   for (auto& f : predict_file_descriptors) f->write(str.c_str(), str.size());
 }
 
-void reduction_output::report_progress(vw& all, const cats& data, const example& ec)
+void reduction_output::report_progress(workspace& all, const cats& data, const example& ec)
 {
   auto loss = data.get_loss(ec.l.cb_cont, ec.pred.pdf_value.action);
 
@@ -145,7 +145,7 @@ inline bool reduction_output::does_example_have_label(const example& ec)
   return (!ec.l.cb_cont.costs.empty() && ec.l.cb_cont.costs[0].action != FLT_MAX);
 }
 
-void reduction_output::print_update_cb_cont(vw& all, const example& ec)
+void reduction_output::print_update_cb_cont(workspace& all, const example& ec)
 {
   if (all.sd->weighted_examples() >= all.sd->dump_interval && !all.logger.quiet && !all.bfgs)
   {
@@ -160,7 +160,7 @@ void reduction_output::print_update_cb_cont(vw& all, const example& ec)
 ////////////////////////////////////////////////////
 
 // Setup reduction in stack
-LEARNER::base_learner* setup(options_i& options, vw& all)
+LEARNER::base_learner* setup(options_i& options, workspace& all)
 {
   option_group_definition new_options("Continuous actions tree with smoothing");
   uint32_t num_actions = 0;
@@ -181,7 +181,7 @@ LEARNER::base_learner* setup(options_i& options, vw& all)
   // to the reduction stack;
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  if (num_actions <= 0) THROW(VW::experimental::error_code::num_actions_gt_zero_s);
+  if (num_actions <= 0) THROW(vw::experimental::error_code::num_actions_gt_zero_s);
 
   // cats stack = [cats -> sample_pdf -> cats_pdf ... rest specified by cats_pdf]
   if (!options.was_supplied("sample_pdf")) options.insert("sample_pdf", "");
@@ -213,4 +213,4 @@ LEARNER::base_learner* setup(options_i& options, vw& all)
 
 }  // namespace cats
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

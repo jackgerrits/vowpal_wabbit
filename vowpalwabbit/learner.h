@@ -40,9 +40,9 @@ enum class prediction_type_t
 
 const char* to_string(prediction_type_t prediction_type);
 
-namespace VW
+namespace vw
 {
-/// \brief Contains the VW::LEARNER::learner object and utilities for
+/// \brief Contains the vw::LEARNER::learner object and utilities for
 /// interacting with it.
 namespace LEARNER
 {
@@ -117,16 +117,16 @@ struct save_metric_data
 
 struct finish_example_data
 {
-  using fn = void (*)(vw&, void* data, void* ex);
+  using fn = void (*)(workspace&, void* data, void* ex);
   void* data = nullptr;
   base_learner* base = nullptr;
   fn finish_example_f = nullptr;
   fn print_example_f = nullptr;
 };
 
-void generic_driver(vw& all);
-void generic_driver(const std::vector<vw*>& alls);
-void generic_driver_onethread(vw& all);
+void generic_driver(workspace& all);
+void generic_driver(const std::vector<workspace*>& alls);
+void generic_driver_onethread(workspace& all);
 
 inline void noop_save_load(void*, io_buf&, bool, bool) {}
 inline void noop_persist_metrics(void*, metric_sink&) {}
@@ -202,15 +202,15 @@ inline void decrement_offset(multi_ex& ec_seq, const size_t increment, const siz
 /// will recursively call the base given to it, whereas a base learner will not
 /// recurse and will simply return the result. Learner is not intended to be
 /// inherited from. Instead it is used through composition, and created through
-/// the various VW::LEARNER::init_learner overloaded functions that chain to the
-/// central factor function VW::LEARNER::learner::init_learner The state of this
+/// the various vw::LEARNER::init_learner overloaded functions that chain to the
+/// central factor function vw::LEARNER::learner::init_learner The state of this
 /// learner, or reduction, is stored in the learner_data field. A
 /// <code>std::shared_pointer<void></code> is used as this class uses type
 /// erasure to allow for an arbitrary reduction to be implemented. It is
 /// extremely important that the function pointers given to the class match the
 /// expected types of the object. If the learner is constructed using
-/// VW::LEARNER::learner::init_learner and assembled before it is transformed
-/// into a VW::LEARNER::base_learner with VW::LEARNER::make_base then the usage
+/// vw::LEARNER::learner::init_learner and assembled before it is transformed
+/// into a vw::LEARNER::base_learner with vw::LEARNER::make_base then the usage
 /// of the templated functions should ensure types are correct.
 ///
 /// \tparam T Type of the reduction data object stored. This allows this
@@ -254,7 +254,7 @@ public:
   // not call predict before learn
   bool learn_returns_prediction = false;
 
-  using end_fptr_type = void (*)(vw&, void*, void*);
+  using end_fptr_type = void (*)(workspace&, void*, void*);
   using finish_fptr_type = void (*)(void*);
 
   void debug_log_message(example& ec, const std::string& msg)
@@ -486,13 +486,13 @@ public:
   }
 
   // called after learn example for each example.  Explicitly not recursive.
-  inline void finish_example(vw& all, E& ec)
+  inline void finish_example(workspace& all, E& ec)
   {
     debug_log_message(ec, "finish_example");
     finish_example_fd.finish_example_f(all, finish_example_fd.data, (void*)&ec);
   }
   // called after learn example for each example.  Explicitly not recursive.
-  void set_finish_example(void (*f)(vw& all, T&, E&))
+  void set_finish_example(void (*f)(workspace& all, T&, E&))
   {
     finish_example_fd.data = learn_fd.data;
     VW_WARNING_STATE_PUSH
@@ -506,7 +506,7 @@ public:
   //
   // usually finish_example routine prints and then deallocs
   // that printing logic can be registered here
-  void set_print_example(void (*f)(vw& all, T&, E&))
+  void set_print_example(void (*f)(workspace& all, T&, E&))
   {
     finish_example_fd.data = learn_fd.data;
     VW_WARNING_STATE_PUSH
@@ -515,7 +515,7 @@ public:
     VW_WARNING_STATE_POP
   }
 
-  inline void print_example(vw& all, E& ec)
+  inline void print_example(workspace& all, E& ec)
   {
     debug_log_message(ec, "print_example");
 
@@ -747,7 +747,7 @@ void multiline_learn_or_predict(multi_learner& base, multi_ex& examples, const u
   }
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([&saved_offsets, &examples] {
+  auto restore_guard = vw::scope_exit([&saved_offsets, &examples] {
     for (size_t i = 0; i < examples.size(); i++) { examples[i]->ft_offset = saved_offsets[i]; }
   });
 
@@ -764,7 +764,7 @@ struct common_learner_builder
 {
   learner<DataT, ExampleT>* _learner = nullptr;
 
-  using end_fptr_type = void (*)(vw&, void*, void*);
+  using end_fptr_type = void (*)(workspace&, void*, void*);
   using finish_fptr_type = void (*)(void*);
 
   common_learner_builder(learner<DataT, ExampleT>* learner, std::unique_ptr<DataT>&& data, const std::string& name)
@@ -852,14 +852,14 @@ struct common_learner_builder
     return *static_cast<FluentBuilderT*>(this);
   }
 
-  FluentBuilderT& set_finish_example(void (*fn_ptr)(vw& all, DataT&, ExampleT&))
+  FluentBuilderT& set_finish_example(void (*fn_ptr)(workspace& all, DataT&, ExampleT&))
   {
     _learner->finish_example_fd.data = _learner->learn_fd.data;
     _learner->finish_example_fd.finish_example_f = (end_fptr_type)(fn_ptr);
     return *static_cast<FluentBuilderT*>(this);
   }
 
-  FluentBuilderT& set_print_example(void (*fn_ptr)(vw& all, DataT&, ExampleT&))
+  FluentBuilderT& set_print_example(void (*fn_ptr)(workspace& all, DataT&, ExampleT&))
   {
     _learner->finish_example_fd.data = _learner->learn_fd.data;
     _learner->finish_example_fd.print_example_f = (end_fptr_type)(fn_ptr);
@@ -996,4 +996,4 @@ base_learner_builder<DataT, ExampleT> make_base_learner(std::unique_ptr<DataT>&&
 }
 
 }  // namespace LEARNER
-}  // namespace VW
+}  // namespace vw

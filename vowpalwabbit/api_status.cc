@@ -4,7 +4,7 @@
 
 #include "api_status.h"
 
-namespace VW
+namespace vw
 {
 namespace experimental
 {
@@ -33,4 +33,4 @@ void api_status::try_clear(api_status* status)
   }
 }
 }  // namespace experimental
-}  // namespace VW
+}  // namespace vw

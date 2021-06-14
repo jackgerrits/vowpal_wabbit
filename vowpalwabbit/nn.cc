@@ -17,10 +17,10 @@
 #include "io/logger.h"
 
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 constexpr float hidden_min_activation = -3;
 constexpr float hidden_max_activation = 3;
@@ -48,7 +48,7 @@ struct nn
   polyprediction* hidden_units_pred;
   polyprediction* hiddenbias_pred;
 
-  vw* all;  // many things
+  workspace* all;  // many things
   std::shared_ptr<rand_state> _random_state;
 
   ~nn()
@@ -81,7 +81,7 @@ static inline float fastexp(float p) { return fastpow2(1.442695040f * p); }
 
 static inline float fasttanh(float p) { return -1.0f + 2.0f / (1.0f + fastexp(-2.0f * p)); }
 
-void finish_setup(nn& n, vw& all)
+void finish_setup(nn& n, workspace& all)
 {
   // TODO: output_layer audit
 
@@ -150,14 +150,14 @@ void predict_or_learn_multi(nn& n, single_learner& base, example& ec)
   memcpy(&sd, n.all->sd, sizeof(shared_data));
   {
     // guard for all.sd as it is modified - this will restore the state at the end of the scope.
-    auto swap_guard = VW::swap_guard(n.all->sd, &sd);
+    auto swap_guard = vw::swap_guard(n.all->sd, &sd);
 
     label_data ld = ec.l.simple;
     void (*save_set_minmax)(shared_data*, float) = n.all->set_minmax;
     float save_min_label;
     float save_max_label;
     float dropscale = n.dropout ? 2.0f : 1.0f;
-    auto loss_function_swap_guard = VW::swap_guard(n.all->loss, n.squared_loss);
+    auto loss_function_swap_guard = vw::swap_guard(n.all->loss, n.squared_loss);
 
     polyprediction* hidden_units = n.hidden_units_pred;
     polyprediction* hiddenbias_pred = n.hiddenbias_pred;
@@ -229,7 +229,7 @@ void predict_or_learn_multi(nn& n, single_learner& base, example& ec)
     n.outputweight.ft_offset = ec.ft_offset;
 
     n.all->set_minmax = noop_mm;
-    auto loss_function_swap_guard_converse_block = VW::swap_guard(n.all->loss, n.squared_loss);
+    auto loss_function_swap_guard_converse_block = vw::swap_guard(n.all->loss, n.squared_loss);
     save_min_label = n.all->sd->min_label;
     n.all->sd->min_label = -1;
     save_max_label = n.all->sd->max_label;
@@ -320,7 +320,7 @@ void predict_or_learn_multi(nn& n, single_learner& base, example& ec)
 
         if (std::fabs(gradient) > 0)
         {
-          auto loss_function_swap_guard_learn_block = VW::swap_guard(n.all->loss, n.squared_loss);
+          auto loss_function_swap_guard_learn_block = vw::swap_guard(n.all->loss, n.squared_loss);
           n.all->set_minmax = noop_mm;
           save_min_label = n.all->sd->min_label;
           n.all->sd->min_label = hidden_min_activation;
@@ -401,14 +401,14 @@ void multipredict(nn& n, single_learner& base, example& ec, size_t count, size_t
   ec.ft_offset -= static_cast<uint64_t>(step * count);
 }
 
-void finish_example(vw& all, nn&, example& ec)
+void finish_example(workspace& all, nn&, example& ec)
 {
-  std::unique_ptr<VW::io::writer> temp(nullptr);
-  auto raw_prediction_guard = VW::swap_guard(all.raw_prediction, temp);
+  std::unique_ptr<vw::io::writer> temp(nullptr);
+  auto raw_prediction_guard = vw::swap_guard(all.raw_prediction, temp);
   return_simple_example(all, nullptr, ec);
 }
 
-base_learner* nn_setup(options_i& options, vw& all)
+base_learner* nn_setup(options_i& options, workspace& all)
 {
   auto n = scoped_calloc_or_throw<nn>();
   bool meanfield = false;

@@ -18,10 +18,10 @@
 
 #include "io/logger.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 struct bs
 {
@@ -30,11 +30,11 @@ struct bs
   float lb;
   float ub;
   std::vector<double> pred_vec;
-  vw* all;  // for raw prediction and loss
+  workspace* all;  // for raw prediction and loss
   std::shared_ptr<rand_state> _random_state;
 };
 
-void bs_predict_mean(vw& all, example& ec, std::vector<double>& pred_vec)
+void bs_predict_mean(workspace& all, example& ec, std::vector<double>& pred_vec)
 {
   ec.pred.scalar = static_cast<float>(accumulate(pred_vec.cbegin(), pred_vec.cend(), 0.0)) / pred_vec.size();
   if (ec.weight > 0 && ec.l.simple.label != FLT_MAX)
@@ -129,7 +129,7 @@ void bs_predict_vote(example& ec, std::vector<double>& pred_vec)
   ec.loss = ((ec.pred.scalar == ec.l.simple.label) ? 0.f : 1.f) * ec.weight;
 }
 
-void print_result(VW::io::writer* f, float res, const v_array<char>& tag, float lb, float ub)
+void print_result(vw::io::writer* f, float res, const v_array<char>& tag, float lb, float ub)
 {
   if (f == nullptr) { return; }
 
@@ -142,11 +142,11 @@ void print_result(VW::io::writer* f, float res, const v_array<char>& tag, float 
   ssize_t t = f->write(ss_str.c_str(), static_cast<unsigned int>(len));
   if (t != len)
   {
-    logger::errlog_error("write error: {}", VW::strerror_to_string(errno));
+    logger::errlog_error("write error: {}", vw::strerror_to_string(errno));
   }
 }
 
-void output_example(vw& all, bs& d, example& ec)
+void output_example(workspace& all, bs& d, example& ec)
 {
   label_data& ld = ec.l.simple;
 
@@ -172,7 +172,7 @@ void output_example(vw& all, bs& d, example& ec)
 template <bool is_learn>
 void predict_or_learn(bs& d, single_learner& base, example& ec)
 {
-  vw& all = *d.all;
+  workspace& all = *d.all;
   bool shouldOutput = all.raw_prediction != nullptr;
 
   float weight_temp = ec.weight;
@@ -215,13 +215,13 @@ void predict_or_learn(bs& d, single_learner& base, example& ec)
   if (shouldOutput) all.print_text_by_ref(all.raw_prediction.get(), outputStringStream.str(), ec.tag);
 }
 
-void finish_example(vw& all, bs& d, example& ec)
+void finish_example(workspace& all, bs& d, example& ec)
 {
   output_example(all, d, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
-base_learner* bs_setup(options_i& options, vw& all)
+base_learner* bs_setup(options_i& options, workspace& all)
 {
   auto data = scoped_calloc_or_throw<bs>();
   std::string type_string("mean");

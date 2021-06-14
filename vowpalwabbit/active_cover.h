@@ -6,4 +6,4 @@
 
 #include "reductions_fwd.h"
 
-VW::LEARNER::base_learner* active_cover_setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* active_cover_setup(vw::config::options_i& options, workspace& all);

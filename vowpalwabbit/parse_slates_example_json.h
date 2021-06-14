@@ -37,7 +37,7 @@ inline float get_number(const rapidjson::Value& value)
 
 template <bool audit>
 void handle_features_value(const char* key_namespace, const Value& value, example* current_example,
-    std::vector<Namespace<audit>>& namespaces, vw& all)
+    std::vector<Namespace<audit>>& namespaces, workspace& all)
 {
   assert(key_namespace != nullptr);
   assert(std::strlen(key_namespace) != 0);
@@ -137,7 +137,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
       assert(!namespaces.empty());
       float number = get_number(value);
       namespaces.back().AddFeature(number,
-          VW::hash_feature_cstr(all, const_cast<char*>(key_namespace), namespaces.back().namespace_hash),
+          vw::hash_feature_cstr(all, const_cast<char*>(key_namespace), namespaces.back().namespace_hash),
           key_namespace);
     }
     break;
@@ -147,7 +147,7 @@ void handle_features_value(const char* key_namespace, const Value& value, exampl
 }
 
 template <bool audit>
-void parse_context(const Value& context, vw& all, v_array<example*>& examples, VW::example_factory_t example_factory,
+void parse_context(const Value& context, workspace& all, v_array<example*>& examples, vw::example_factory_t example_factory,
     void* ex_factory_context, std::vector<example*>& slot_examples,
     std::unordered_map<uint64_t, example*>* dedup_examples = nullptr)
 {
@@ -158,11 +158,11 @@ void parse_context(const Value& context, vw& all, v_array<example*>& examples, V
   {
     auto slot_id = context["_slot_id"].GetInt();
     examples[0]->l.slates.slot_id = slot_id;
-    examples[0]->l.slates.type = VW::slates::example_type::action;
+    examples[0]->l.slates.type = vw::slates::example_type::action;
   }
   else
   {
-    examples[0]->l.slates.type = VW::slates::example_type::shared;
+    examples[0]->l.slates.type = vw::slates::example_type::shared;
   }
 
   assert(namespaces.size() == 0);
@@ -175,7 +175,7 @@ void parse_context(const Value& context, vw& all, v_array<example*>& examples, V
     {
       auto ex = &(*example_factory)(ex_factory_context);
       all.example_parser->lbl_parser.default_label(&ex->l);
-      ex->l.slates.type = VW::slates::example_type::action;
+      ex->l.slates.type = vw::slates::example_type::action;
       examples.push_back(ex);
       if (dedup_examples && !dedup_examples->empty() && obj.HasMember("__aid"))
       {
@@ -206,7 +206,7 @@ void parse_context(const Value& context, vw& all, v_array<example*>& examples, V
     {
       auto ex = &(*example_factory)(ex_factory_context);
       all.example_parser->lbl_parser.default_label(&ex->l);
-      ex->l.slates.type = VW::slates::example_type::slot;
+      ex->l.slates.type = vw::slates::example_type::slot;
       examples.push_back(ex);
       slot_examples.push_back(ex);
       handle_features_value(" ", slot_object, ex, namespaces, all);
@@ -216,8 +216,8 @@ void parse_context(const Value& context, vw& all, v_array<example*>& examples, V
 }
 
 template <bool audit>
-void parse_slates_example_json(vw& all, v_array<example*>& examples, char* line, size_t /*length*/,
-    VW::example_factory_t example_factory, void* ex_factory_context,
+void parse_slates_example_json(workspace& all, v_array<example*>& examples, char* line, size_t /*length*/,
+    vw::example_factory_t example_factory, void* ex_factory_context,
     std::unordered_map<uint64_t, example*>* dedup_examples = nullptr)
 {
   Document document;
@@ -230,8 +230,8 @@ void parse_slates_example_json(vw& all, v_array<example*>& examples, char* line,
 }
 
 template <bool audit>
-void parse_slates_example_dsjson(vw& all, v_array<example*>& examples, char* line, size_t /*length*/,
-    VW::example_factory_t example_factory, void* ex_factory_context, DecisionServiceInteraction* data,
+void parse_slates_example_dsjson(workspace& all, v_array<example*>& examples, char* line, size_t /*length*/,
+    vw::example_factory_t example_factory, void* ex_factory_context, DecisionServiceInteraction* data,
     std::unordered_map<uint64_t, example*>* dedup_examples = nullptr)
 {
   Document document;

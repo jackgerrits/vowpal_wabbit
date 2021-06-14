@@ -27,9 +27,9 @@
 
 #define B_SEARCH_MAX_ITER 20
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 
-namespace VW
+namespace vw
 {
 namespace cb_explore_adf
 {
@@ -48,7 +48,7 @@ private:
   std::vector<float> _min_costs;
   std::vector<float> _max_costs;
 
-  VW::version_struct _model_file_version;
+  vw::version_struct _model_file_version;
 
   // for backing up cb example data when computing sensitivities
   std::vector<ACTION_SCORE::action_scores> _ex_as;
@@ -56,7 +56,7 @@ private:
 
 public:
   cb_explore_adf_regcb(bool regcbopt, float c0, bool first_only, float min_cb_cost, float max_cb_cost,
-      VW::version_struct model_file_version);
+      vw::version_struct model_file_version);
   ~cb_explore_adf_regcb() = default;
 
   // Should be called through cb_explore_adf_base for pre/post-processing
@@ -73,7 +73,7 @@ private:
 };
 
 cb_explore_adf_regcb::cb_explore_adf_regcb(bool regcbopt, float c0, bool first_only, float min_cb_cost,
-    float max_cb_cost, VW::version_struct model_file_version)
+    float max_cb_cost, vw::version_struct model_file_version)
     : _counter(0)
     , _regcbopt(regcbopt)
     , _c0(c0)
@@ -248,7 +248,7 @@ void cb_explore_adf_regcb::save_load(io_buf& io, bool read, bool text)
   }
 }
 
-base_learner* setup(VW::config::options_i& options, vw& all)
+base_learner* setup(vw::config::options_i& options, workspace& all)
 {
   using config::make_option;
   bool cb_explore_adf_option = false;
@@ -296,7 +296,7 @@ base_learner* setup(VW::config::options_i& options, vw& all)
   bool with_metrics = options.was_supplied("extra_metrics");
 
   using explore_type = cb_explore_adf_base<cb_explore_adf_regcb>;
-  auto data = VW::make_unique<explore_type>(
+  auto data = vw::make_unique<explore_type>(
       with_metrics, regcbopt, c0, first_only, min_cb_cost, max_cb_cost, all.model_file_ver);
   auto* l = make_reduction_learner(
       std::move(data), base, explore_type::learn, explore_type::predict, all.get_setupfn_name(setup) + "-regcb")
@@ -313,4 +313,4 @@ base_learner* setup(VW::config::options_i& options, vw& all)
 
 }  // namespace regcb
 }  // namespace cb_explore_adf
-}  // namespace VW
+}  // namespace vw

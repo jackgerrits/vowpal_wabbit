@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include "reductions.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
 namespace CLASSWEIGHTS
 {
@@ -62,7 +62,7 @@ void update_example_weight(classweights& cweights, example& ec)
 }
 
 template <bool is_learn, prediction_type_t pred_type>
-void predict_or_learn(classweights& cweights, VW::LEARNER::single_learner& base, example& ec)
+void predict_or_learn(classweights& cweights, vw::LEARNER::single_learner& base, example& ec)
 {
   if (is_learn)
   {
@@ -78,7 +78,7 @@ void predict_or_learn(classweights& cweights, VW::LEARNER::single_learner& base,
 
 using namespace CLASSWEIGHTS;
 
-VW::LEARNER::base_learner* classweight_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* classweight_setup(options_i& options, workspace& all)
 {
   std::vector<std::string> classweight_array;
   auto cweights = scoped_calloc_or_throw<classweights>();
@@ -92,14 +92,14 @@ VW::LEARNER::base_learner* classweight_setup(options_i& options, vw& all)
 
   if (!all.logger.quiet) *(all.trace_message) << "parsed " << cweights->weights.size() << " class weights" << std::endl;
 
-  VW::LEARNER::single_learner* base = as_singleline(setup_base(options, all));
+  vw::LEARNER::single_learner* base = as_singleline(setup_base(options, all));
 
-  VW::LEARNER::learner<classweights, example>* ret;
+  vw::LEARNER::learner<classweights, example>* ret;
   if (base->pred_type == prediction_type_t::scalar)
-    ret = &VW::LEARNER::init_learner<classweights>(cweights, base, &predict_or_learn<true, prediction_type_t::scalar>,
+    ret = &vw::LEARNER::init_learner<classweights>(cweights, base, &predict_or_learn<true, prediction_type_t::scalar>,
         &predict_or_learn<false, prediction_type_t::scalar>, all.get_setupfn_name(classweight_setup) + "-scalar");
   else if (base->pred_type == prediction_type_t::multiclass)
-    ret = &VW::LEARNER::init_learner<classweights>(cweights, base,
+    ret = &vw::LEARNER::init_learner<classweights>(cweights, base,
         &predict_or_learn<true, prediction_type_t::multiclass>, &predict_or_learn<false, prediction_type_t::multiclass>,
         all.get_setupfn_name(classweight_setup) + "-multi");
   else

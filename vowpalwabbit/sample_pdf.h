@@ -5,11 +5,11 @@
 #pragma once
 #include "learner.h"
 
-namespace VW
+namespace vw
 {
 namespace continuous_action
 {
 // Setup reduction in stack
-LEARNER::base_learner* sample_pdf_setup(config::options_i& options, vw& all);
+LEARNER::base_learner* sample_pdf_setup(config::options_i& options, workspace& all);
 }  // namespace continuous_action
-}  // namespace VW
+}  // namespace vw

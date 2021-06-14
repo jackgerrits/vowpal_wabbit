@@ -42,8 +42,8 @@ struct parser
       , finished_examples(0)
       , strict_parse{strict_parse_}
   {
-    this->input = VW::make_unique<io_buf>();
-    this->output = VW::make_unique<io_buf>();
+    this->input = vw::make_unique<io_buf>();
+    this->output = vw::make_unique<io_buf>();
     this->lbl_parser = simple_label_parser;
   }
 
@@ -52,16 +52,16 @@ struct parser
   parser& operator=(const parser&) = delete;
 
   // helper(s) for text parsing
-  std::vector<VW::string_view> words;
+  std::vector<vw::string_view> words;
 
-  VW::object_pool<example> example_pool;
-  VW::ptr_queue<example> ready_parsed_examples;
+  vw::object_pool<example> example_pool;
+  vw::ptr_queue<example> ready_parsed_examples;
 
   std::unique_ptr<io_buf> input;  // Input source(s)
   /// reader consumes the input io_buf in the vw object and is generally for file based parsing
-  int (*reader)(vw*, v_array<example*>& examples);
+  int (*reader)(workspace*, v_array<example*>& examples);
   /// text_reader consumes the char* input and is for text based parsing
-  void (*text_reader)(vw*, const char*, size_t, v_array<example*>&);
+  void (*text_reader)(workspace*, const char*, size_t, v_array<example*>&);
 
   shared_data* _shared_data = nullptr;
 
@@ -93,7 +93,7 @@ struct parser
   size_t finished_count;   // the number of finished examples;
   int bound_sock = 0;
 
-  std::vector<VW::string_view> parse_name;
+  std::vector<vw::string_view> parse_name;
 
   label_parser lbl_parser;  // moved from vw
 
@@ -116,19 +116,19 @@ struct dsjson_metrics
   std::string LastEventTime;
 };
 
-void enable_sources(vw& all, bool quiet, size_t passes, input_options& input_options);
+void enable_sources(workspace& all, bool quiet, size_t passes, input_options& input_options);
 
 VW_DEPRECATED("Function is no longer used")
-void adjust_used_index(vw& all);
+void adjust_used_index(workspace& all);
 
 // parser control
 void lock_done(parser& p);
-void set_done(vw& all);
+void set_done(workspace& all);
 
 // source control functions
-void reset_source(vw& all, size_t numbits);
+void reset_source(workspace& all, size_t numbits);
 VW_DEPRECATED("Function is no longer used")
 void finalize_source(parser* source);
 VW_DEPRECATED("Function is no longer used")
 void set_compressed(parser* par);
-void free_parser(vw& all);
+void free_parser(workspace& all);

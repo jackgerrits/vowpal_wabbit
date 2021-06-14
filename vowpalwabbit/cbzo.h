@@ -6,11 +6,11 @@
 
 #include "reductions.h"
 
-namespace VW
+namespace vw
 {
 namespace cbzo
 {
-VW::LEARNER::base_learner* setup(VW::config::options_i& options, vw& all);
+vw::LEARNER::base_learner* setup(vw::config::options_i& options, workspace& all);
 
 }  // namespace cbzo
-}  // namespace VW
+}  // namespace vw

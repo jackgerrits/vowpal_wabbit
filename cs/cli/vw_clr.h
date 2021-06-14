@@ -16,7 +16,7 @@
 using namespace System;
 using namespace System::Runtime::InteropServices;
 
-namespace VW
+namespace vw
 {
     /// <summary>
     /// Collected performance statistics.
@@ -145,7 +145,7 @@ namespace VW
 }
 
 #define CATCHRETHROW \
-catch (VW::vw_exception const& ex) \
-{ throw gcnew VW::VowpalWabbitException(ex); } \
+catch (vw::vw_exception const& ex) \
+{ throw gcnew vw::VowpalWabbitException(ex); } \
 catch (std::exception const& ex) \
 { throw gcnew System::Exception(gcnew System::String(ex.what())); }

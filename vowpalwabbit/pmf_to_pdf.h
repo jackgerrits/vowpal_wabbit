@@ -8,11 +8,11 @@
 #include "cb.h"
 #include "action_score.h"
 
-namespace VW
+namespace vw
 {
 namespace pmf_to_pdf
 {
-LEARNER::base_learner* setup(config::options_i& options, vw& all);
+LEARNER::base_learner* setup(config::options_i& options, workspace& all);
 struct reduction
 {
   void predict(example& ec);
@@ -35,4 +35,4 @@ private:
   ACTION_SCORE::action_scores temp_pred_a_s;
 };
 }  // namespace pmf_to_pdf
-}  // namespace VW
+}  // namespace vw

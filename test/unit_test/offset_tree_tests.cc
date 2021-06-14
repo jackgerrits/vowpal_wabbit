@@ -6,10 +6,10 @@
 #include "test_common.h"
 #include "cb_label_parser.h"
 
-using namespace VW::LEARNER;
+using namespace vw::LEARNER;
 using namespace std;
 
-namespace VW
+namespace vw
 {
 namespace offset_tree
 {
@@ -61,14 +61,14 @@ using scores_t = std::vector<float>;
 void predict_test_helper(const predictions_t& base_reduction_predictions, const scores_t& expected_scores);
 test_learner_t* get_test_harness_reduction(const predictions_t& base_reduction_predictions);
 }  // namespace offset_tree
-}  // namespace VW
+}  // namespace vw
 
 BOOST_AUTO_TEST_CASE(offset_tree_learn_basic)
 {
   // Setup a test harness base reduction
-  const auto test_harness = VW::offset_tree::get_test_harness_reduction({{.9f, .1f}, {.9f, .1f}});
+  const auto test_harness = vw::offset_tree::get_test_harness_reduction({{.9f, .1f}, {.9f, .1f}});
 
-  VW::offset_tree::offset_tree tree(3);
+  vw::offset_tree::offset_tree tree(3);
   tree.init();
   example ec;
   ec.pred.a_s = v_init<ACTION_SCORE::action_score>();
@@ -82,29 +82,29 @@ BOOST_AUTO_TEST_CASE(offset_tree_learn_basic)
 BOOST_AUTO_TEST_CASE(offset_tree_predict)
 {
   // 0 node tree
-  VW::offset_tree::predict_test_helper({{}}, {});
+  vw::offset_tree::predict_test_helper({{}}, {});
   // 1 node tree
-  VW::offset_tree::predict_test_helper({{}}, {1.0f});
+  vw::offset_tree::predict_test_helper({{}}, {1.0f});
   // 2 node trees
-  VW::offset_tree::predict_test_helper({{.2f, .8f}}, {.2f, .8f});
-  VW::offset_tree::predict_test_helper({{.1f, .9f}}, {.1f, .9f});
-  VW::offset_tree::predict_test_helper({{0.0f, 1.0f}}, {0.0f, 1.0f});
+  vw::offset_tree::predict_test_helper({{.2f, .8f}}, {.2f, .8f});
+  vw::offset_tree::predict_test_helper({{.1f, .9f}}, {.1f, .9f});
+  vw::offset_tree::predict_test_helper({{0.0f, 1.0f}}, {0.0f, 1.0f});
   // 3 node trees
-  VW::offset_tree::predict_test_helper({{.9f, .1f}, {.9f, .1f}}, {.9f * .9f, .9f * .1f, .1f});
-  VW::offset_tree::predict_test_helper({{.2f, .8f}, {.2f, .8f}}, {.2f * .2f, .2f * .8f, .8f});
+  vw::offset_tree::predict_test_helper({{.9f, .1f}, {.9f, .1f}}, {.9f * .9f, .9f * .1f, .1f});
+  vw::offset_tree::predict_test_helper({{.2f, .8f}, {.2f, .8f}}, {.2f * .2f, .2f * .8f, .8f});
   // 4 node tree
-  VW::offset_tree::predict_test_helper(
+  vw::offset_tree::predict_test_helper(
       {{.9f, .1f}, {.9f, .1f}, {.9f, .1f}}, {.9f * .9f, .9f * .1f, .1f * .9f, .1f * .1f});
   // 5 node tree
-  VW::offset_tree::predict_test_helper({{.9f, .1f}, {.9f, .1f}, {.9f, .1f}, {.9f, .1f}},
+  vw::offset_tree::predict_test_helper({{.9f, .1f}, {.9f, .1f}, {.9f, .1f}, {.9f, .1f}},
       {.9f * .9f * .9f, .9f * .9f * .1f, .9f * .1f * .9f, .9f * .1f * .1f, .1f});
 }
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_11)
 {
-  VW::offset_tree::min_depth_binary_tree tree;
+  vw::offset_tree::min_depth_binary_tree tree;
   tree.build_tree(11);
-  std::vector<VW::offset_tree::tree_node> expected = {{0, 0, 0, 11, true}, {1, 0, 0, 11, true}, {2, 0, 0, 12, true},
+  std::vector<vw::offset_tree::tree_node> expected = {{0, 0, 0, 11, true}, {1, 0, 0, 11, true}, {2, 0, 0, 12, true},
       {3, 0, 0, 12, true}, {4, 0, 0, 13, true}, {5, 0, 0, 13, true}, {6, 0, 0, 14, true}, {7, 0, 0, 14, true},
       {8, 0, 0, 15, true}, {9, 0, 0, 15, true}, {10, 0, 0, 18, true}, {11, 0, 1, 16, false}, {12, 2, 3, 16, false},
       {13, 4, 5, 17, false}, {14, 6, 7, 17, false}, {15, 8, 9, 18, false}, {16, 11, 12, 19, false},
@@ -114,31 +114,31 @@ BOOST_AUTO_TEST_CASE(build_min_depth_tree_11)
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_4)
 {
-  VW::offset_tree::min_depth_binary_tree tree;
+  vw::offset_tree::min_depth_binary_tree tree;
   tree.build_tree(4);
-  std::vector<VW::offset_tree::tree_node> expected = {{0, 0, 0, 4, true}, {1, 0, 0, 4, true}, {2, 0, 0, 5, true},
+  std::vector<vw::offset_tree::tree_node> expected = {{0, 0, 0, 4, true}, {1, 0, 0, 4, true}, {2, 0, 0, 5, true},
       {3, 0, 0, 5, true}, {4, 0, 1, 6, false}, {5, 2, 3, 6, false}, {6, 4, 5, 6, false}};
   BOOST_CHECK_EQUAL_COLLECTIONS(tree.nodes.begin(), tree.nodes.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_3)
 {
-  VW::offset_tree::min_depth_binary_tree tree;
+  vw::offset_tree::min_depth_binary_tree tree;
   tree.build_tree(3);
-  std::vector<VW::offset_tree::tree_node> expected = {
+  std::vector<vw::offset_tree::tree_node> expected = {
       {0, 0, 0, 3, true}, {1, 0, 0, 3, true}, {2, 0, 0, 4, true}, {3, 0, 1, 4, false}, {4, 3, 2, 4, false}};
   BOOST_CHECK_EQUAL_COLLECTIONS(tree.nodes.begin(), tree.nodes.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(build_min_depth_tree_1)
 {
-  VW::offset_tree::min_depth_binary_tree tree;
+  vw::offset_tree::min_depth_binary_tree tree;
   tree.build_tree(1);
-  std::vector<VW::offset_tree::tree_node> expected = {{0, 0, 0, 0, true}};
+  std::vector<vw::offset_tree::tree_node> expected = {{0, 0, 0, 0, true}};
   BOOST_CHECK_EQUAL_COLLECTIONS(tree.nodes.begin(), tree.nodes.end(), expected.begin(), expected.end());
 }
 
-namespace VW
+namespace vw
 {
 namespace offset_tree
 {
@@ -159,7 +159,7 @@ test_learner_t* get_test_harness_reduction(const predictions_t& base_reduction_p
 void predict_test_helper(const predictions_t& base_reduction_predictions, const scores_t& expected_scores)
 {
   const auto test_base = get_test_harness_reduction(base_reduction_predictions);
-  VW::offset_tree::offset_tree tree(static_cast<uint32_t>(expected_scores.size()));
+  vw::offset_tree::offset_tree tree(static_cast<uint32_t>(expected_scores.size()));
   tree.init();
   example ec;
   ec.pred.a_s = v_init<ACTION_SCORE::action_score>();
@@ -170,4 +170,4 @@ void predict_test_helper(const predictions_t& base_reduction_predictions, const 
 }
 
 }  // namespace offset_tree
-}  // namespace VW
+}  // namespace vw

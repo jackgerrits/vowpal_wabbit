@@ -16,9 +16,9 @@
 #include "io/logger.h"
 #include "shared_data.h"
 
-using namespace VW::LEARNER;
-using namespace VW::config;
-namespace logger = VW::io::logger;
+using namespace vw::LEARNER;
+using namespace vw::config;
+namespace logger = vw::io::logger;
 
 namespace plt_ns
 {
@@ -32,7 +32,7 @@ struct node
 
 struct plt
 {
-  vw* all;
+  workspace* all;
 
   // tree structure
   uint32_t k;     // number of labels
@@ -267,10 +267,10 @@ void predict(plt& p, single_learner& base, example& ec)
   ec.l.multilabels = std::move(multilabels);
 }
 
-void finish_example(vw& all, plt& /*p*/, example& ec)
+void finish_example(workspace& all, plt& /*p*/, example& ec)
 {
   MULTILABEL::output_example(all, ec);
-  VW::finish_example(all, ec);
+  vw::finish_example(all, ec);
 }
 
 void finish(plt& p)
@@ -322,7 +322,7 @@ void save_load_tree(plt& p, io_buf& model_file, bool read, bool text)
 
 using namespace plt_ns;
 
-base_learner* plt_setup(options_i& options, vw& all)
+base_learner* plt_setup(options_i& options, workspace& all)
 {
   auto tree = scoped_calloc_or_throw<plt>();
   option_group_definition new_options("Probabilistic Label Tree ");

@@ -14,7 +14,7 @@
 
 #include <iterator>
 
-namespace VW
+namespace vw
 {
 namespace shared_feature_merger
 {
@@ -41,7 +41,7 @@ struct sfm_data
 };
 
 template <bool is_learn>
-void predict_or_learn(sfm_data& data, VW::LEARNER::multi_learner& base, multi_ex& ec_seq)
+void predict_or_learn(sfm_data& data, vw::LEARNER::multi_learner& base, multi_ex& ec_seq)
 {
   if (ec_seq.size() == 0) THROW("cb_adf: At least one action must be provided for an example to be valid.");
 
@@ -59,7 +59,7 @@ void predict_or_learn(sfm_data& data, VW::LEARNER::multi_learner& base, multi_ex
   }
 
   // Guard example state restore against throws
-  auto restore_guard = VW::scope_exit([has_example_header, &shared_example, &ec_seq] {
+  auto restore_guard = vw::scope_exit([has_example_header, &shared_example, &ec_seq] {
     if (has_example_header)
     {
       for (auto& example : ec_seq) LabelDict::del_example_namespaces_from_example(*example, *shared_example);
@@ -90,17 +90,17 @@ void persist(sfm_data& data, metric_sink& metrics)
   }
 }
 
-VW::LEARNER::base_learner* shared_feature_merger_setup(config::options_i& options, vw& all)
+vw::LEARNER::base_learner* shared_feature_merger_setup(config::options_i& options, workspace& all)
 {
   if (!use_reduction(options)) return nullptr;
 
   auto data = scoped_calloc_or_throw<sfm_data>();
 
-  if (options.was_supplied("extra_metrics")) data->_metrics = VW::make_unique<sfm_metrics>();
+  if (options.was_supplied("extra_metrics")) data->_metrics = vw::make_unique<sfm_metrics>();
 
-  auto* base = VW::LEARNER::as_multiline(setup_base(options, all));
+  auto* base = vw::LEARNER::as_multiline(setup_base(options, all));
 
-  auto& learner = VW::LEARNER::init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>,
+  auto& learner = vw::LEARNER::init_learner(data, base, predict_or_learn<true>, predict_or_learn<false>,
       all.get_setupfn_name(shared_feature_merger_setup), base->learn_returns_prediction);
 
   learner.set_persist_metrics(persist);
@@ -108,9 +108,9 @@ VW::LEARNER::base_learner* shared_feature_merger_setup(config::options_i& option
   // TODO: Incorrect feature numbers will be reported without merging the example namespaces from the
   //       shared example in a finish_example function. However, its too expensive to perform the full operation.
 
-  return VW::LEARNER::make_base(learner);
+  return vw::LEARNER::make_base(learner);
 }
 
 }  // namespace shared_feature_merger
 
-}  // namespace VW
+}  // namespace vw

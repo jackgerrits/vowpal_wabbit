@@ -36,7 +36,7 @@ template std::ostream& std::operator<<<char>(std::ostream&, const std::vector<ch
 template std::ostream& std::operator<<<std::string>(std::ostream&, const std::vector<std::string>&);
 template std::ostream& std::operator<<<float>(std::ostream&, const std::vector<float>&);
 
-namespace VW
+namespace vw
 {
 namespace config
 {
@@ -228,7 +228,7 @@ void check_disagreeing_option_values(T value, const std::string& name, const std
     {
       std::stringstream ss;
       ss << "Disagreeing option values for '" << name << "': '" << value << "' vs '" << item << "'";
-      THROW_EX(VW::vw_argument_disagreement_exception, ss.str());
+      THROW_EX(vw::vw_argument_disagreement_exception, ss.str());
     }
   }
 }
@@ -243,7 +243,7 @@ inline void check_disagreeing_option_values(
     {
       std::stringstream ss;
       ss << "Disagreeing option values for '" << name << "': '" << value << "' vs '" << item << "'";
-      THROW_EX(VW::vw_argument_disagreement_exception, ss.str());
+      THROW_EX(vw::vw_argument_disagreement_exception, ss.str());
     }
   }
 }
@@ -311,4 +311,4 @@ void options_boost_po::add_to_description(
   }
 }
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace VW
+namespace vw
 {
 namespace config
 {
@@ -58,4 +58,4 @@ struct is_scalar_option_type
 };
 
 }  // namespace config
-}  // namespace VW
+}  // namespace vw

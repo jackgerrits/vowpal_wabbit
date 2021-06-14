@@ -12,19 +12,19 @@
 // needed for custom types (like string_view)
 #include <fmt/ostream.h>
 
-namespace VW
+namespace vw
 {
 namespace io
 {
   /*
-  // TODO: this be an object thats passed around, not stand-alone functions 
+  // TODO: this be an object thats passed around, not stand-alone functions
 struct logger {
 private:
   std::shared_ptr<spdlog::logger> _internal_logger;
 public:
   vw_logger()
   : _internal_logger(spdlog::default_logger()) {}
-  
+
   template<typename FormatString, typename... Args>
     void log_info(const FormatString &fmt, Args&&...args)
   {
@@ -83,7 +83,7 @@ namespace logger
     detail::log_count++;
     if (detail::log_count <= detail::max_limit) spdlog::default_logger_raw()->warn(fmt, std::forward<Args>(args)...);
   }
-  
+
   template<typename FormatString, typename... Args>
     void log_error(const FormatString &fmt, Args&&...args)
   {
@@ -115,7 +115,7 @@ namespace logger
     detail::log_count++;
     if (detail::log_count <= detail::max_limit) { detail::_stderr_logger->warn(fmt, std::forward<Args>(args)...); }
   }
-  
+
   template<typename FormatString, typename... Args>
     void errlog_error(const FormatString &fmt, Args&&...args)
   {

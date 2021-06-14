@@ -26,11 +26,11 @@
 #include <unordered_set>
 #include <cmath>
 
-using namespace VW::LEARNER;
-using namespace VW;
-using namespace VW::config;
+using namespace vw::LEARNER;
+using namespace vw;
+using namespace vw::config;
 
-namespace logger = VW::io::logger;
+namespace logger = vw::io::logger;
 
 namespace CCB
 {
@@ -175,7 +175,7 @@ void default_label(label& ld)
 bool test_label(CCB::label& ld) { return ld.outcome == nullptr; }
 
 ACTION_SCORE::action_score convert_to_score(
-    const VW::string_view& action_id_str, const VW::string_view& probability_str)
+    const vw::string_view& action_id_str, const vw::string_view& probability_str)
 {
   auto action_id = static_cast<uint32_t>(int_of_string(action_id_str));
   auto probability = float_of_string(probability_str);
@@ -196,14 +196,14 @@ ACTION_SCORE::action_score convert_to_score(
 }
 
 //<action>:<cost>:<probability>,<action>:<probability>,<action>:<probability>,…
-CCB::conditional_contextual_bandit_outcome* parse_outcome(VW::string_view& outcome)
+CCB::conditional_contextual_bandit_outcome* parse_outcome(vw::string_view& outcome)
 {
   auto& ccb_outcome = *(new CCB::conditional_contextual_bandit_outcome());
 
-  std::vector<VW::string_view> split_commas;
+  std::vector<vw::string_view> split_commas;
   tokenize(',', outcome, split_commas);
 
-  std::vector<VW::string_view> split_colons;
+  std::vector<vw::string_view> split_colons;
   tokenize(':', split_commas[0], split_colons);
 
   if (split_colons.size() != 3) THROW("Malformed ccb label");
@@ -226,12 +226,12 @@ CCB::conditional_contextual_bandit_outcome* parse_outcome(VW::string_view& outco
   return &ccb_outcome;
 }
 
-void parse_explicit_inclusions(CCB::label& ld, const std::vector<VW::string_view>& split_inclusions)
+void parse_explicit_inclusions(CCB::label& ld, const std::vector<vw::string_view>& split_inclusions)
 {
   for (const auto& inclusion : split_inclusions) { ld.explicit_included_actions.push_back(int_of_string(inclusion)); }
 }
 
-void parse_label(parser* p, shared_data*, label& ld, std::vector<VW::string_view>& words, ::reduction_features&)
+void parse_label(parser* p, shared_data*, label& ld, std::vector<vw::string_view>& words, ::reduction_features&)
 {
   ld.weight = 1.0;
 
@@ -258,7 +258,7 @@ void parse_label(parser* p, shared_data*, label& ld, std::vector<VW::string_view
     for (size_t i = 2; i < words.size(); i++)
     {
       auto is_outcome = words[i].find(':');
-      if (is_outcome != VW::string_view::npos)
+      if (is_outcome != vw::string_view::npos)
       {
         if (ld.outcome != nullptr) { THROW("There may be only 1 outcome associated with a slot.") }
 
@@ -280,7 +280,7 @@ void parse_label(parser* p, shared_data*, label& ld, std::vector<VW::string_view
           });
 
       // TODO do a proper comparison here.
-      if (!VW::math::are_same(total_pred, 1.f))
+      if (!vw::math::are_same(total_pred, 1.f))
       {
         THROW("When providing all prediction probabilities they must add up to 1.f, instead summed to " << total_pred);
       }
@@ -297,7 +297,7 @@ label_parser ccb_label_parser = {
   // default_label
   [](polylabel* v) { default_label(v->conditional_contextual_bandit); },
   // parse_label
-  [](parser* p, shared_data* sd, polylabel* v, std::vector<VW::string_view>& words, ::reduction_features& red_features) {
+  [](parser* p, shared_data* sd, polylabel* v, std::vector<vw::string_view>& words, ::reduction_features& red_features) {
     parse_label(p, sd, v->conditional_contextual_bandit, words, red_features);
   },
   // cache_label

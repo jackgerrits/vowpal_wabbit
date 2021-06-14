@@ -6,11 +6,11 @@
 
 #include "reductions.h"
 
-using namespace VW::config;
+using namespace vw::config;
 
-void learn(char&, VW::LEARNER::base_learner&, example&) {}
+void learn(char&, vw::LEARNER::base_learner&, example&) {}
 
-VW::LEARNER::base_learner* noop_setup(options_i& options, vw& all)
+vw::LEARNER::base_learner* noop_setup(options_i& options, workspace& all)
 {
   bool noop = false;
   option_group_definition new_options("Noop Learner");
@@ -18,5 +18,5 @@ VW::LEARNER::base_learner* noop_setup(options_i& options, vw& all)
 
   if (!options.add_parse_and_check_necessary(new_options)) return nullptr;
 
-  return make_base(VW::LEARNER::init_learner(learn, 1, all.get_setupfn_name(noop_setup)));
+  return make_base(vw::LEARNER::init_learner(learn, 1, all.get_setupfn_name(noop_setup)));
 }

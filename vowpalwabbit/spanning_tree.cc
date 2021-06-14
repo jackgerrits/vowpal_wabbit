@@ -77,7 +77,7 @@ void fail_send(const socket_t fd, const void* buf, const int count)
   if (send(fd, (char*)buf, count, 0) == -1) THROWERRNO("send: ");
 }
 
-namespace VW
+namespace vw
 {
 SpanningTree::SpanningTree(uint16_t port, bool quiet) : m_stop(false), m_port(port), m_future(nullptr), m_quiet(quiet)
 {
@@ -307,4 +307,4 @@ void SpanningTree::Run()
   WSACleanup();
 #endif
 }
-}  // namespace VW
+}  // namespace vw
