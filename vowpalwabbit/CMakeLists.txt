@@ -100,6 +100,7 @@ set(vw_all_headers
   debug_print.h
   decision_scores.h
   distributionally_robust.h
+  featurization_hooks.h
   ect.h
   error_constants.h
   error_data.h
@@ -290,6 +291,7 @@ set(vw_all_sources
   interactions.cc
   io_buf.cc
   kernel_svm.cc
+  featurization_hooks.cc
   label_dictionary.cc
   lda_core.cc
   learner.cc

@@ -230,8 +230,10 @@ public:
   std::unique_ptr<VW::kskip_ngram_transformer> skip_gram_transformer;
   std::vector<std::string> limit_strings;      // descriptor of feature limits
   std::array<uint32_t, NUM_NAMESPACES> limit;  // count to limit features by
-  std::array<uint64_t, NUM_NAMESPACES>
-      affix_features;  // affixes to generate (up to 16 per namespace - 4 bits per affix)
+
+  affix_hook affix_featurization_hook;
+  spelling_hook spelling_featurization_hook;
+  dictionary_hook dictionary_featurization_hook;
   std::array<bool, NUM_NAMESPACES> spelling_features;  // generate spelling features for which namespace
   std::vector<std::string> dictionary_path;            // where to look for dictionaries
 

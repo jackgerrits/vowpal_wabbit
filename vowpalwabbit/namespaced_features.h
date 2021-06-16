@@ -13,8 +13,6 @@
 #include "feature_group.h"
 #include "generic_range.h"
 
-typedef unsigned char namespace_index;
-
 namespace VW
 {
 /// Insertion or removal will result in this value in invalidated.

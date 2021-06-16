@@ -18,6 +18,7 @@
 
 using feature_value = float;
 using feature_index = uint64_t;
+using namespace_index = unsigned char;
 using audit_strings = std::pair<std::string, std::string>;
 using audit_strings_ptr = std::shared_ptr<audit_strings>;
 
