@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-example_predict::iterator::iterator(features* feature_space, namespace_index* index)
+example_predict::iterator::iterator(features* feature_space, v_array<VW::strong_namespace_index>::iterator index)
     : _feature_space(feature_space), _index(index)
 {
 }
@@ -19,7 +19,7 @@ example_predict::iterator& example_predict::iterator::operator++()
   return *this;
 }
 
-namespace_index example_predict::iterator::index() { return *_index; }
+VW::strong_namespace_index example_predict::iterator::index() { return *_index; }
 
 bool example_predict::iterator::operator==(const iterator& rhs) { return _index == rhs._index; }
 bool example_predict::iterator::operator!=(const iterator& rhs) { return _index != rhs._index; }

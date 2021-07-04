@@ -23,7 +23,7 @@ namespace INTERACTIONS
  */
 
 // returns number of new features that will be generated for example and sum of their squared values
-void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector<namespace_index>>& interactions,
+void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector<VW::strong_namespace_index>>& interactions,
     const std::array<features, NUM_NAMESPACES>& feature_spaces, size_t& new_features_cnt, float& new_features_value)
 {
   new_features_cnt = 0;
@@ -39,7 +39,7 @@ void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector
       size_t num_features_in_inter = 1;
       float sum_feat_sq_in_inter = 1.;
 
-      for (namespace_index ns : inter)
+      for (auto ns : inter)
       {
         num_features_in_inter *= feature_spaces[ns].size();
         sum_feat_sq_in_inter *= feature_spaces[ns].sum_feat_sq;
@@ -166,7 +166,7 @@ void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector
   }
 }
 
-bool sort_interactions_comparator(const std::vector<namespace_index>& a, const std::vector<namespace_index>& b)
+bool sort_interactions_comparator(const std::vector<VW::strong_namespace_index>& a, const std::vector<VW::strong_namespace_index>& b)
 {
   if (a.size() != b.size()) { return a.size() > b.size(); }
   for (size_t i = 0; i < a.size(); i++)
@@ -189,7 +189,7 @@ bool sort_interactions_comparator(const std::vector<namespace_index>& a, const s
 // with one exeption - returns false if interaction made of one namespace
 // like 'aaa' as it has no sense to sort such things.
 
-inline bool must_be_left_sorted(const std::vector<namespace_index>& oi)
+inline bool must_be_left_sorted(const std::vector<VW::strong_namespace_index>& oi)
 {
   if (oi.size() <= 1) return true;  // one letter in std::string - no need to sort
 
@@ -211,10 +211,10 @@ inline bool must_be_left_sorted(const std::vector<namespace_index>& oi)
   return false;  // 'aaa' or 'abc'
 }
 
-std::vector<std::vector<namespace_index>> expand_quadratics_wildcard_interactions(
-    bool leave_duplicate_interactions, const std::set<namespace_index>& new_example_indices)
+std::vector<std::vector<VW::strong_namespace_index>> expand_quadratics_wildcard_interactions(
+    bool leave_duplicate_interactions, const std::set<VW::strong_namespace_index>& new_example_indices)
 {
-  std::set<std::vector<namespace_index>> interactions;
+  std::set<std::vector<VW::strong_namespace_index>> interactions;
 
   for (auto it = new_example_indices.begin(); it != new_example_indices.end(); ++it)
   {
@@ -229,7 +229,7 @@ std::vector<std::vector<namespace_index>> expand_quadratics_wildcard_interaction
       if (leave_duplicate_interactions) { interactions.insert({idx2, idx1}); }
     }
   }
-  return std::vector<std::vector<namespace_index>>(interactions.begin(), interactions.end());
+  return std::vector<std::vector<VW::strong_namespace_index>>(interactions.begin(), interactions.end());
 }
 
 // used from parse_args.cc
@@ -237,17 +237,17 @@ std::vector<std::vector<namespace_index>> expand_quadratics_wildcard_interaction
 // also sort namespaces in interactions containing duplicate namespaces to make sure they are grouped together.
 
 void sort_and_filter_duplicate_interactions(
-    std::vector<std::vector<namespace_index>>& vec, bool filter_duplicates, size_t& removed_cnt, size_t& sorted_cnt)
+    std::vector<std::vector<VW::strong_namespace_index>>& vec, bool filter_duplicates, size_t& removed_cnt, size_t& sorted_cnt)
 {
   // 2 out parameters
   removed_cnt = 0;
   sorted_cnt = 0;
 
   // interaction value sort + original position
-  std::vector<std::pair<std::vector<namespace_index>, size_t>> vec_sorted;
+  std::vector<std::pair<std::vector<VW::strong_namespace_index>, size_t>> vec_sorted;
   for (size_t i = 0; i < vec.size(); ++i)
   {
-    std::vector<namespace_index> sorted_i(vec[i]);
+    std::vector<VW::strong_namespace_index> sorted_i(vec[i]);
     std::stable_sort(std::begin(sorted_i), std::end(sorted_i));
     vec_sorted.push_back(std::make_pair(sorted_i, i));
   }
@@ -256,11 +256,11 @@ void sort_and_filter_duplicate_interactions(
   {
     // remove duplicates
     std::stable_sort(vec_sorted.begin(), vec_sorted.end(),
-        [](std::pair<std::vector<namespace_index>, size_t> const& a,
-            std::pair<std::vector<namespace_index>, size_t> const& b) { return a.first < b.first; });
+        [](std::pair<std::vector<VW::strong_namespace_index>, size_t> const& a,
+            std::pair<std::vector<VW::strong_namespace_index>, size_t> const& b) { return a.first < b.first; });
     auto last = unique(vec_sorted.begin(), vec_sorted.end(),
-        [](std::pair<std::vector<namespace_index>, size_t> const& a,
-            std::pair<std::vector<namespace_index>, size_t> const& b) { return a.first == b.first; });
+        [](std::pair<std::vector<VW::strong_namespace_index>, size_t> const& a,
+            std::pair<std::vector<VW::strong_namespace_index>, size_t> const& b) { return a.first == b.first; });
     vec_sorted.erase(last, vec_sorted.end());
 
     // report number of removed interactions
@@ -268,14 +268,14 @@ void sort_and_filter_duplicate_interactions(
 
     // restore original order
     std::stable_sort(vec_sorted.begin(), vec_sorted.end(),
-        [](std::pair<std::vector<namespace_index>, size_t> const& a,
-            std::pair<std::vector<namespace_index>, size_t> const& b) { return a.second < b.second; });
+        [](std::pair<std::vector<VW::strong_namespace_index>, size_t> const& a,
+            std::pair<std::vector<VW::strong_namespace_index>, size_t> const& b) { return a.second < b.second; });
   }
 
   // we have original vector and vector with duplicates removed + corresponding indexes in original vector
   // plus second vector's data is sorted. We can reuse it if we need interaction to be left sorted.
   // let's make a new vector from these two sources - without dulicates and with sorted data whenever it's needed.
-  std::vector<std::vector<namespace_index>> res;
+  std::vector<std::vector<VW::strong_namespace_index>> res;
   for (auto& i : vec_sorted)
   {
     if (must_be_left_sorted(i.first))
@@ -291,10 +291,10 @@ void sort_and_filter_duplicate_interactions(
   vec = res;
 }
 
-std::vector<namespace_index> indices_to_values_one_based(
-    const std::vector<size_t>& indices, const std::set<namespace_index>& values)
+std::vector<VW::strong_namespace_index> indices_to_values_one_based(
+    const std::vector<size_t>& indices, const std::set<VW::strong_namespace_index>& values)
 {
-  std::vector<namespace_index> result;
+  std::vector<VW::strong_namespace_index> result;
   result.reserve(indices.size());
   for (size_t i = 0; i < indices.size(); i++)
   {
@@ -305,10 +305,10 @@ std::vector<namespace_index> indices_to_values_one_based(
   return result;
 }
 
-std::vector<namespace_index> indices_to_values_ignore_last_index(
-    const std::vector<size_t>& indices, const std::set<namespace_index>& values)
+std::vector<VW::strong_namespace_index> indices_to_values_ignore_last_index(
+    const std::vector<size_t>& indices, const std::set<VW::strong_namespace_index>& values)
 {
-  std::vector<namespace_index> result;
+  std::vector<VW::strong_namespace_index> result;
   result.reserve(indices.size() - 1);
   for (size_t i = 0; i < indices.size() - 1; i++)
   {
@@ -319,10 +319,10 @@ std::vector<namespace_index> indices_to_values_ignore_last_index(
   return result;
 }
 
-std::vector<std::vector<namespace_index>> generate_namespace_combinations_with_repetition(
-    const std::set<namespace_index>& namespaces, size_t num_to_pick)
+std::vector<std::vector<VW::strong_namespace_index>> generate_namespace_combinations_with_repetition(
+    const std::set<VW::strong_namespace_index>& namespaces, size_t num_to_pick)
 {
-  std::vector<std::vector<namespace_index>> result;
+  std::vector<std::vector<VW::strong_namespace_index>> result;
   // This computation involves factorials and so can only be done with relatively small inputs.
   // Factorial 22 would result in 64 bit overflow.
   if ((namespaces.size() + num_to_pick) <= 21)
@@ -353,10 +353,10 @@ std::vector<std::vector<namespace_index>> generate_namespace_combinations_with_r
   return result;
 }
 
-std::vector<std::vector<namespace_index>> generate_namespace_permutations_with_repetition(
-    const std::set<namespace_index>& namespaces, size_t num_to_pick)
+std::vector<std::vector<VW::strong_namespace_index>> generate_namespace_permutations_with_repetition(
+    const std::set<VW::strong_namespace_index>& namespaces, size_t num_to_pick)
 {
-  std::vector<std::vector<namespace_index>> result;
+  std::vector<std::vector<VW::strong_namespace_index>> result;
   result.reserve(VW::math::number_of_permutations_with_repetition(namespaces.size(), num_to_pick));
 
   std::vector<size_t> one_based_chosen_indices(num_to_pick, 0);

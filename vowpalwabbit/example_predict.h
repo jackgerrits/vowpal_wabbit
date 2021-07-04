@@ -32,13 +32,13 @@ struct example_predict
   class iterator
   {
     features* _feature_space;
-    v_array<namespace_index>::iterator _index;
+    v_array<VW::strong_namespace_index>::iterator _index;
 
   public:
-    iterator(features* feature_space, namespace_index* index);
+    iterator(features* feature_space, v_array<VW::strong_namespace_index>::iterator index);
     features& operator*();
     iterator& operator++();
-    namespace_index index();
+    VW::strong_namespace_index index();
     bool operator==(const iterator& rhs);
     bool operator!=(const iterator& rhs);
   };
@@ -55,13 +55,13 @@ struct example_predict
   /// If indices is modified this iterator is invalidated.
   iterator end();
 
-  v_array<namespace_index> indices;
+  v_array<VW::strong_namespace_index> indices;
   std::array<features, NUM_NAMESPACES> feature_space;  // Groups of feature values.
   uint64_t ft_offset = 0;                              // An offset for all feature values.
 
   // Interactions are specified by this struct's interactions vector of vectors of unsigned characters, where each
   // vector is an interaction and each char is a namespace.
-  std::vector<std::vector<namespace_index>>* interactions = nullptr;
+  std::vector<std::vector<VW::strong_namespace_index>>* interactions = nullptr;
   reduction_features _reduction_features;
 
   // Used for debugging reductions.  Keeps track of current reduction level.

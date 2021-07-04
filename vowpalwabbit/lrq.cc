@@ -56,7 +56,7 @@ void predict_or_learn(LRQstate& lrq, single_learner& base, example& ec)
   // Remember original features
 
   memset(lrq.orig_size, 0, sizeof(lrq.orig_size));
-  for (namespace_index i : ec.indices)
+  for (auto i : ec.indices)
   {
     if (lrq.lrindices[i]) lrq.orig_size[i] = ec.feature_space[i].size();
   }

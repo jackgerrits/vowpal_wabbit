@@ -153,7 +153,7 @@ VW_DEPRECATED("Use the overload without audit and with added const.")
 void copy_example_metadata(bool audit, example*, example*);
 VW_DEPRECATED("Use the overload without audit and with added const.")
 void copy_example_data(bool audit, example*, example*);  // metadata + features, don't copy the label
-void move_feature_namespace(example* dst, example* src, namespace_index c);
+void move_feature_namespace(example* dst, example* src, unsigned char c);
 
 void copy_example_metadata(example*, const example*);
 void copy_example_data(example*, const example*);  // metadata + features, don't copy the label

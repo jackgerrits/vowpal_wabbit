@@ -432,7 +432,7 @@ public:
       parserWarning(
           "malformed example! '|',String,space, or EOL expected after : \"", _line.substr(0, _read_idx), "\"");
     }
-    if (_new_index && _ae->feature_space[_index].size() > 0) _ae->indices.push_back(_index);
+    if (_new_index && _ae->feature_space[_index].size() > 0) _ae->indices.emplace_back(_index);
   }
 
   inline FORCE_INLINE void listNameSpace()

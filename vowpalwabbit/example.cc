@@ -100,7 +100,7 @@ void copy_example_data(example* dst, const example* src)
 
   // copy feature data
   dst->indices = src->indices;
-  for (namespace_index c : src->indices) dst->feature_space[c] = src->feature_space[c];
+  for (auto c : src->indices) dst->feature_space[c] = src->feature_space[c];
   dst->num_features = src->num_features;
   dst->total_sum_feat_sq = src->total_sum_feat_sq;
   dst->total_sum_feat_sq_calculated = src->total_sum_feat_sq_calculated;
@@ -131,13 +131,14 @@ void copy_example_data_with_label(example* dst, const example* src)
   copy_example_label(dst, src);
 }
 
-void move_feature_namespace(example* dst, example* src, namespace_index c)
+void move_feature_namespace(example* dst, example* src, unsigned char c)
 {
-  if (std::find(src->indices.begin(), src->indices.end(), c) == src->indices.end()) return;  // index not present in src
-  if (std::find(dst->indices.begin(), dst->indices.end(), c) == dst->indices.end()) dst->indices.push_back(c);
+  VW::strong_namespace_index ns{c};
+  if (std::find(src->indices.begin(), src->indices.end(), ns) == src->indices.end()) { return; }  // index not present in src
+  if (std::find(dst->indices.begin(), dst->indices.end(), ns) == dst->indices.end()) { dst->indices.push_back(ns); }
 
-  auto& fdst = dst->feature_space[c];
-  auto& fsrc = src->feature_space[c];
+  auto& fdst = dst->feature_space[ns];
+  auto& fsrc = src->feature_space[ns];
 
   src->num_features -= fsrc.size();
   src->reset_total_sum_feat_sq();

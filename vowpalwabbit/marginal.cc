@@ -121,7 +121,7 @@ void undo_marginal(data& sm, example& ec)
 {
   for (example::iterator i = ec.begin(); i != ec.end(); ++i)
   {
-    namespace_index n = i.index();
+    auto n = i.index();
     if (sm.id_features[n]) std::swap(sm.temp[n], *i);
   }
 }

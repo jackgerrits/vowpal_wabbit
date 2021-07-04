@@ -752,7 +752,7 @@ void parse_feature_tweaks(
   }
 
   // prepare namespace interactions
-  std::vector<std::vector<namespace_index>> decoded_interactions;
+  std::vector<std::vector<VW::strong_namespace_index>> decoded_interactions;
 
   if ( ( (!all.interactions.empty() && /*data was restored from old model file directly to v_array and will be overriden automatically*/
           (options.was_supplied("quadratic") || options.was_supplied("cubic") || options.was_supplied("interactions")) ) )

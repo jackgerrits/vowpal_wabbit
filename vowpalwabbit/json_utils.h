@@ -22,7 +22,7 @@ struct DecisionServiceInteraction
 template <bool audit>
 struct Namespace
 {
-  char feature_group;
+  VW::strong_namespace_index feature_group;
   feature_index namespace_hash;
   features* ftrs;
   size_t feature_count;
@@ -62,7 +62,7 @@ template <bool audit>
 void push_ns(example* ex, const char* ns, std::vector<Namespace<audit>>& namespaces, vw& all)
 {
   Namespace<audit> n;
-  n.feature_group = ns[0];
+  n.feature_group = VW::strong_namespace_index{ns[0]};
   n.namespace_hash = VW::hash_space_cstr(all, ns);
   n.ftrs = ex->feature_space.data() + ns[0];
   n.feature_count = 0;

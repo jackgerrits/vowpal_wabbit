@@ -35,7 +35,7 @@ void predict_or_learn(LRQFAstate& lrq, single_learner& base, example& ec)
   vw& all = *lrq.all;
 
   memset(lrq.orig_size, 0, sizeof(lrq.orig_size));
-  for (namespace_index i : ec.indices) lrq.orig_size[i] = ec.feature_space[i].size();
+  for (auto i : ec.indices) lrq.orig_size[i] = ec.feature_space[i].size();
 
   size_t which = ec.example_counter;
   float first_prediction = 0;

@@ -99,7 +99,7 @@ int VW::read_example_from_cache(
     index = *reinterpret_cast<unsigned char*>(c);
     c += sizeof(index);
 
-    ae->indices.push_back(static_cast<size_t>(index));
+    ae->indices.emplace_back(index);
     features& ours = ae->feature_space[index];
     size_t storage = *reinterpret_cast<size_t*>(c);
     c += sizeof(size_t);
@@ -216,7 +216,7 @@ void cache_features(io_buf& cache, example* ae, uint64_t mask)
 
   cache.write_value<unsigned char>(ae->is_newline ? newline_example : non_newline_example);
   cache.write_value<unsigned char>(static_cast<unsigned char>(ae->indices.size()));
-  for (namespace_index ns : ae->indices) output_features(cache, ns, ae->feature_space[ns], mask);
+  for (auto ns : ae->indices) output_features(cache, ns, ae->feature_space[ns], mask);
 }
 
 uint32_t VW::convert(size_t number)

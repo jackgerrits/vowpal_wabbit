@@ -38,7 +38,7 @@ struct mwt
   uint32_t num_classes;
   bool learn;
 
-  v_array<namespace_index> indices;  // excluded namespaces
+  v_array<VW::strong_namespace_index> indices;  // excluded namespaces
   features feature_space[256];
   vw* all;
 };
@@ -68,7 +68,7 @@ void predict_or_learn(mwt& c, single_learner& base, example& ec)
   {
     c.total++;
     // For each nonzero feature in observed namespaces, check it's value.
-    for (unsigned char ns : ec.indices)
+    for (auto ns : ec.indices)
       if (c.namespaces[ns]) GD::foreach_feature<mwt, value_policy>(c.all, ec.feature_space[ns], c);
     for (uint64_t policy : c.policies)
     {
@@ -84,10 +84,10 @@ void predict_or_learn(mwt& c, single_learner& base, example& ec)
     c.indices.clear();
     uint32_t stride_shift = c.all->weights.stride_shift();
     uint64_t weight_mask = c.all->weights.mask();
-    for (unsigned char ns : ec.indices)
+    for (auto ns : ec.indices)
       if (c.namespaces[ns])
       {
-        c.indices.push_back(ns);
+        c.indices.emplace_back(ns);
         if (learn)
         {
           c.feature_space[ns].clear();
@@ -119,7 +119,7 @@ void predict_or_learn(mwt& c, single_learner& base, example& ec)
   if VW_STD17_CONSTEXPR (exclude || learn)
     while (!c.indices.empty())
     {
-      unsigned char ns = c.indices.back();
+      auto ns = c.indices.back();
       c.indices.pop_back();
       std::swap(c.feature_space[ns], ec.feature_space[ns]);
     }

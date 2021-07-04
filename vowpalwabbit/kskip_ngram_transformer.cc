@@ -70,7 +70,7 @@ void compile_gram(const std::vector<std::string>& grams, std::array<uint32_t, NU
 
 void VW::kskip_ngram_transformer::generate_grams(example* ex)
 {
-  for (namespace_index index : ex->indices)
+  for (auto index : ex->indices)
   {
     size_t length = ex->feature_space[index].size();
     for (size_t n = 1; n < ngram_definition[index]; n++)

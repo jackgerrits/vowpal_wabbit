@@ -23,47 +23,47 @@ constexpr bool feature_self_interactions = true;
 /*old: ft_value != 1.0 && feature_self_interactions_for_value_other_than_1*/
 #define PROCESS_SELF_INTERACTIONS(ft_value) feature_self_interactions
 
-constexpr unsigned char printable_start = ' ';
-constexpr unsigned char printable_end = '~';
-constexpr unsigned char printable_ns_size = printable_end - printable_start;
+constexpr VW::strong_namespace_index printable_start{' '};
+constexpr VW::strong_namespace_index printable_end{'~'};
+constexpr VW::strong_namespace_index printable_ns_size{printable_end - printable_start};
 constexpr uint64_t valid_ns_size =
     printable_end - printable_start - 1;  // -1 to skip characters ':' and '|' excluded in is_valid_ns()
 
-inline constexpr bool is_printable_namespace(const unsigned char ns)
+inline constexpr bool is_printable_namespace(VW::strong_namespace_index ns)
 {
   return ns >= printable_start && ns <= printable_end;
 }
 
-inline bool contains_wildcard(const std::vector<namespace_index>& interaction)
+inline bool contains_wildcard(const std::vector<VW::strong_namespace_index>& interaction)
 {
   return std::find(interaction.begin(), interaction.end(), wildcard_namespace) != interaction.end();
 }
 
 // function estimates how many new features will be generated for example and their sum(value^2).
-void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector<namespace_index>>& interactions,
+void eval_count_of_generated_ft(bool permutations, const std::vector<std::vector<VW::strong_namespace_index>>& interactions,
     const std::array<features, NUM_NAMESPACES>& feature_spaces, size_t& new_features_cnt, float& new_features_value);
 
-std::vector<std::vector<namespace_index>> generate_namespace_combinations_with_repetition(
-    const std::set<namespace_index>& namespaces, size_t num_to_pick);
-std::vector<std::vector<namespace_index>> generate_namespace_permutations_with_repetition(
-    const std::set<namespace_index>& namespaces, size_t num_to_pick);
-using generate_func_t = std::vector<std::vector<namespace_index>>(
-    const std::set<namespace_index>& namespaces, size_t num_to_pick);
+std::vector<std::vector<VW::strong_namespace_index>> generate_namespace_combinations_with_repetition(
+    const std::set<VW::strong_namespace_index>& namespaces, size_t num_to_pick);
+std::vector<std::vector<VW::strong_namespace_index>> generate_namespace_permutations_with_repetition(
+    const std::set<VW::strong_namespace_index>& namespaces, size_t num_to_pick);
+using generate_func_t = std::vector<std::vector<VW::strong_namespace_index>>(
+    const std::set<VW::strong_namespace_index>& namespaces, size_t num_to_pick);
 
-std::vector<std::vector<namespace_index>> expand_quadratics_wildcard_interactions(
-    bool leave_duplicate_interactions, const std::set<namespace_index>& new_example_indices);
+std::vector<std::vector<VW::strong_namespace_index>> expand_quadratics_wildcard_interactions(
+    bool leave_duplicate_interactions, const std::set<VW::strong_namespace_index>& new_example_indices);
 
-bool sort_interactions_comparator(const std::vector<namespace_index>& a, const std::vector<namespace_index>& b);
+bool sort_interactions_comparator(const std::vector<VW::strong_namespace_index>& a, const std::vector<VW::strong_namespace_index>& b);
 
 void sort_and_filter_duplicate_interactions(
-    std::vector<std::vector<namespace_index>>& vec, bool filter_duplicates, size_t& removed_cnt, size_t& sorted_cnt);
+    std::vector<std::vector<VW::strong_namespace_index>>& vec, bool filter_duplicates, size_t& removed_cnt, size_t& sorted_cnt);
 
 template <generate_func_t generate_func, bool leave_duplicate_interactions>
-std::vector<std::vector<namespace_index>> compile_interaction(
-    const std::vector<namespace_index>& interaction, const std::set<namespace_index>& indices)
+std::vector<std::vector<VW::strong_namespace_index>> compile_interaction(
+    const std::vector<VW::strong_namespace_index>& interaction, const std::set<VW::strong_namespace_index>& indices)
 {
   std::vector<size_t> insertion_indices;
-  std::vector<namespace_index> insertion_ns;
+  std::vector<VW::strong_namespace_index> insertion_ns;
   size_t num_wildcards = 0;
   for (size_t i = 0; i < interaction.size(); i++)
   {
@@ -90,10 +90,10 @@ std::vector<std::vector<namespace_index>> compile_interaction(
 
 // Compiling an interaction means to expand out wildcards (:) for each index present
 template <generate_func_t generate_func, bool leave_duplicate_interactions>
-std::vector<std::vector<namespace_index>> compile_interactions(
-    const std::vector<std::vector<namespace_index>>& interactions, const std::set<namespace_index>& indices)
+std::vector<std::vector<VW::strong_namespace_index>> compile_interactions(
+    const std::vector<std::vector<VW::strong_namespace_index>>& interactions, const std::set<VW::strong_namespace_index>& indices)
 {
-  std::vector<std::vector<namespace_index>> final_interactions;
+  std::vector<std::vector<VW::strong_namespace_index>> final_interactions;
 
   for (const auto& inter : interactions)
   {
@@ -118,14 +118,14 @@ std::vector<std::vector<namespace_index>> compile_interactions(
 struct interactions_generator
 {
 private:
-  std::set<namespace_index> all_seen_namespaces;
+  std::set<VW::strong_namespace_index> all_seen_namespaces;
 
 public:
-  std::vector<std::vector<namespace_index>> generated_interactions;
+  std::vector<std::vector<VW::strong_namespace_index>> generated_interactions;
 
   template <generate_func_t generate_func, bool leave_duplicate_interactions>
-  void update_interactions_if_new_namespace_seen(const std::vector<std::vector<namespace_index>>& interactions,
-      const v_array<namespace_index>& new_example_indices)
+  void update_interactions_if_new_namespace_seen(const std::vector<std::vector<VW::strong_namespace_index>>& interactions,
+      const v_array<VW::strong_namespace_index>& new_example_indices)
   {
     auto prev_count = all_seen_namespaces.size();
     all_seen_namespaces.insert(new_example_indices.begin(), new_example_indices.end());
@@ -135,10 +135,10 @@ public:
       // We do not generate interactions for non-printable namespaces as
       // generally they are used for implementation details and special behavior
       // and not user inputted features.
-      std::set<namespace_index> indices_to_interact;
+      std::set<VW::strong_namespace_index> indices_to_interact;
       for (auto ns_index : all_seen_namespaces)
       {
-        if (is_printable_namespace(ns_index)) { indices_to_interact.insert(ns_index); }
+        if (is_printable_namespace(VW::strong_namespace_index{ns_index})) { indices_to_interact.insert(ns_index); }
       }
       generated_interactions.clear();
       if (indices_to_interact.size() > 0)

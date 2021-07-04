@@ -644,7 +644,7 @@ void end_pass_example(vw& all, example* ae)
 
 void feature_limit(vw& all, example* ex)
 {
-  for (namespace_index index : ex->indices)
+  for (auto index : ex->indices)
     if (all.limit[index] < ex->feature_space[index].size())
     {
       features& fs = ex->feature_space[index];
@@ -704,7 +704,7 @@ void setup_example(vw& all, example* ae)
 
   if (all.ignore_some)
   {
-    for (unsigned char* i = ae->indices.begin(); i != ae->indices.end(); i++)
+    for (auto i = ae->indices.begin(); i != ae->indices.end(); i++)
     {
       if (all.ignore[*i])
       {
@@ -791,7 +791,7 @@ example* import_example(vw& all, const std::string& label, primitive_feature_spa
   for (size_t i = 0; i < len; i++)
   {
     unsigned char index = features[i].name;
-    ret->indices.push_back(index);
+    ret->indices.emplace_back(index);
     for (size_t j = 0; j < features[i].len; j++)
       ret->feature_space[index].push_back(features[i].fs[j].x, features[i].fs[j].weight_index);
   }
@@ -810,7 +810,7 @@ primitive_feature_space* export_example(vw& all, example* ec, size_t& len)
 
   for (size_t idx = 0; idx < len; ++idx)
   {
-    namespace_index i = ec->indices[idx];
+    auto i = ec->indices[idx];
     fs_ptr[fs_count].name = i;
     fs_ptr[fs_count].len = ec->feature_space[i].size();
     fs_ptr[fs_count].fs = new feature[fs_ptr[fs_count].len];

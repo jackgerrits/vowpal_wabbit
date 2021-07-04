@@ -10,7 +10,7 @@
 
 using namespace VW::config;
 
-#define val_namespace 100  // valency and distance feature space
+constexpr VW::strong_namespace_index val_namespace{100};  // valency and distance feature space
 #define offset_const 344429
 #define arc_hybrid 1
 #define arc_eager 2
@@ -76,7 +76,7 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
 
   data->ex = VW::alloc_examples(1);
   data->ex->indices.push_back(val_namespace);
-  for (size_t i = 1; i < 14; i++) data->ex->indices.push_back(static_cast<unsigned char>(i) + 'A');
+  for (unsigned char i = 1; i < 14; i++) data->ex->indices.emplace_back(i + 'A');
   data->ex->indices.push_back(constant_namespace);
   data->ex->interactions = &sch.get_vw_pointer_unsafe().interactions;
 
@@ -85,14 +85,13 @@ void initialize(Search::search &sch, size_t & /*num_actions*/, options_i &option
   else
     sch.set_num_learners(3);
 
-  std::vector<std::vector<namespace_index>> newpairs{{'B', 'C'}, {'B', 'E'}, {'B', 'B'}, {'C', 'C'}, {'D', 'D'},
-      {'E', 'E'}, {'F', 'F'}, {'G', 'G'}, {'E', 'F'}, {'B', 'H'}, {'B', 'J'}, {'E', 'L'}, {'d', 'B'}, {'d', 'C'},
-      {'d', 'D'}, {'d', 'E'}, {'d', 'F'}, {'d', 'G'}, {'d', 'd'}};
-  std::vector<std::vector<namespace_index>> newtriples{{'E', 'F', 'G'}, {'B', 'E', 'F'}, {'B', 'C', 'E'},
-      {'B', 'C', 'D'}, {'B', 'E', 'L'}, {'E', 'L', 'M'}, {'B', 'H', 'I'}, {'B', 'C', 'C'}, {'B', 'E', 'J'},
-      {'B', 'E', 'H'}, {'B', 'J', 'K'}, {'B', 'E', 'N'}};
+  std::vector<std::vector<VW::strong_namespace_index>> newpairs{{'B'_ns, 'C'_ns}, {'B'_ns, 'E'_ns}, {'B'_ns, 'B'_ns}, {'C'_ns, 'C'_ns}, {'D'_ns, 'D'_ns},
+      {'E'_ns, 'E'_ns}, {'F'_ns, 'F'_ns}, {'G'_ns, 'G'_ns}, {'E'_ns, 'F'_ns}, {'B'_ns, 'H'_ns}, {'B'_ns, 'J'_ns}, {'E'_ns, 'L'_ns}, {'d'_ns, 'B'_ns}, {'d'_ns, 'C'_ns},
+      {'d'_ns, 'D'_ns}, {'d'_ns, 'E'_ns}, {'d'_ns, 'F'_ns}, {'d'_ns, 'G'_ns}, {'d'_ns, 'd'_ns}};
+  std::vector<std::vector<VW::strong_namespace_index>> newtriples{{'E'_ns, 'F'_ns, 'G'_ns}, {'B'_ns, 'E'_ns, 'F'_ns}, {'B'_ns, 'C'_ns, 'E'_ns},
+      {'B'_ns, 'C'_ns, 'D'_ns}, {'B'_ns, 'E'_ns, 'L'_ns}, {'E'_ns, 'L'_ns, 'M'_ns}, {'B'_ns, 'H'_ns, 'I'_ns}, {'B'_ns, 'C'_ns, 'C'_ns}, {'B'_ns, 'E'_ns, 'J'_ns},
+      {'B'_ns, 'E'_ns, 'H'_ns}, {'B'_ns, 'J'_ns, 'K'_ns}, {'B'_ns, 'E'_ns, 'N'_ns}};
 
-  all.interactions.clear();
   all.interactions.insert(std::end(all.interactions), std::begin(newpairs), std::end(newpairs));
   all.interactions.insert(std::end(all.interactions), std::begin(newtriples), std::end(newtriples));
 
@@ -133,7 +132,7 @@ void add_all_features(example &ex, example &src, unsigned char tgt_ns, uint64_t 
     uint64_t offset, bool /* audit */ = false)
 {
   features &tgt_fs = ex.feature_space[tgt_ns];
-  for (namespace_index ns : src.indices)
+  for (auto ns : src.indices)
     if (ns != constant_namespace)  // ignore constant_namespace
       for (feature_index i : src.feature_space[ns].indicies)
         tgt_fs.push_back(1.0f, ((i / multiplier + offset) * multiplier) & mask);

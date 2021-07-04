@@ -14,7 +14,10 @@ namespace logger = VW::io::logger;
 
 struct interact
 {
-  unsigned char n1, n2;  // namespaces to interact
+  // namespaces to interact
+  VW::strong_namespace_index n1;
+  VW::strong_namespace_index n2;  
+
   features feat_store;
   vw* all;
   float n1_feat_sq;
@@ -158,8 +161,8 @@ VW::LEARNER::base_learner* interact_setup(options_i& options, vw& all)
 
   auto data = scoped_calloc_or_throw<interact>();
 
-  data->n1 = static_cast<unsigned char>(s[0]);
-  data->n2 = static_cast<unsigned char>(s[1]);
+  data->n1 = VW::strong_namespace_index(s[0]);
+  data->n2 = VW::strong_namespace_index(s[1]);
   logger::errlog_info("Interacting namespaces {0:c} and {1:c}", data->n1, data->n2);
   data->all = &all;
 

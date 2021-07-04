@@ -27,10 +27,10 @@ struct mf
   v_array<float> sub_predictions;
 
   // array for temp storage of indices during prediction
-  v_array<unsigned char> predict_indices;
+  v_array<VW::strong_namespace_index> predict_indices;
 
   // array for temp storage of indices
-  v_array<unsigned char> indices;
+  v_array<VW::strong_namespace_index> indices;
 
   // array for temp storage of features
   features temp_features;
@@ -56,25 +56,25 @@ void predict(mf& data, single_learner& base, example& ec)
 
   // erase indices
   ec.indices.clear();
-  ec.indices.push_back(0);
+  ec.indices.emplace_back(0);
 
   auto* saved_interactions = ec.interactions;
   auto restore_guard = VW::scope_exit([saved_interactions, &ec] { ec.interactions = saved_interactions; });
 
-  std::vector<std::vector<namespace_index>> empty_interactions;
+  std::vector<std::vector<VW::strong_namespace_index>> empty_interactions;
   ec.interactions = &empty_interactions;
 
   // add interaction terms to prediction
   for (auto& i : *saved_interactions)
   {
-    auto left_ns = static_cast<int>(i[0]);
-    auto right_ns = static_cast<int>(i[1]);
+    VW::strong_namespace_index left_ns{i[0]};
+    VW::strong_namespace_index right_ns{i[1]};
 
     if (ec.feature_space[left_ns].size() > 0 && ec.feature_space[right_ns].size() > 0)
     {
       for (size_t k = 1; k <= data.rank; k++)
       {
-        ec.indices[0] = static_cast<namespace_index>(left_ns);
+        ec.indices[0] = left_ns;
 
         // compute l^k * x_l using base learner
         base.predict(ec, k);
@@ -82,7 +82,7 @@ void predict(mf& data, single_learner& base, example& ec)
         if (cache_sub_predictions) data.sub_predictions[2 * k - 1] = x_dot_l;
 
         // set example to right namespace only
-        ec.indices[0] = static_cast<namespace_index>(right_ns);
+        ec.indices[0] = right_ns;
 
         // compute r^k * x_r using base learner
         base.predict(ec, k + data.rank);
@@ -117,23 +117,23 @@ void learn(mf& data, single_learner& base, example& ec)
 
   // erase indices
   ec.indices.clear();
-  ec.indices.push_back(0);
+  ec.indices.emplace_back(0);
 
   auto* saved_interactions = ec.interactions;
-  std::vector<std::vector<namespace_index>> empty_interactions;
+  std::vector<std::vector<VW::strong_namespace_index>> empty_interactions;
   ec.interactions = &empty_interactions;
 
   // update interaction terms
   // looping over all pairs of non-empty namespaces
   for (auto& i : *saved_interactions)
   {
-    int left_ns = static_cast<int>(i[0]);
-    int right_ns = static_cast<int>(i[1]);
+    VW::strong_namespace_index left_ns{i[0]};
+    VW::strong_namespace_index right_ns{i[1]};
 
     if (ec.feature_space[left_ns].size() > 0 && ec.feature_space[right_ns].size() > 0)
     {
       // set example to left namespace only
-      ec.indices[0] = static_cast<namespace_index>(left_ns);
+      ec.indices[0] = left_ns;
 
       // store feature values in left namespace
       data.temp_features = ec.feature_space[left_ns];
@@ -157,7 +157,7 @@ void learn(mf& data, single_learner& base, example& ec)
       }
 
       // set example to right namespace only
-      ec.indices[0] = static_cast<namespace_index>(right_ns);
+      ec.indices[0] = right_ns;
 
       // store feature values for right namespace
       data.temp_features = ec.feature_space[right_ns];
@@ -198,7 +198,7 @@ base_learner* mf_setup(options_i& options, vw& all)
   // store global pairs in local data structure and clear global pairs
   // for eventual calls to base learner
   auto non_pair_count = std::count_if(all.interactions.begin(), all.interactions.end(),
-      [](const std::vector<unsigned char>& interaction) { return interaction.size() != 2; });
+      [](const std::vector<VW::strong_namespace_index>& interaction) { return interaction.size() != 2; });
   if (non_pair_count > 0) { THROW("can only use pairs with new_mf"); }
 
   all.random_positive_weights = true;

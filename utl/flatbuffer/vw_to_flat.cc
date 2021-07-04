@@ -353,7 +353,7 @@ void to_flat::convert_txt_to_flat(vw& all)
       }
     }
     std::vector<flatbuffers::Offset<VW::parsers::flatbuffer::Namespace>> namespaces;
-    for (const namespace_index& ns : ae->indices)
+    for (const auto& ns : ae->indices)
     {
       // Skip over constant namespace as that will be assigned while reading flatbuffer again
       if (ns == 128) { continue; }

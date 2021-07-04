@@ -1522,7 +1522,7 @@ public:
   void PushNamespace(const char* ns, BaseState<audit>* return_state)
   {
     Namespace<audit> n;
-    n.feature_group = ns[0];
+    n.feature_group = VW::strong_namespace_index{ns[0]};
     n.namespace_hash = VW::hash_space_cstr(*all, ns);
     n.ftrs = ex->feature_space.data() + ns[0];
     n.feature_count = 0;
