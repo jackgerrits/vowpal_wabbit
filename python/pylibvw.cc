@@ -540,32 +540,95 @@ std::string varray_char_to_string(v_array<char>& a)
 
 std::string my_get_tag(example_ptr ec) { return varray_char_to_string(ec->tag); }
 
-uint32_t ex_num_namespaces(example_ptr ec) { return (uint32_t)ec->indices.size(); }
-
-unsigned char ex_namespace(example_ptr ec, uint32_t ns) { return ec->indices[ns]; }
-
-uint32_t ex_num_features(example_ptr ec, unsigned char ns) { return (uint32_t)ec->feature_space[ns].size(); }
-
-uint32_t ex_feature(example_ptr ec, unsigned char ns, uint32_t i)
+uint32_t ex_num_namespaces(example_ptr ec)
 {
-  return (uint32_t)ec->feature_space[ns].indicies[i];
+  uint32_t ret = 0;
+  for (auto& group_list : ec->feature_space) 
+  {
+    ret += group_list.size();
+  }
+   return ret;
 }
 
-float ex_feature_weight(example_ptr ec, unsigned char ns, uint32_t i) { return ec->feature_space[ns].values[i]; }
+unsigned char ex_namespace(example_ptr ec, uint32_t distance) 
+{
+  uint32_t curr = 0;
+  for (auto& group_list : ec->feature_space) 
+  {
+    if (curr + group_list.size() > distance)
+    {
+      auto it = group_list.begin();
+      std::advance(it, distance - curr);
+      return it->index;
+    }
+    else
+    {
+      curr += group_list.size();
+    }
+  }
+   return -1;
+}
 
-float ex_sum_feat_sq(example_ptr ec, unsigned char ns) { return ec->feature_space[ns].sum_feat_sq; }
+uint32_t ex_num_features(example_ptr ec, const char* ns) {
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    return fs.get_list(ns[0]).front().feats.size();
+  }
+  return fg->size();
+}
 
-void ex_push_feature(example_ptr ec, unsigned char ns, uint32_t fid, float v)
-{  // warning: assumes namespace exists!
-  ec->feature_space[ns].push_back(v, fid);
+uint32_t ex_feature(example_ptr ec, const char* ns, uint32_t i)
+{
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    return fs.get_list(ns[0]).front().feats.indicies[i];
+  }
+  return fg->indicies[i];
+}
+
+float ex_feature_weight(example_ptr ec, const char* ns, uint32_t i)
+{
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    return fs.get_list(ns[0]).front().feats.values[i];
+  }
+  return fg->values[i];
+}
+
+float ex_sum_feat_sq(example_ptr ec, const char* ns)
+{
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    return fs.get_list(ns[0]).front().feats.sum_feat_sq;
+  }
+  return fg->sum_feat_sq;
+}
+
+void ex_push_feature(example_ptr ec, const char* ns, uint32_t fid, float v)
+{
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  fs.get_or_create(ns[0], hash).push_back(v, fid);
   ec->num_features++;
   ec->reset_total_sum_feat_sq();
 }
 
-void ex_push_feature_list(example_ptr ec, vw_ptr vw, unsigned char ns, py::list& a)
-{  // warning: assumes namespace exists!
-  char ns_str[2] = {(char)ns, 0};
-  uint64_t ns_hash = VW::hash_space(*vw, ns_str);
+void ex_push_feature_list(example_ptr ec, vw_ptr vw, const char* ns, py::list& a)
+{
+  auto& fs = ec->feature_space;
+  uint64_t hash = VW::hash_space(*vw, ns);
   size_t count = 0;
   for (ssize_t i = 0; i < len(a); i++)
   {
@@ -582,7 +645,9 @@ void ex_push_feature_list(example_ptr ec, vw_ptr vw, unsigned char ns, py::list&
       }  // TODO str(ai)
       py::extract<float> get_val(fv[1]);
       if (get_val.check())
+      {
         f.x = get_val();
+      }
       else
       {
         std::cerr << "warning: malformed feature in list" << std::endl;
@@ -597,7 +662,7 @@ void ex_push_feature_list(example_ptr ec, vw_ptr vw, unsigned char ns, py::list&
       py::extract<std::string> get_str(ai);
       if (get_str.check())
       {
-        f.weight_index = VW::hash_feature(*vw, get_str(), ns_hash);
+        f.weight_index = VW::hash_feature(*vw, get_str(), hash);
         got = true;
       }
       else
@@ -616,7 +681,7 @@ void ex_push_feature_list(example_ptr ec, vw_ptr vw, unsigned char ns, py::list&
       }
       if (got)
       {
-        ec->feature_space[ns].push_back(f.x, f.weight_index);
+        fs.get_or_create(ns[0], hash).push_back(f.x, f.weight_index);
         count++;
       }
     }
@@ -625,12 +690,15 @@ void ex_push_feature_list(example_ptr ec, vw_ptr vw, unsigned char ns, py::list&
   ec->reset_total_sum_feat_sq();
 }
 
-void ex_push_namespace(example_ptr ec, unsigned char ns) { ec->indices.push_back(ns); }
-
-void ex_ensure_namespace_exists(example_ptr ec, unsigned char ns)
+void ex_push_namespace(example_ptr ec, const char* ns)
 {
-  for (auto nss : ec->indices)
-    if (ns == nss) return;
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  fs.get_or_create(ns[0], hash);
+}
+
+void ex_ensure_namespace_exists(example_ptr ec, const char* ns)
+{
   ex_push_namespace(ec, ns);
 }
 
@@ -645,47 +713,75 @@ void ex_push_dictionary(example_ptr ec, vw_ptr vw, py::dict& dict)
     py::object objectVal = py::object(py::handle<>(PyIter_Next(objectVals.ptr())));
 
     char chCheckKey = objectKey.ptr()->ob_type->tp_name[0];
-    if (chCheckKey != 's') continue;
+    if (chCheckKey != 's') { continue; }
     chCheckKey = objectVal.ptr()->ob_type->tp_name[0];
-    if (chCheckKey != 'l') continue;
+    if (chCheckKey != 'l') { continue; }
 
     py::extract<std::string> ns_e(objectKey);
-    if (ns_e().length() < 1) continue;
+    if (ns_e().length() < 1) { continue; }
     py::extract<py::list> list_e(objectVal);
     py::list list = list_e();
-    char ns = ns_e()[0];
-    ex_ensure_namespace_exists(ec, ns);
-    ex_push_feature_list(ec, vw, ns, list);
+    std::string ns = ns_e();
+    ex_ensure_namespace_exists(ec, ns.c_str());
+    ex_push_feature_list(ec, vw, ns.c_str(), list);
   }
 }
 
-bool ex_pop_feature(example_ptr ec, unsigned char ns)
+bool ex_pop_feature(example_ptr ec, const char* ns)
 {
-  if (ec->feature_space[ns].size() == 0) return false;
-  float val = ec->feature_space[ns].values.back();
-  ec->feature_space[ns].values.pop_back();
-  if (ec->feature_space[ns].indicies.size() > 0) ec->feature_space[ns].indicies.pop_back();
-  if (ec->feature_space[ns].space_names.size() > 0) ec->feature_space[ns].space_names.pop_back();
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    fg = &fs.get_list(ns[0]).front().feats;
+  }
+  if (fg->size() == 0) return false;
+  float val = fg->values.back();
+  fg->values.pop_back();
+  if (fg->indicies.size() > 0) fg->indicies.pop_back();
+  if (fg->space_names.size() > 0) fg->space_names.pop_back();
   ec->num_features--;
-  ec->feature_space[ns].sum_feat_sq -= val * val;
+  fg->sum_feat_sq -= val * val;
   ec->reset_total_sum_feat_sq();
   return true;
 }
 
-void ex_erase_namespace(example_ptr ec, unsigned char ns)
+void ex_erase_namespace(example_ptr ec, const char* ns)
 {
-  ec->num_features -= ec->feature_space[ns].size();
+  auto& fs = ec->feature_space;
+  uint64_t hash = hashstring(ns, strlen(ns), 0);
+  features* fg = fs.get_or_null(ns[0], hash);
+  if (fg == nullptr)
+  {
+    std::vector<uint64_t> bad_hashes;
+    for (auto& nsf : fs.get_list(ns[0]))
+    {
+      ec->num_features -= nsf.feats.size();
+      bad_hashes.push_back(nsf.hash);
+    }
+    for (auto& bad_hash : bad_hashes)
+    {
+      fs.remove(ns[0], bad_hash);
+    }
+  }
+  else
+  {
+    ec->num_features -= fg->size();
+    fs.remove(ns[0], hash);
+  }
   ec->reset_total_sum_feat_sq();
-  ec->feature_space[ns].sum_feat_sq = 0.;
-  ec->feature_space[ns].clear();
 }
 
 bool ex_pop_namespace(example_ptr ec)
 {
-  if (ec->indices.size() == 0) return false;
-  unsigned char ns = ec->indices.back();
-  ec->indices.pop_back();
-  ex_erase_namespace(ec, ns);
+  auto& fs = ec->feature_space;
+  auto& inds = fs.indices();
+  if (inds.size() == 0) return false;
+  auto& nsf = fs.get_list(inds.back()).back();
+  ec->num_features -= nsf.feats.size();
+  fs.remove(nsf.index, nsf.hash);
+  ec->reset_total_sum_feat_sq();
   return true;
 }
 
@@ -693,6 +789,7 @@ void my_setup_example(vw_ptr vw, example_ptr ec) { VW::setup_example(*vw, ec.get
 
 void unsetup_example(vw_ptr vwP, example_ptr ae)
 {
+  std::cout << "HERE" << std::endl;
   vw& all = *vwP;
   ae->partial_prediction = 0.;
   ae->num_features = 0;
@@ -706,30 +803,39 @@ void unsetup_example(vw_ptr vwP, example_ptr ae)
 
   if (all.add_constant)
   {
-    ae->feature_space[constant_namespace].clear();
-    int hit_constant = -1;
-    size_t N = ae->indices.size();
-    for (size_t i = 0; i < N; i++)
+    std::vector<unsigned char> bad_indices;
+    std::vector<uint64_t> bad_hashes;
+    for (auto& group_list : ae->feature_space)
     {
-      int j = (int)(N - 1 - i);
-      if (ae->indices[j] == constant_namespace)
+      for (auto& nsf : group_list)
       {
-        if (hit_constant >= 0) { THROW("error: hit constant namespace twice!"); }
-        hit_constant = j;
-        break;
+        if (nsf.index >= constant_namespace)
+        {
+          bad_indices.push_back(nsf.index);
+          bad_hashes.push_back(nsf.hash);
+        }
       }
     }
-    if (hit_constant >= 0)
+    for (int i = 0; i < bad_indices.size(); ++i)
     {
-      for (size_t i = hit_constant; i < N - 1; i++) ae->indices[i] = ae->indices[i + 1];
-      ae->indices.pop_back();
+      ae->feature_space.remove(bad_indices[i], bad_hashes[i]);
     }
   }
 
   uint32_t multiplier = all.wpp << all.weights.stride_shift();
   if (multiplier != 1)  // make room for per-feature information.
-    for (auto ns : ae->indices)
-      for (auto& idx : ae->feature_space[ns].indicies) idx /= multiplier;
+  {
+    for (auto& group_list : ae->feature_space)
+    {
+      for (auto& nsf : group_list)
+      {
+        for (auto& idx : nsf.feats.indicies)
+        {
+          idx /= multiplier;
+        }
+      }
+    }
+  }
 }
 
 void ex_set_label_string(example_ptr ec, vw_ptr vw, std::string label, size_t labelType)
